@@ -42,6 +42,15 @@ SERVICE_NAME="formelektrik-web"
 BACKUP_DIR="$INSTALL_DIR/data/backups"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# SERVICE_USER home'suz; npm/node cache için yazılabilir HOME + cache şart
+# (yoksa "EACCES /home/formelektrik" hatası). Tüm sudo -u çağrıları bununla.
+run_as_service() {
+    sudo -u "$SERVICE_USER" env \
+        HOME="$INSTALL_DIR" \
+        npm_config_cache="$INSTALL_DIR/.npm-cache" \
+        "$@"
+}
+
 # Argüman parser
 DO_PULL=1
 DO_DEPS=1
@@ -179,10 +188,10 @@ if [[ $DO_DEPS -eq 1 ]]; then
     # package-lock.json değişti mi?
     if [[ -f "package-lock.json" ]]; then
         log "Bağımlılıklar kontrol ediliyor (npm ci)..."
-        sudo -u "$SERVICE_USER" npm ci --omit=dev --silent 2>&1 | tail -3
+        run_as_service npm ci --omit=dev --silent 2>&1 | tail -3
     else
         log "Bağımlılıklar kontrol ediliyor (npm install)..."
-        sudo -u "$SERVICE_USER" npm install --omit=dev --silent
+        run_as_service npm install --omit=dev --silent
     fi
     ok "Bağımlılıklar güncel"
 fi
@@ -192,7 +201,7 @@ if [[ $DO_MIGRATE -eq 1 ]]; then
     log "Veritabanı şeması kontrol ediliyor..."
     # init.js idempotent — CREATE TABLE IF NOT EXISTS + INSERT OR IGNORE
     # Yeni tablolar / index'ler otomatik eklenir, mevcut veriye dokunmaz
-    sudo -u "$SERVICE_USER" node "$INSTALL_DIR/server/db/init.js" 2>&1 | grep -v "^$" | tail -10 || true
+    run_as_service node "$INSTALL_DIR/server/db/init.js" 2>&1 | grep -v "^$" | tail -10 || true
     ok "Şema güncellendi"
 fi
 

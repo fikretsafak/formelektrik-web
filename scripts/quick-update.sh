@@ -10,7 +10,9 @@
 
 set -e
 
-REPO_DIR="${ENERJIONE_REPO:-/opt/formelektrik-web-source}"
+# Repo yolu: FORMELEKTRIK_REPO öncelikli; eski kurulumlardaki ENERJIONE_REPO da
+# desteklenir; ikisi de yoksa varsayılan /opt/formelektrik-web-source.
+REPO_DIR="${FORMELEKTRIK_REPO:-${ENERJIONE_REPO:-/opt/formelektrik-web-source}}"
 
 if [[ $EUID -ne 0 ]]; then
    echo "Lütfen sudo ile çalıştırın: sudo formelektrik-update"

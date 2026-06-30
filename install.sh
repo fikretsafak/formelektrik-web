@@ -35,8 +35,18 @@ fi
 
 INSTALL_DIR="/opt/formelektrik-web"
 SERVICE_USER="formelektrik"
-DOMAIN="${ENERJIONE_DOMAIN:-formelektrik.com}"
+DOMAIN="${FORMELEKTRIK_DOMAIN:-formelektrik.com}"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# SERVICE_USER home'suz (--no-create-home) oluşturuluyor; npm/node cache
+# için yazılabilir HOME + cache dizini şart, yoksa "EACCES /home/..." patlar.
+# Tüm sudo -u çağrılarında bu env üzerinden çalıştır.
+run_as_service() {
+    sudo -u "$SERVICE_USER" env \
+        HOME="$INSTALL_DIR" \
+        npm_config_cache="$INSTALL_DIR/.npm-cache" \
+        "$@"
+}
 
 echo ""
 echo "════════════════════════════════════════════════════════"
@@ -120,13 +130,13 @@ ok "Dosyalar yerleştirildi"
 # ============ 7. npm install ============
 log "Node.js bağımlılıkları kuruluyor..."
 cd "$INSTALL_DIR"
-sudo -u "$SERVICE_USER" npm ci --omit=dev --silent 2>&1 | tail -5 || sudo -u "$SERVICE_USER" npm install --omit=dev --silent
+run_as_service npm ci --omit=dev --silent 2>&1 | tail -5 || run_as_service npm install --omit=dev --silent
 ok "Bağımlılıklar kuruldu"
 
 # ============ 8. Veritabanı init ============
 if [[ ! -f "$INSTALL_DIR/data/formelektrik.db" ]]; then
     log "Veritabanı oluşturuluyor..."
-    sudo -u "$SERVICE_USER" node "$INSTALL_DIR/server/db/init.js"
+    run_as_service node "$INSTALL_DIR/server/db/init.js"
     ok "Veritabanı hazır"
 else
     ok "Veritabanı zaten mevcut, atlanıyor"
@@ -189,8 +199,8 @@ if [[ -f "$INSTALL_DIR/scripts/quick-update.sh" ]]; then
     log "Hızlı güncelleme alias'ı kuruluyor: 'formelektrik-update'"
     install -m 755 "$INSTALL_DIR/scripts/quick-update.sh" /usr/local/bin/formelektrik-update
     # Kaynak repo lokasyonunu env olarak işaretle
-    if ! grep -q "ENERJIONE_REPO" /etc/environment 2>/dev/null; then
-        echo "ENERJIONE_REPO=$SOURCE_DIR" >> /etc/environment
+    if ! grep -q "FORMELEKTRIK_REPO" /etc/environment 2>/dev/null; then
+        echo "FORMELEKTRIK_REPO=$SOURCE_DIR" >> /etc/environment
     fi
     ok "Artık 'sudo formelektrik-update' ile tek komutla güncelleyebilirsiniz"
 fi
