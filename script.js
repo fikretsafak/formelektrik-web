@@ -1105,6 +1105,11 @@
     const yr = $('#year'); if (yr) yr.textContent = new Date().getFullYear();
     applyLang(); bindLang(); bindHeader(); markActiveNav(); bindReveal(); bindParallaxBg(); bindCountUp();
     bindLeadForm(); bindAppointment();
+    // Kariyer başvuru formu (varsa) — popup'lı KVKK onay checkbox'ı enjekte et.
+    // Kariyer'in kendi submit handler'ı #applyKvkk.checked bekliyor; inject o id
+    // ile "Metni aç ve onayla" popup'lı checkbox üretir (iletişim/randevu ile aynı).
+    const applyForm = $('#applyForm');
+    if (applyForm) injectKvkkCheckbox(applyForm, 'applyKvkk');
     loadServices(); loadProjects(); loadBrands(); loadBlog(); loadAnnouncements();
     loadPartners(); loadRefs(); loadContact(); initAnnouncementPopup();
     initCookieBanner();

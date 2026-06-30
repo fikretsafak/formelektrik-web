@@ -156,10 +156,8 @@
             </label>
           </div>
           <div class="field"><label data-i18n="form.message">Mesajınız</label><textarea name="message" rows="3"></textarea></div>
-          <label class="kvkk-check">
-            <input type="checkbox" id="applyKvkk">
-            <span id="applyKvkkLabel"><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum ve onaylıyorum.</span>
-          </label>
+          <!-- KVKK onay checkbox'ı script.js injectKvkkCheckbox() ile buraya
+               (submit butonu öncesine) eklenir — "Metni aç ve onayla" popup'lı. -->
           <button type="submit" class="btn btn-primary btn-block"><span class="material-symbols-rounded">send</span> <span data-i18n="career.submit">Başvur</span></button>
           <div class="form-msg" id="applyMsg"></div>
         </form>
@@ -278,9 +276,8 @@
 
   const form = document.getElementById('applyForm');
   const msg = document.getElementById('applyMsg');
-  // KVKK onay etiketini aktif dile göre ayarla
-  const kvkkLabelEl = document.getElementById('applyKvkkLabel');
-  if (kvkkLabelEl) kvkkLabelEl.innerHTML = T.kvkkLabel;
+  // KVKK onay checkbox'ı (popup'lı) script.js injectKvkkCheckbox() tarafından
+  // submit butonu öncesine eklenir; submit handler #applyKvkk.checked kontrol eder.
   const cvInput = document.getElementById('cvInput');
   const cvName = document.getElementById('cvName');
   const cvDrop = document.getElementById('cvDrop');
