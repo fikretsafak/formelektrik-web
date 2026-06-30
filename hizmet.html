@@ -264,9 +264,13 @@
       const titleSep = document.getElementById('svcTitleSep');
       if (inlineTitle) { inlineTitle.textContent = service.title; }
       if (titleSep) { titleSep.hidden = false; }
+      // Kapak yalnızca "Kapağı yazıda göster" açıkken basılır (show_cover).
+      // Tanımsızsa (eski kayıt) geriye uyum için gösterilir.
+      const showCover = service.show_cover === undefined || service.show_cover === null
+        ? true : !!service.show_cover;
       head.innerHTML = `
         ${service.summary ? `<p class="svc-lead">${esc(service.summary)}</p>` : ''}
-        ${service.cover_image ? `<img class="svc-cover" src="${esc(service.cover_image)}" alt="${esc(service.title)}" onerror="this.remove()">` : ''}
+        ${(service.cover_image && showCover) ? `<img class="svc-cover" src="${esc(service.cover_image)}" alt="${esc(service.title)}" onerror="this.remove()">` : ''}
       `;
       bodyWrap.innerHTML = service.body ? `<div class="detail-body">${service.body}</div>` : '';
       document.getElementById('svcCta').style.display = '';

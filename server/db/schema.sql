@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS services (
   body          TEXT NOT NULL DEFAULT '', -- HTML (TinyMCE) — detay sayfası
   icon          TEXT,                  -- Material Symbols ikon adı
   cover_image   TEXT,
+  show_cover    INTEGER NOT NULL DEFAULT 1, -- kapağı detay sayfasında göster
   language      TEXT NOT NULL DEFAULT 'tr',
   sort_order    INTEGER NOT NULL DEFAULT 0,
   status        TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),

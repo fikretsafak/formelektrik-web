@@ -42,6 +42,10 @@ if (tableExists('users') && !columnExists('users', 'must_change_password')) {
 if (tableExists('posts') && !columnExists('posts', 'show_cover')) {
   db.exec('ALTER TABLE posts ADD COLUMN show_cover INTEGER NOT NULL DEFAULT 1');
 }
+// services — "Kapağı yazıda göster" alanı (posts ile aynı mantık)
+if (tableExists('services') && !columnExists('services', 'show_cover')) {
+  db.exec('ALTER TABLE services ADD COLUMN show_cover INTEGER NOT NULL DEFAULT 1');
+}
 if (tableExists('posts') && tableExists('users')) {
   const firstAdmin = db.prepare(`SELECT id FROM users WHERE role = 'admin' ORDER BY id LIMIT 1`).get();
   if (firstAdmin) {
