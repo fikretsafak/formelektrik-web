@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hizmet — Form Elektrik</title>
+<meta name="description" content="Form Elektrik mühendislik hizmeti detayı." />
+<link rel="icon" type="image/png" href="/assets/main/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  .detail-hero { padding-top: calc(var(--header-h) + 56px); padding-bottom: 0; }
+  .detail-topbar { display:flex; align-items:center; gap:18px; margin-bottom:22px; flex-wrap:wrap; }
+  .detail-back { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text-soft); transition:color .2s; flex:none; }
+  .detail-back:hover { color: var(--cyan); }
+  .detail-back .material-symbols-rounded { font-size:18px; }
+  .detail-topbar .topbar-sep { width:1px; height:18px; background:var(--line-2); flex:none; }
+  .detail-topbar .topbar-title { font-family: var(--font-head); color: var(--navy); font-size: clamp(1rem, 1.6vw, 1.18rem); font-weight: 600; letter-spacing:-0.01em; line-height:1.2; }
+  @media (max-width: 560px) { .detail-topbar .topbar-sep { display:none; } }
+  .svc-hero-card {
+    display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+    padding: clamp(22px, 3vw, 32px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line-2);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--cyan) 10%, #fff), color-mix(in srgb, var(--cyan-2) 10%, var(--bg-soft)));
+    position: relative; overflow: hidden;
+  }
+  .svc-hero-card::after {
+    content:''; position:absolute; top:-40%; right:-10%; width:50%; height:180%;
+    background: radial-gradient(circle, rgba(42,169,224,0.25), transparent 65%); opacity:.4; pointer-events:none;
+  }
+  .svc-hero-ico {
+    width: 68px; height: 68px; border-radius: 18px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background: color-mix(in srgb, var(--cyan) 16%, var(--bg-soft-2));
+    border: 1px solid color-mix(in srgb, var(--cyan) 30%, transparent);
+    position: relative; z-index: 1;
+  }
+  .svc-hero-ico .material-symbols-rounded { font-size: 34px; color: var(--cyan); }
+  .svc-hero-body { position: relative; z-index: 1; }
+  .svc-hero-code { display:block; font-family: var(--font); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
+  .svc-hero-body h1 { font-family: var(--font-head); color: var(--navy); font-size: clamp(1.5rem, 2.6vw, 1.9rem); line-height: 1.2; letter-spacing:-0.015em; margin: 6px 0 8px; font-weight: 600; }
+  .svc-hero-body p { color: var(--text-soft); font-size: clamp(0.95rem, 1.4vw, 1.02rem); max-width: 620px; line-height: 1.55; }
+  .svc-lead { color: var(--text-soft); font-size: clamp(1rem, 1.5vw, 1.1rem); line-height: 1.6; max-width: 720px; margin: 6px 0 0; }
+  .svc-cover { width:100%; border-radius: var(--radius); border:1px solid var(--line); margin-top: 28px; }
+  .detail-body {
+    font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.85; color: var(--text);
+    max-width: 800px;
+  }
+  .detail-body h1, .detail-body h2, .detail-body h3, .detail-body h4 { font-family: var(--font-head); color: var(--navy); margin: 32px 0 14px; line-height:1.3; }
+  .detail-body h2 { font-size: 24px; }
+  .detail-body h3 { font-size: 20px; }
+  .detail-body p { margin: 16px 0; }
+  .detail-body ul, .detail-body ol { margin: 16px 0 16px 24px; }
+  .detail-body li { margin: 7px 0; }
+  .detail-body img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+  .detail-body a { color: var(--cyan); text-decoration: underline; text-underline-offset:3px; }
+  .detail-body blockquote { border-left:3px solid var(--cyan); padding-left:18px; margin:20px 0; color:var(--text); font-style:italic; }
+  .detail-body table { width:100%; border-collapse:collapse; margin:20px 0; font-family: var(--font); font-size:.95rem; }
+  .detail-body th, .detail-body td { border:1px solid var(--line); padding:10px 12px; text-align:left; }
+  .svc-cta-band { margin-top: 56px; }
+  .other-svc-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:16px; margin-top:24px; }
+  /* Diğer hizmet kartları — üstte görsel/gradient bandı + ikon */
+  .other-svc-card { padding:0 !important; overflow:hidden; }
+  .other-svc-media { position:relative; height:150px; display:flex; align-items:flex-end; background:linear-gradient(135deg, var(--navy), var(--navy-2)); overflow:hidden; }
+  .other-svc-media img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .other-svc-media .material-symbols-rounded { position:relative; z-index:1; margin:12px; width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.92); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+  .other-svc-media.no-img { align-items:center; justify-content:center; background:radial-gradient(circle at 30% 25%, rgba(42,169,224,.4), transparent 55%), linear-gradient(135deg, var(--navy), var(--navy-2)); }
+  .other-svc-media.no-img .material-symbols-rounded { margin:0; width:62px; height:62px; font-size:34px; }
+  .other-svc-body { padding:22px 24px 26px; display:flex; flex-direction:column; }
+  .other-svc-body h3 { margin-bottom:8px; }
+  .detail-loading, .detail-error { text-align:center; color:var(--text-soft); padding:80px 20px; }
+  .detail-error .material-symbols-rounded { font-size:56px; opacity:.3; display:block; margin-bottom:14px; }
+  /* Çözüm Ortakları (marka kartları) */
+  .partner-grid { display:flex; flex-wrap:wrap; gap:16px; margin-top:22px; }
+  .partner-card { display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:22px 24px; border:1px solid var(--line-2); border-radius:var(--radius);
+    background:#fff; width:200px; transition:box-shadow .2s, transform .2s, border-color .2s;
+    text-decoration:none; color:inherit; }
+  .partner-card:hover { box-shadow:var(--shadow); transform:translateY(-3px); border-color:color-mix(in srgb, var(--cyan) 40%, transparent); }
+  .partner-logo-box { height:64px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; border:none; background:none; }
+  .partner-card img { max-height:60px; max-width:160px; object-fit:contain; border:none !important; border-radius:0 !important; box-shadow:none !important; background:none; }
+  .partner-logo-text { font-family:var(--font-head); font-size:1.05rem; color:var(--navy); font-weight:700; }
+  .partner-card p { font-size:.85rem; color:var(--text-soft); line-height:1.45; }
+  @media (max-width: 640px) {
+    .svc-hero-card { grid-template-columns: 1fr; gap: 18px; }
+    .partner-card { width:calc(50% - 8px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Form Elektrik">
+      <img src="/assets/main/logo-white.png" alt="Form Elektrik" onerror="this.onerror=null;this.src='/assets/main/logo.png'" />
+      <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
+      <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+      <a href="/blog" data-i18n="nav.blog">Blog</a>
+      <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MOBİL MENÜ ===== -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" class="btn btn-primary btn-block" data-i18n="nav.quote">Teklif Al</a>
+</nav>
+
+<!-- ===== HİZMET DETAY ===== -->
+<section class="detail-hero">
+  <div class="wrap">
+    <div class="detail-topbar">
+      <a href="/#hizmetler" class="detail-back"><span class="material-symbols-rounded">arrow_back</span> <span id="backLabel">Tüm hizmetler</span></a>
+      <span class="topbar-sep" id="svcTitleSep" hidden></span>
+      <span class="topbar-title" id="svcInlineTitle"></span>
+    </div>
+    <div id="svcHead"></div>
+  </div>
+</section>
+
+<section style="padding-top:36px">
+  <div class="wrap">
+    <div id="svcBodyWrap">
+      <div class="detail-loading" id="svcLoading">Yükleniyor…</div>
+    </div>
+
+    <!-- Çözüm Ortaklarımız (markalar) -->
+    <div id="partnerWrap" style="margin-top:48px; display:none">
+      <h3 class="section-title" style="font-size:1.4rem" id="partnerTitle">Çözüm Ortaklarımız</h3>
+      <div class="partner-grid" id="partnerGrid"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-band svc-cta-band" id="svcCta" style="display:none">
+      <h2 id="ctaTitle">Bu hizmet için teklif alın</h2>
+      <p id="ctaSub">Uzman mühendislerimiz ihtiyacınızı dinleyip en uygun çözümü sunsun.</p>
+      <div class="hero-cta">
+        <a href="/#iletisim" class="btn btn-primary"><span class="material-symbols-rounded">request_quote</span> <span id="ctaQuote">Teklif Al</span></a>
+        <a href="/#iletisim" class="btn btn-ghost-light"><span class="material-symbols-rounded">event</span> <span id="ctaBook">Görüşme Planla</span></a>
+      </div>
+    </div>
+
+    <!-- Diğer hizmetler -->
+    <div id="otherSvcWrap" style="margin-top:56px; display:none">
+      <h3 class="section-title" style="font-size:1.4rem" id="otherSvcTitle">Diğer Hizmetler</h3>
+      <div class="other-svc-grid" id="otherSvcGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/assets/main/logo.png" alt="Form Elektrik" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'" />
+        <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+        <p data-i18n="footer.about">Enerji altyapıları ve güç sistemleri alanında mühendislik odaklı, uçtan uca çözüm sağlayıcısı. 2000'den bu yana güvenilir çözüm ortağınız.</p>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">call</span> +90 312 394 7100</div>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">mail</span> info@formelektrik.com</div>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.solutions">Çözümlerimiz</h4>
+        <a href="/hizmet?slug=ges" data-i18n="svc.ges">Yenilenebilir Enerji</a>
+        <a href="/hizmet?slug=otomasyon" data-i18n="svc.otomasyon">Şebeke Koruma ve Otomasyon</a>
+        <a href="/hizmet?slug=bess" data-i18n="svc.bess">Enerji Depolama</a>
+        <a href="/hizmet?slug=emobility" data-i18n="svc.emobility">E-Mobility</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.corporate">Kurumsal</h4>
+        <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+        <a href="/kariyer">Kariyer</a>
+        <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+        <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      </div>
+      <div class="footer-col">
+        <h4>Diğer</h4>
+        <a href="/blog" data-i18n="nav.blog">Blog</a>
+        <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatması</a>
+        <div class="footer-social" style="margin-top:16px">
+          <a href="https://tr.linkedin.com/company/form-elektrik-insaat-muh-a-s-" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+          <a href="https://www.instagram.com/form_elektrik/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
+          <a href="https://www.youtube.com/channel/UCOF1W02fEyOTseZ2o2CLCcA" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
+          <a href="https://tr-tr.facebook.com/form.elektrik/" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
+      <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatma Metni</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(() => {
+  const lang = localStorage.getItem('fe-lang') || 'tr';
+  const T = {
+    tr: { back:'Tüm hizmetler', notFound:'Hizmet bulunamadı', notFoundSub:'Aradığınız hizmet bulunamadı ya da yayında değil.', home:'Ana sayfaya dön',
+          ctaTitle:'Bu hizmet için teklif alın', ctaSub:'Uzman mühendislerimiz ihtiyacınızı dinleyip en uygun çözümü sunsun.', ctaQuote:'Teklif Al', ctaBook:'Görüşme Planla', other:'Diğer Hizmetler', more:'Detay', partners:'Çözüm Ortaklarımız' },
+    en: { back:'All services', notFound:'Service not found', notFoundSub:'The service you are looking for was not found or is unpublished.', home:'Back to home',
+          ctaTitle:'Get a quote for this service', ctaSub:'Let our engineers understand your needs and propose the best solution.', ctaQuote:'Get a Quote', ctaBook:'Book a Meeting', other:'Other Services', more:'Details', partners:'Our Solution Partners' },
+  };
+  const t = T[lang] || T.tr;
+  const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]);
+  const serviceIconName = value => String(value || 'bolt').trim() || 'bolt';
+  const slug = new URLSearchParams(location.search).get('slug');
+
+  document.getElementById('backLabel').textContent = t.back;
+  document.getElementById('ctaTitle').textContent = t.ctaTitle;
+  document.getElementById('ctaSub').textContent = t.ctaSub;
+  document.getElementById('ctaQuote').textContent = t.ctaQuote;
+  document.getElementById('ctaBook').textContent = t.ctaBook;
+  document.getElementById('otherSvcTitle').textContent = t.other;
+  document.getElementById('partnerTitle').textContent = t.partners;
+
+  const head = document.getElementById('svcHead');
+  const bodyWrap = document.getElementById('svcBodyWrap');
+
+  const showError = () => {
+    head.innerHTML = '';
+    bodyWrap.innerHTML = `<div class="detail-error">
+      <span class="material-symbols-rounded">error_outline</span>
+      <h2 class="section-title" style="font-size:1.5rem">${esc(t.notFound)}</h2>
+      <p style="color:var(--text-soft);margin-top:10px">${esc(t.notFoundSub)}</p>
+      <a href="/" class="btn btn-outline" style="margin-top:20px"><span class="material-symbols-rounded">home</span> ${esc(t.home)}</a>
+    </div>`;
+  };
+
+  if (!slug) { showError(); return; }
+
+  fetch('/api/services/' + encodeURIComponent(slug) + '?language=' + lang)
+    .then(r => { if (!r.ok) throw new Error('nf'); return r.json(); })
+    .then(({ service }) => {
+      if (!service) throw new Error('nf');
+      document.title = service.title + ' — Form Elektrik';
+      // Başlığı üst şeride (geri linkinin yanına) taşı
+      const inlineTitle = document.getElementById('svcInlineTitle');
+      const titleSep = document.getElementById('svcTitleSep');
+      if (inlineTitle) { inlineTitle.textContent = service.title; }
+      if (titleSep) { titleSep.hidden = false; }
+      head.innerHTML = `
+        ${service.summary ? `<p class="svc-lead">${esc(service.summary)}</p>` : ''}
+        ${service.cover_image ? `<img class="svc-cover" src="${esc(service.cover_image)}" alt="${esc(service.title)}" onerror="this.remove()">` : ''}
+      `;
+      bodyWrap.innerHTML = service.body ? `<div class="detail-body">${service.body}</div>` : '';
+      document.getElementById('svcCta').style.display = '';
+      loadPartners(service.code || slug);
+    })
+    .catch(showError);
+
+  // Çözüm ortağı markaları (bu hizmetle ilişkili)
+  function loadPartners(serviceCode) {
+    if (!serviceCode) return;
+    fetch('/api/brands/partner?service=' + encodeURIComponent(serviceCode))
+      .then(r => r.ok ? r.json() : { brands: [] })
+      .then(({ brands }) => {
+        const list = (brands || []);
+        if (!list.length) return;
+        document.getElementById('partnerWrap').style.display = '';
+        document.getElementById('partnerGrid').innerHTML = list.map(b => {
+          const logo = b.logo_url
+            ? `<img src="${esc(b.logo_url)}" alt="${esc(b.name)}" onerror="this.parentElement.innerHTML='<span class=&quot;partner-logo-text&quot;>${esc(b.name)}</span>'">`
+            : `<span class="partner-logo-text">${esc(b.name)}</span>`;
+          return `<a class="partner-card" href="/marka?slug=${encodeURIComponent(b.slug)}">
+            <div class="partner-logo-box">${logo}</div>
+            ${b.description ? `<p>${esc(b.description)}</p>` : ''}
+          </a>`;
+        }).join('');
+      })
+      .catch(() => {});
+  }
+
+  // Diğer hizmetler
+  fetch('/api/services?language=' + lang)
+    .then(r => r.ok ? r.json() : { services: [] })
+    .then(({ services }) => {
+      const others = (services || []).filter(s => s.slug !== slug).slice(0, 4);
+      if (!others.length) return;
+      document.getElementById('otherSvcWrap').style.display = '';
+      const SVC_IMG = { 'ag-og': '/assets/services/ag-og.jpg', otomasyon: '/assets/services/otomasyon.jpg', ges: '/assets/services/ges.jpg', bess: '/assets/services/bess.jpg', emobility: '/assets/services/emobility.jpg' };
+      document.getElementById('otherSvcGrid').innerHTML = others.map(s => {
+        const img = s.cover_image || s.image_url || SVC_IMG[s.code] || '';
+        const media = img
+          ? `<div class="other-svc-media"><img src="${esc(img)}" alt="${esc(s.title)}" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"><span class="material-symbols-rounded">${esc(serviceIconName(s.icon))}</span></div>`
+          : `<div class="other-svc-media no-img"><span class="material-symbols-rounded">${esc(serviceIconName(s.icon))}</span></div>`;
+        return `
+        <a class="service-card other-svc-card" href="/hizmet?slug=${encodeURIComponent(s.slug)}">
+          ${media}
+          <div class="other-svc-body">
+            <h3>${esc(s.title)}</h3>
+            <p>${esc(s.summary || '')}</p>
+            <span class="more">${esc(t.more)} <span class="material-symbols-rounded">arrow_forward</span></span>
+          </div>
+        </a>`; }).join('');
+    })
+    .catch(() => {});
+
+  // Dil değişince içeriği yeniden çek
+  document.querySelectorAll('#langToggle button').forEach(b => b.addEventListener('click', () => {
+    localStorage.setItem('fe-lang', b.dataset.lang);
+    location.reload();
+  }));
+})();
+</script>
+</body>
+</html>

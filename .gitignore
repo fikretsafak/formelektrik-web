@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Secrets / runtime
+.env
+.env.local
+.env.production
+
+# SQLite DB
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+data/backups/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Claude Code (local settings/worktrees)
+.claude/
+
+# Pazarlama sunumu — deploy için gerekli değil
+*.pptx

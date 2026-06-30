@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kariyer — Form Elektrik</title>
+<meta name="description" content="Form Elektrik'te kariyer fırsatları. Açık pozisyonları inceleyin, başvurunuzu ve CV'nizi bize iletin." />
+<link rel="icon" type="image/png" href="/assets/main/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  .career-hero { background: radial-gradient(circle at 18% 20%, rgba(42,169,224,.22), transparent 38%), linear-gradient(130deg, #0a1330, #16205c 60%, #1f2d7a); padding: calc(var(--header-h) + 56px) 0 64px; position: relative; overflow: hidden; }
+  .career-hero::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(circle at 70% 40%, #000, transparent 75%); pointer-events: none; }
+  .career-hero .wrap { position: relative; z-index: 1; }
+  .career-hero h1 { font-family: var(--font-head); font-size: clamp(2rem, 4.4vw, 3rem); color: #fff; line-height: 1.1; margin: 14px 0 16px; max-width: 760px; }
+  .career-hero p { color: var(--text-on-navy-soft); font-size: 1.08rem; line-height: 1.6; max-width: 620px; }
+  .career-values { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 8px; }
+  .cv-card { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 16px; padding: 24px; transition: .18s; }
+  .cv-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: rgba(42,169,224,.4); background: #fff; }
+  .cv-ico { width: 50px; height: 50px; border-radius: 14px; background: var(--cyan-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .cv-ico .material-symbols-rounded { color: var(--cyan); font-size: 27px; }
+  .cv-card h4 { font-family: var(--font-head); color: var(--navy); font-size: 1.02rem; margin-bottom: 8px; }
+  .cv-card p { color: var(--text-soft); font-size: .9rem; line-height: 1.55; }
+  .career-hero-compact { padding: calc(var(--header-h) + 36px) 0 40px; }
+  .career-hero-compact h1 { margin: 12px 0 12px; }
+  .career-hero-compact p { font-size: 1rem; }
+  /* İlanlar grid (yan yana) */
+  .jobs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .job-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--cyan); border-radius: 16px; padding: 26px 24px; box-shadow: var(--shadow-sm); transition: .18s; cursor: pointer; }
+  .job-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: transparent; border-top-color: var(--cyan); }
+  .job-card h3 { font-family: var(--font-head); color: var(--navy); font-size: 1.18rem; margin-bottom: 12px; }
+  .job-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--text-soft); font-size: .88rem; margin-bottom: 14px; }
+  .job-meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .job-meta .material-symbols-rounded { font-size: 17px; color: var(--cyan); }
+  .job-card p.job-sum { color: var(--text-soft); font-size: .92rem; line-height: 1.55; flex: 1; }
+  .job-card .job-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; color: var(--cyan); font-weight: 700; font-size: .9rem; }
+  .job-card .job-more .material-symbols-rounded { font-size: 18px; transition: transform .2s; }
+  .job-card:hover .job-more .material-symbols-rounded { transform: translateX(4px); }
+  .jobs-empty { grid-column: 1 / -1; text-align: center; color: var(--text-soft); padding: 40px 20px; background: var(--bg-soft); border-radius: 16px; border: 1px dashed var(--line-2); }
+  .jobs-empty .material-symbols-rounded { font-size: 48px; opacity: .3; display: block; margin-bottom: 10px; }
+  /* İlan detay popup */
+  .job-modal { position: fixed; inset: 0; background: rgba(15,22,64,.5); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .job-modal.open { display: flex; }
+  .job-modal-card { background: #fff; border-radius: var(--radius-lg); max-width: 640px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 36px; position: relative; box-shadow: var(--shadow-lg); }
+  .job-modal-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--text-soft); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .job-modal-close:hover { background: var(--navy); color: #fff; }
+  .job-modal-card h2 { font-family: var(--font-head); color: var(--navy); font-size: 1.6rem; margin-bottom: 12px; padding-right: 40px; }
+  .job-modal-body { color: var(--text-soft); line-height: 1.7; margin: 18px 0 24px; }
+  .job-modal-body h1,.job-modal-body h2,.job-modal-body h3,.job-modal-body h4 { color: var(--navy); font-family: var(--font-head); margin: 18px 0 8px; }
+  .job-modal-body ul,.job-modal-body ol { padding-left: 22px; margin: 10px 0; }
+  .job-modal-body li { margin-bottom: 6px; }
+  .job-modal-body p { margin-bottom: 12px; }
+  /* Başvuru formu */
+  .apply-section { background: var(--bg-soft); }
+  .apply-card { max-width: 720px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: clamp(28px, 4vw, 44px); box-shadow: var(--shadow-sm); }
+  .apply-card h2 { font-family: var(--font-head); color: var(--navy); font-size: 1.5rem; margin-bottom: 6px; }
+  .apply-card > p { color: var(--text-soft); margin-bottom: 24px; }
+  .file-field { border: 1.5px dashed var(--line-2); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: .15s; }
+  .file-field:hover { border-color: var(--cyan); background: var(--cyan-soft); }
+  .file-field.has-file { border-style: solid; border-color: #16a34a; background: #f0fdf4; }
+  .file-field.has-file .material-symbols-rounded { color: #16a34a; }
+  .file-field .material-symbols-rounded { color: var(--cyan); font-size: 26px; }
+  .file-field input { display: none; }
+  .file-field-name { color: var(--text-soft); font-size: .92rem; }
+  .req-star { color: #ef4444; }
+  @media (max-width: 980px) { .career-values { grid-template-columns: repeat(2, 1fr); } .jobs-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .career-values { grid-template-columns: 1fr; } .jobs-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Form Elektrik">
+      <img src="/assets/main/logo-white.png" alt="Form Elektrik" onerror="this.onerror=null;this.src='/assets/main/logo.png'" />
+      <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
+      <a href="/hakkimizda" data-i18n="nav.about">Kurumsal</a>
+      <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/blog" data-i18n="nav.blog">Blog</a>
+      <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe">
+          <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg>
+        </button>
+        <button data-lang="en" title="English" aria-label="English">
+          <svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h2"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h2)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg>
+        </button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </div>
+</header>
+<nav class="mobile-nav" id="mobileNav">
+  <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/hakkimizda" data-i18n="nav.about">Kurumsal<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
+</nav>
+
+<main>
+  <!-- KOMPAKT HERO + AÇIK POZİSYONLAR -->
+  <section class="career-hero career-hero-compact">
+    <div class="wrap">
+      <span class="eyebrow on-navy"><span class="material-symbols-rounded" style="font-size:16px">work</span> <span data-i18n="career.eyebrow">Kariyer</span></span>
+      <h1 data-i18n="career.jobsTitle">Açık Pozisyonlar</h1>
+      <p data-i18n="career.heroShort">Form Elektrik ailesine katılın. Aşağıdaki ilanları inceleyin, detaylar için tıklayın ve CV'nizle başvurun.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:36px">
+    <div class="wrap">
+      <div class="jobs-grid reveal" id="jobsList">
+        <div class="jobs-empty" data-i18n="common.loading">Yükleniyor…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAŞVURU FORMU -->
+  <section class="apply-section" id="basvuru">
+    <div class="wrap">
+      <div class="apply-card reveal">
+        <h2 data-i18n="career.applyTitle">Başvurunuzu yapın</h2>
+        <p data-i18n="career.applySub">Açık bir pozisyona ya da genel havuza başvurabilirsiniz. CV'nizi ekleyin, sizinle iletişime geçelim.</p>
+        <form id="applyForm">
+          <div class="field-row">
+            <div class="field"><label data-i18n="form.firstName">Ad</label><input name="firstName" required maxlength="80" /></div>
+            <div class="field"><label data-i18n="form.lastName">Soyad</label><input name="lastName" required maxlength="80" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label data-i18n="form.email">E-posta</label><input name="email" type="email" required /></div>
+            <div class="field"><label data-i18n="form.phone">Telefon</label><input name="phone" /></div>
+          </div>
+          <div class="field">
+            <label data-i18n="career.position">Pozisyon</label>
+            <select name="jobId" id="applyJob"><option value="" data-i18n="career.generalApp">Genel Başvuru</option></select>
+          </div>
+          <div class="field">
+            <label><span data-i18n="career.cv">CV (PDF / Word)</span> <span class="req-star">*</span></label>
+            <label class="file-field" id="cvDrop">
+              <span class="material-symbols-rounded">upload_file</span>
+              <span class="file-field-name" id="cvName" data-i18n="career.cvHint">Dosya seçin (PDF, DOC — en fazla 10 MB)</span>
+              <input type="file" id="cvInput" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+            </label>
+          </div>
+          <div class="field"><label data-i18n="form.message">Mesajınız</label><textarea name="message" rows="3"></textarea></div>
+          <label class="kvkk-check">
+            <input type="checkbox" id="applyKvkk">
+            <span id="applyKvkkLabel"><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum ve onaylıyorum.</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block"><span class="material-symbols-rounded">send</span> <span data-i18n="career.submit">Başvur</span></button>
+          <div class="form-msg" id="applyMsg"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <!-- İLAN DETAY POPUP -->
+  <div class="job-modal" id="jobModal">
+    <div class="job-modal-card">
+      <button type="button" class="job-modal-close" id="jobModalClose" aria-label="Kapat"><span class="material-symbols-rounded">close</span></button>
+      <h2 id="jmTitle"></h2>
+      <div class="job-meta" id="jmMeta"></div>
+      <div class="job-modal-body" id="jmBody"></div>
+      <a href="#basvuru" class="btn btn-primary btn-block" id="jmApply"><span data-i18n="career.submit">Başvur</span> <span class="material-symbols-rounded">arrow_forward</span></a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/assets/main/logo.png" alt="Form Elektrik" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'" />
+        <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+        <p data-i18n="footer.about">Enerji altyapıları ve güç sistemleri alanında mühendislik odaklı, uçtan uca çözüm sağlayıcısı. 2000'den bu yana güvenilir çözüm ortağınız.</p>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">call</span> +90 312 394 7100</div>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">mail</span> info@formelektrik.com</div>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.solutions">Çözümlerimiz</h4>
+        <a href="/hizmet?slug=ges" data-i18n="svc.ges">Yenilenebilir Enerji</a>
+        <a href="/hizmet?slug=otomasyon" data-i18n="svc.otomasyon">Şebeke Koruma ve Otomasyon</a>
+        <a href="/hizmet?slug=bess" data-i18n="svc.bess">Enerji Depolama</a>
+        <a href="/hizmet?slug=emobility" data-i18n="svc.emobility">E-Mobility</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.corporate">Kurumsal</h4>
+        <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+        <a href="/kariyer">Kariyer</a>
+        <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+        <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      </div>
+      <div class="footer-col">
+        <h4>Diğer</h4>
+        <a href="/blog" data-i18n="nav.blog">Blog</a>
+        <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatması</a>
+        <div class="footer-social" style="margin-top:16px">
+          <a href="https://tr.linkedin.com/company/form-elektrik-insaat-muh-a-s-" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+          <a href="https://www.instagram.com/form_elektrik/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
+          <a href="https://www.youtube.com/channel/UCOF1W02fEyOTseZ2o2CLCcA" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
+          <a href="https://tr-tr.facebook.com/form.elektrik/" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
+      <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatma Metni</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(function () {
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const lang = localStorage.getItem('fe-lang') || 'tr';
+  const TXT = {
+    tr: { type: { 'full-time':'Tam zamanlı','part-time':'Yarı zamanlı','intern':'Staj' }, empty:'Şu an açık pozisyon yok. Yine de aşağıdan CV bırakabilirsiniz.', apply:'Başvur', uploading:'CV okunuyor…', ok:'Başvurunuz alındı! En kısa sürede dönüş yapacağız.', err:'Bir hata oluştu. Lütfen tekrar deneyin.', cvErr:'CV yalnızca PDF veya Word olabilir (max 10 MB).', cvRequired:'Lütfen CV yükleyin — başvuru için zorunludur.', autofill:'CV’den bilgiler dolduruldu, lütfen kontrol edin.', kvkk:'Devam etmek için KVKK Aydınlatma Metni\'ni onaylamanız gerekiyor.', kvkkLabel:'<a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>\'ni okudum ve onaylıyorum.' },
+    en: { type: { 'full-time':'Full-time','part-time':'Part-time','intern':'Internship' }, empty:'No open positions right now. You can still leave your CV below.', apply:'Apply', uploading:'Reading CV…', ok:'Your application has been received! We will get back to you soon.', err:'An error occurred. Please try again.', cvErr:'CV must be PDF or Word (max 10 MB).', cvRequired:'Please upload your CV — it is required to apply.', autofill:'Fields filled from your CV, please review.', kvkk:'You must accept the Privacy Notice to proceed.', kvkkLabel:'I have read and accept the <a href="/kvkk" target="_blank" rel="noopener">Privacy Notice</a>.' }
+  };
+  const T = TXT[lang] || TXT.tr;
+
+  // İlan detay popup
+  const jobModal = document.getElementById('jobModal');
+  const applySel = document.getElementById('applyJob');
+  const metaHtml = (j) => {
+    const typeLabel = T.type[j.type] || j.type || '';
+    return [
+      j.department ? `<span><span class="material-symbols-rounded">apartment</span>${esc(j.department)}</span>` : '',
+      j.location ? `<span><span class="material-symbols-rounded">location_on</span>${esc(j.location)}</span>` : '',
+      typeLabel ? `<span><span class="material-symbols-rounded">schedule</span>${esc(typeLabel)}</span>` : '',
+    ].filter(Boolean).join('');
+  };
+  function openJob(j) {
+    document.getElementById('jmTitle').textContent = j.title;
+    document.getElementById('jmMeta').innerHTML = metaHtml(j);
+    const body = (j.body && j.body.trim()) ? j.body : (j.summary ? `<p>${esc(j.summary)}</p>` : `<p>${esc(lang==='tr'?'Bu ilan için detaylı açıklama eklenmemiş. Başvurunuzu iletebilirsiniz.':'No detailed description added for this posting. You can still apply.')}</p>`);
+    document.getElementById('jmBody').innerHTML = body; // admin TinyMCE içeriği
+    document.getElementById('jmApply').onclick = () => { applySel.value = j.id; closeJob(); };
+    jobModal.classList.add('open'); document.body.style.overflow = 'hidden';
+  }
+  function closeJob() { jobModal.classList.remove('open'); document.body.style.overflow = ''; }
+  document.getElementById('jobModalClose').addEventListener('click', closeJob);
+  jobModal.addEventListener('click', (e) => { if (e.target === jobModal) closeJob(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && jobModal.classList.contains('open')) closeJob(); });
+
+  // İlanları çek (grid + tıklanınca popup)
+  fetch('/api/careers/jobs').then(r => r.ok ? r.json() : { jobs: [] }).then(({ jobs }) => {
+    const list = document.getElementById('jobsList');
+    if (!jobs || !jobs.length) {
+      list.innerHTML = `<div class="jobs-empty"><span class="material-symbols-rounded">work_off</span>${esc(T.empty)}</div>`;
+      return;
+    }
+    list.innerHTML = jobs.map((j, i) => `
+      <div class="job-card" data-idx="${i}">
+        <h3>${esc(j.title)}</h3>
+        <div class="job-meta">${metaHtml(j)}</div>
+        ${j.summary ? `<p class="job-sum">${esc(j.summary)}</p>` : '<p class="job-sum"></p>'}
+        <span class="job-more">${esc(lang==='tr'?'Detay ve başvuru':'Details & apply')} <span class="material-symbols-rounded">arrow_forward</span></span>
+      </div>`).join('');
+    list.querySelectorAll('.job-card').forEach(card => card.addEventListener('click', () => openJob(jobs[+card.dataset.idx])));
+    // Başvuru select doldur
+    jobs.forEach(j => { const o = document.createElement('option'); o.value = j.id; o.textContent = j.title; applySel.appendChild(o); });
+  }).catch(() => {});
+
+  const form = document.getElementById('applyForm');
+  const msg = document.getElementById('applyMsg');
+  // KVKK onay etiketini aktif dile göre ayarla
+  const kvkkLabelEl = document.getElementById('applyKvkkLabel');
+  if (kvkkLabelEl) kvkkLabelEl.innerHTML = T.kvkkLabel;
+  const cvInput = document.getElementById('cvInput');
+  const cvName = document.getElementById('cvName');
+  const cvDrop = document.getElementById('cvDrop');
+  const defaultCvHint = cvName.textContent;
+  let cvUrl = null;
+  let uploading = false;
+
+  // CV seçilince: anında yükle + parse + formu otomatik doldur
+  cvInput.addEventListener('change', async () => {
+    cvUrl = null;
+    const f = cvInput.files[0];
+    if (!f) { cvName.textContent = defaultCvHint; cvDrop.classList.remove('has-file'); return; }
+    if (f.size > 10 * 1024 * 1024) { msg.className = 'form-msg err'; msg.textContent = T.cvErr; cvInput.value = ''; return; }
+    cvName.textContent = (lang === 'tr' ? 'Okunuyor… ' : 'Reading… ') + f.name;
+    uploading = true;
+    try {
+      const fd = new FormData(); fd.append('cv', f);
+      const ur = await fetch('/api/careers/upload-cv', { method: 'POST', body: fd });
+      if (!ur.ok) { msg.className = 'form-msg err'; msg.textContent = T.cvErr; cvInput.value = ''; cvName.textContent = defaultCvHint; return; }
+      const data = await ur.json();
+      cvUrl = data.url;
+      cvName.textContent = '✓ ' + f.name;
+      cvDrop.classList.add('has-file');
+      // Otomatik doldurma — sadece boş alanları doldur (kullanıcı düzeltebilir)
+      const p = data.parsed || {};
+      const setIf = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if (el && val && !el.value) el.value = val; };
+      setIf('firstName', p.firstName); setIf('lastName', p.lastName);
+      setIf('email', p.email); setIf('phone', p.phone);
+      if (p.firstName || p.email || p.phone) { msg.className = 'form-msg ok'; msg.textContent = T.autofill; }
+      else { msg.className = 'form-msg'; msg.textContent = ''; }
+    } catch { msg.className = 'form-msg err'; msg.textContent = T.cvErr; cvInput.value = ''; cvName.textContent = defaultCvHint; }
+    finally { uploading = false; }
+  });
+
+  // Başvuru gönder
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className = 'form-msg'; msg.textContent = '';
+    const kvkkEl = form.querySelector('#applyKvkk');
+    if (!kvkkEl || !kvkkEl.checked) { msg.className = 'form-msg err'; msg.textContent = T.kvkk; return; }
+    if (uploading) { msg.className = 'form-msg'; msg.textContent = T.uploading; return; }
+    if (!cvUrl) { msg.className = 'form-msg err'; msg.textContent = T.cvRequired; cvDrop.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    try {
+      const fd = new FormData(form);
+      const payload = { jobId: fd.get('jobId') || null, firstName: fd.get('firstName'), lastName: fd.get('lastName'), email: fd.get('email'), phone: fd.get('phone'), message: fd.get('message'), cvUrl };
+      const r = await fetch('/api/careers/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!r.ok) throw new Error();
+      msg.className = 'form-msg ok'; msg.textContent = T.ok;
+      form.reset(); cvUrl = null; cvName.textContent = defaultCvHint; cvDrop.classList.remove('has-file');
+    } catch { msg.className = 'form-msg err'; msg.textContent = T.err; }
+    finally { btn.disabled = false; }
+  });
+})();
+</script>
+</body>
+</html>

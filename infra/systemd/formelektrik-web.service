@@ -1,0 +1,34 @@
+[Unit]
+Description=Form Elektrik Web Site (Node.js Express)
+Documentation=https://github.com/fikretsafak/formelektrik-web
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=formelektrik
+Group=formelektrik
+
+WorkingDirectory=/opt/formelektrik-web
+
+EnvironmentFile=/opt/formelektrik-web/.env
+
+# Node binary'i NVM kullanıyorsanız değiştirin
+ExecStart=/usr/bin/node /opt/formelektrik-web/server/index.js
+
+Restart=on-failure
+RestartSec=5s
+
+# Log: journalctl -u formelektrik-web -f
+StandardOutput=journal
+StandardError=journal
+
+# Güvenlik
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/formelektrik-web/data /opt/formelektrik-web/uploads
+
+[Install]
+WantedBy=multi-user.target

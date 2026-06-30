@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marka — Form Elektrik</title>
+<meta name="description" content="Form Elektrik çözüm ortağı marka detayı." />
+<link rel="icon" type="image/png" href="/assets/main/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  .detail-hero { padding-top: calc(var(--header-h) + 56px); padding-bottom: 0; }
+  .detail-topbar { display:flex; align-items:center; gap:18px; margin-bottom:22px; flex-wrap:wrap; }
+  .detail-back { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--text-soft); transition:color .2s; flex:none; }
+  .detail-back:hover { color: var(--cyan); }
+  .detail-back .material-symbols-rounded { font-size:18px; }
+  .detail-topbar .topbar-sep { width:1px; height:18px; background:var(--line-2); flex:none; }
+  .detail-topbar .topbar-title { font-family: var(--font-head); color: var(--navy); font-size: clamp(1rem, 1.6vw, 1.18rem); font-weight: 600; letter-spacing:-0.01em; line-height:1.2; }
+  @media (max-width: 560px) { .detail-topbar .topbar-sep { display:none; } }
+  .brand-hero-card {
+    display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+    padding: clamp(22px, 3vw, 32px);
+    border-radius: var(--radius);
+    border: 1px solid var(--line-2);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--cyan) 10%, #fff), color-mix(in srgb, var(--cyan-2) 10%, var(--bg-soft)));
+    position: relative; overflow: hidden;
+  }
+  .brand-hero-card::after {
+    content:''; position:absolute; top:-40%; right:-10%; width:50%; height:180%;
+    background: radial-gradient(circle, rgba(42,169,224,0.25), transparent 65%); opacity:.4; pointer-events:none;
+  }
+  .brand-hero-logo {
+    width: 150px; min-height: 96px; border-radius: 16px; flex:none;
+    display:flex; align-items:center; justify-content:center; padding: 16px;
+    background: #fff;
+    border: 1px solid color-mix(in srgb, var(--cyan) 24%, transparent);
+    position: relative; z-index: 1;
+  }
+  .brand-hero-logo img { max-width: 100%; max-height: 80px; object-fit: contain; }
+  .brand-hero-logo .brand-logo-text { font-family: var(--font-head); font-size: 1.3rem; color: var(--navy); font-weight: 700; text-align:center; }
+  .brand-hero-body { position: relative; z-index: 1; }
+  .brand-hero-eyebrow { display:block; font-family: var(--font); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); margin-bottom: 8px; }
+  .brand-hero-body h1 { font-family: var(--font-head); color: var(--navy); font-size: clamp(1.5rem, 2.6vw, 1.9rem); line-height: 1.2; letter-spacing:-0.015em; margin: 6px 0 8px; font-weight: 600; }
+  .brand-hero-body p { color: var(--text-soft); font-size: clamp(0.95rem, 1.4vw, 1.02rem); max-width: 620px; line-height: 1.55; }
+  .brand-hero-link { display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:14px; font-weight:600; color:var(--cyan); }
+  .brand-hero-link .material-symbols-rounded { font-size:18px; }
+  .brand-cover { width:100%; border-radius: var(--radius); border:1px solid var(--line); margin-top: 28px; }
+  .detail-body {
+    font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.85; color: var(--text);
+    max-width: 800px;
+  }
+  .detail-body h1, .detail-body h2, .detail-body h3, .detail-body h4 { font-family: var(--font-head); color: var(--navy); margin: 32px 0 14px; line-height:1.3; }
+  .detail-body h2 { font-size: 24px; }
+  .detail-body h3 { font-size: 20px; }
+  .detail-body p { margin: 16px 0; }
+  .detail-body ul, .detail-body ol { margin: 16px 0 16px 24px; }
+  .detail-body li { margin: 7px 0; }
+  .detail-body img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+  .detail-body a { color: var(--cyan); text-decoration: underline; text-underline-offset:3px; }
+  .detail-body blockquote { border-left:3px solid var(--cyan); padding-left:18px; margin:20px 0; color:var(--text); font-style:italic; }
+  .detail-body table { width:100%; border-collapse:collapse; margin:20px 0; font-family: var(--font); font-size:.95rem; }
+  .detail-body th, .detail-body td { border:1px solid var(--line); padding:10px 12px; text-align:left; }
+  .brand-cta-band { margin-top: 56px; }
+  .brand-svc-grid { display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; }
+  .brand-svc-chip { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border:1px solid var(--line-2); border-radius:100px; background:#fff; color:var(--navy); font-weight:600; font-size:.92rem; transition:.18s; }
+  .brand-svc-chip:hover { border-color:var(--cyan); color:var(--cyan); }
+  .brand-svc-chip .material-symbols-rounded { font-size:18px; color:var(--cyan); }
+  .detail-loading, .detail-error { text-align:center; color:var(--text-soft); padding:80px 20px; }
+  .detail-error .material-symbols-rounded { font-size:56px; opacity:.3; display:block; margin-bottom:14px; }
+  @media (max-width: 640px) {
+    .brand-hero-card { grid-template-columns: 1fr; gap: 18px; }
+    .brand-hero-logo { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Form Elektrik">
+      <img src="/assets/main/logo-white.png" alt="Form Elektrik" onerror="this.onerror=null;this.src='/assets/main/logo.png'" />
+      <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
+      <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+      <a href="/blog" data-i18n="nav.blog">Blog</a>
+      <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MOBİL MENÜ ===== -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" class="btn btn-primary btn-block" data-i18n="nav.quote">Teklif Al</a>
+</nav>
+
+<!-- ===== MARKA DETAY ===== -->
+<section class="detail-hero">
+  <div class="wrap">
+    <div class="detail-topbar">
+      <a href="/#markalar" class="detail-back"><span class="material-symbols-rounded">arrow_back</span> <span id="backLabel">Markalar</span></a>
+      <span class="topbar-sep" id="brandTitleSep" hidden></span>
+      <span class="topbar-title" id="brandInlineTitle"></span>
+    </div>
+    <div id="brandHead"></div>
+  </div>
+</section>
+
+<section style="padding-top:36px">
+  <div class="wrap">
+    <div id="brandBodyWrap">
+      <div class="detail-loading" id="brandLoading">Yükleniyor…</div>
+    </div>
+
+    <!-- İlgili hizmetler -->
+    <div id="brandSvcWrap" style="margin-top:48px; display:none">
+      <h3 class="section-title" style="font-size:1.3rem" id="brandSvcTitle">Bu markayı sunduğumuz hizmetler</h3>
+      <div class="brand-svc-grid" id="brandSvcGrid"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-band brand-cta-band" id="brandCta" style="display:none">
+      <h2 id="ctaTitle">Bu marka hakkında bilgi alın</h2>
+      <p id="ctaSub">Uzman ekibimiz doğru ürün ve çözüm seçiminde size yardımcı olsun.</p>
+      <div class="hero-cta">
+        <a href="/#iletisim" class="btn btn-primary"><span class="material-symbols-rounded">request_quote</span> <span id="ctaQuote">İletişime Geçin</span></a>
+        <a href="/#iletisim" class="btn btn-ghost-light"><span class="material-symbols-rounded">event</span> <span id="ctaBook">Görüşme Planla</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/assets/main/logo.png" alt="Form Elektrik" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'" />
+        <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+        <p data-i18n="footer.about">Enerji altyapıları ve güç sistemleri alanında mühendislik odaklı, uçtan uca çözüm sağlayıcısı. 2000'den bu yana güvenilir çözüm ortağınız.</p>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">call</span> <span id="footerPhone">+90 312 394 7100</span></div>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">mail</span> <span id="footerEmail">info@formelektrik.com</span></div>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.solutions">Çözümlerimiz</h4>
+        <a href="/hizmet?slug=ges" data-i18n="svc.ges">Yenilenebilir Enerji</a>
+        <a href="/hizmet?slug=otomasyon" data-i18n="svc.otomasyon">Şebeke Koruma ve Otomasyon</a>
+        <a href="/hizmet?slug=bess" data-i18n="svc.bess">Enerji Depolama</a>
+        <a href="/hizmet?slug=emobility" data-i18n="svc.emobility">E-Mobility</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.corporate">Kurumsal</h4>
+        <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+        <a href="/kariyer">Kariyer</a>
+        <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+        <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      </div>
+      <div class="footer-col">
+        <h4>Diğer</h4>
+        <a href="/blog" data-i18n="nav.blog">Blog</a>
+        <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatması</a>
+        <div class="footer-social" style="margin-top:16px">
+          <a data-social="linkedin" href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+          <a data-social="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
+          <a data-social="youtube" href="#" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
+          <a data-social="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
+      <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatma Metni</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(() => {
+  const lang = localStorage.getItem('fe-lang') || 'tr';
+  const T = {
+    tr: { back:'Markalar', notFound:'Marka bulunamadı', notFoundSub:'Aradığınız marka bulunamadı ya da yayında değil.', home:'Ana sayfaya dön',
+          ctaTitle:'Bu marka hakkında bilgi alın', ctaSub:'Uzman ekibimiz doğru ürün ve çözüm seçiminde size yardımcı olsun.', ctaQuote:'İletişime Geçin', ctaBook:'Görüşme Planla',
+          svcTitle:'Bu markayı sunduğumuz hizmetler', visitSite:'Marka sitesini ziyaret et', eyebrow:'Çözüm Ortağı' },
+    en: { back:'Brands', notFound:'Brand not found', notFoundSub:'The brand you are looking for was not found or is unpublished.', home:'Back to home',
+          ctaTitle:'Get information about this brand', ctaSub:'Let our team help you choose the right product and solution.', ctaQuote:'Get in Touch', ctaBook:'Book a Meeting',
+          svcTitle:'Services where we offer this brand', visitSite:'Visit brand website', eyebrow:'Solution Partner' },
+  };
+  const t = T[lang] || T.tr;
+  const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]);
+  const slug = new URLSearchParams(location.search).get('slug');
+
+  const SVC_LABEL = {
+    'ag-og': { tr:'AG-OG Projelendirme', en:'LV-MV Engineering', icon:'bolt' },
+    otomasyon: { tr:'Şebeke Koruma ve Otomasyon', en:'Grid Protection & Automation', icon:'settings_input_component' },
+    ges: { tr:'Yenilenebilir Enerji (GES)', en:'Renewable Energy (Solar)', icon:'solar_power' },
+    bess: { tr:'Enerji Depolama (BESS)', en:'Energy Storage (BESS)', icon:'battery_charging_full' },
+    emobility: { tr:'E-Mobility / EV Şarj', en:'E-Mobility / EV Charging', icon:'ev_station' },
+  };
+
+  document.getElementById('backLabel').textContent = t.back;
+  document.getElementById('ctaTitle').textContent = t.ctaTitle;
+  document.getElementById('ctaSub').textContent = t.ctaSub;
+  document.getElementById('ctaQuote').textContent = t.ctaQuote;
+  document.getElementById('ctaBook').textContent = t.ctaBook;
+  document.getElementById('brandSvcTitle').textContent = t.svcTitle;
+
+  const head = document.getElementById('brandHead');
+  const bodyWrap = document.getElementById('brandBodyWrap');
+
+  const showError = () => {
+    head.innerHTML = '';
+    bodyWrap.innerHTML = `<div class="detail-error">
+      <span class="material-symbols-rounded">error_outline</span>
+      <h2 class="section-title" style="font-size:1.5rem">${esc(t.notFound)}</h2>
+      <p style="color:var(--text-soft);margin-top:10px">${esc(t.notFoundSub)}</p>
+      <a href="/" class="btn btn-outline" style="margin-top:20px"><span class="material-symbols-rounded">home</span> ${esc(t.home)}</a>
+    </div>`;
+  };
+
+  if (!slug) { showError(); return; }
+
+  fetch('/api/brands/' + encodeURIComponent(slug) + '?language=' + lang)
+    .then(r => { if (!r.ok) throw new Error('nf'); return r.json(); })
+    .then(({ brand }) => {
+      if (!brand) throw new Error('nf');
+      document.title = brand.name + ' — Form Elektrik';
+      const inlineTitle = document.getElementById('brandInlineTitle');
+      const titleSep = document.getElementById('brandTitleSep');
+      if (inlineTitle) inlineTitle.textContent = brand.name;
+      if (titleSep) titleSep.hidden = false;
+
+      const logo = brand.logo_url
+        ? `<img src="${esc(brand.logo_url)}" alt="${esc(brand.name)}" onerror="this.parentElement.innerHTML='<span class=&quot;brand-logo-text&quot;>${esc(brand.name)}</span>'">`
+        : `<span class="brand-logo-text">${esc(brand.name)}</span>`;
+      const link = brand.url
+        ? `<a class="brand-hero-link" href="${esc(brand.url)}" target="_blank" rel="noopener">${esc(t.visitSite)} <span class="material-symbols-rounded">north_east</span></a>`
+        : '';
+      head.innerHTML = `
+        <div class="brand-hero-card">
+          <div class="brand-hero-logo">${logo}</div>
+          <div class="brand-hero-body">
+            <span class="brand-hero-eyebrow">${esc(t.eyebrow)}</span>
+            <h1>${esc(brand.name)}</h1>
+            ${brand.description ? `<p>${esc(brand.description)}</p>` : ''}
+            ${link}
+          </div>
+        </div>
+        ${brand.cover_image ? `<img class="brand-cover" src="${esc(brand.cover_image)}" alt="${esc(brand.name)}" onerror="this.remove()">` : ''}
+      `;
+      bodyWrap.innerHTML = brand.body ? `<div class="detail-body">${brand.body}</div>` : '';
+
+      // İlgili hizmetler (markanın çözüm ortağı olduğu hizmetler)
+      const codes = (brand.services || []).filter(c => SVC_LABEL[c]);
+      if (codes.length) {
+        document.getElementById('brandSvcWrap').style.display = '';
+        document.getElementById('brandSvcGrid').innerHTML = codes.map(c => {
+          const s = SVC_LABEL[c];
+          return `<a class="brand-svc-chip" href="/hizmet?slug=${encodeURIComponent(c)}"><span class="material-symbols-rounded">${s.icon}</span>${esc(s[lang] || s.tr)}</a>`;
+        }).join('');
+      }
+      document.getElementById('brandCta').style.display = '';
+    })
+    .catch(showError);
+
+  // Dil değişince içeriği yeniden çek
+  document.querySelectorAll('#langToggle button').forEach(b => b.addEventListener('click', () => {
+    localStorage.setItem('fe-lang', b.dataset.lang);
+    location.reload();
+  }));
+})();
+</script>
+</body>
+</html>
