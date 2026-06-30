@@ -743,6 +743,21 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 #contactModal .field textarea { padding: 10px 13px; }
 #contactModal .field textarea { min-height: 72px; }
 #contactModal #serviceChips .chip { padding: 7px 13px; font-size: 0.82rem; }
+/* Konu chip'leri yatay slider — popup hizmet sayısıyla uzamasın */
+#contactModal #serviceChips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;            /* scrollbar için nefes payı */
+  scrollbar-width: thin;
+  scrollbar-color: var(--cyan) transparent;
+}
+#contactModal #serviceChips::-webkit-scrollbar { height: 6px; }
+#contactModal #serviceChips::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 100px; }
+#contactModal #serviceChips::-webkit-scrollbar-track { background: transparent; }
+#contactModal #serviceChips .chip { flex: 0 0 auto; scroll-snap-align: start; white-space: nowrap; }
 #contactModal .kvkk-check { margin: 2px 0 10px; }
 .appt-step { display: none; } .appt-step.active { display: block; }
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }

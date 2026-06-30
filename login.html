@@ -196,7 +196,7 @@ form.addEventListener('submit', async e => {
       body: JSON.stringify({ email: fd.get('email'), password: fd.get('password') }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'invalid');
+    if (!res.ok) { const e = new Error(data.error || 'invalid'); e.retryAfter = data.retry_after; throw e; }
     // Beni hatırla: kalıcı (localStorage) — değilse sadece bu oturum (sessionStorage)
     const store = remember ? localStorage : sessionStorage;
     (remember ? sessionStorage : localStorage).removeItem('e1-token');
@@ -206,10 +206,18 @@ form.addEventListener('submit', async e => {
     location.href = data.user.role === 'admin' ? '/admin/' : '/account/';
   } catch (err) {
     statusEl.className = 'form-status is-error';
-    const tooMany = err.message === 'too_many_attempts';
-    statusEl.textContent = tooMany
-      ? (LANG === 'en' ? 'Too many failed attempts. Please try again in 15 minutes.' : 'Çok fazla başarısız giriş. Lütfen 15 dakika sonra deneyin.')
-      : (LANG === 'en' ? 'Invalid email or password.' : 'E-posta veya şifre hatalı.');
+    const mins = err.retryAfter ? Math.ceil(err.retryAfter / 60) : 15;
+    if (err.message === 'account_locked') {
+      statusEl.textContent = LANG === 'en'
+        ? `Account temporarily locked due to too many failed attempts. Try again in ${mins} minutes.`
+        : `Çok fazla hatalı deneme nedeniyle hesap geçici olarak kilitlendi. ${mins} dakika sonra tekrar deneyin.`;
+    } else if (err.message === 'too_many_attempts') {
+      statusEl.textContent = LANG === 'en'
+        ? 'Too many failed attempts. Please try again in 15 minutes.'
+        : 'Çok fazla başarısız giriş. Lütfen 15 dakika sonra deneyin.';
+    } else {
+      statusEl.textContent = LANG === 'en' ? 'Invalid email or password.' : 'E-posta veya şifre hatalı.';
+    }
     btn.disabled = false;
     btn.textContent = LOGIN_I18N[LANG]['login.submit'];
   }

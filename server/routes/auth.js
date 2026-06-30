@@ -12,13 +12,21 @@ const router = express.Router();
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 saat
 const APP_BASE_URL = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
+// Katman 1 — IP bazlı: 15 dk'da 10 başarısız deneme. Başarılı giriş sayılmaz
+// (skipSuccessfulRequests), böylece meşru kullanıcı limitini doldurmaz.
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 10,
+  skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_attempts' },
 });
+
+// Katman 2 — hesap bazlı kilit (IP rotasyonuna karşı):
+// art arda MAX_FAILED hatalı şifre → hesap LOCK_MS süre kilitli.
+const MAX_FAILED = 5;
+const LOCK_MS = 15 * 60 * 1000; // 15 dk
 
 router.post('/login', loginLimiter, (req, res) => {
   const { email, password } = req.body || {};
@@ -28,8 +36,30 @@ router.post('/login', loginLimiter, (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
   if (!user || !user.is_active) return res.status(401).json({ error: 'invalid_credentials' });
 
+  // Hesap kilitli mi? (locked_until gelecekteyse reddet — şifre doğru olsa bile)
+  if (user.locked_until && new Date(user.locked_until).getTime() > Date.now()) {
+    const retryAfter = Math.ceil((new Date(user.locked_until).getTime() - Date.now()) / 1000);
+    return res.status(429).json({ error: 'account_locked', retry_after: retryAfter });
+  }
+
   const ok = bcrypt.compareSync(password, user.password);
-  if (!ok) return res.status(401).json({ error: 'invalid_credentials' });
+  if (!ok) {
+    // Başarısız: sayacı artır; eşiğe ulaşınca hesabı kilitle
+    const failed = (user.failed_attempts || 0) + 1;
+    if (failed >= MAX_FAILED) {
+      const lockedUntil = new Date(Date.now() + LOCK_MS).toISOString();
+      db.prepare('UPDATE users SET failed_attempts = ?, locked_until = ? WHERE id = ?')
+        .run(failed, lockedUntil, user.id);
+      return res.status(429).json({ error: 'account_locked', retry_after: Math.ceil(LOCK_MS / 1000) });
+    }
+    db.prepare('UPDATE users SET failed_attempts = ? WHERE id = ?').run(failed, user.id);
+    return res.status(401).json({ error: 'invalid_credentials' });
+  }
+
+  // Başarılı: sayacı + kilidi sıfırla
+  if (user.failed_attempts || user.locked_until) {
+    db.prepare('UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?').run(user.id);
+  }
 
   const token = signToken(user);
   res.cookie('token', token, {

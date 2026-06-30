@@ -46,6 +46,13 @@ if (tableExists('posts') && !columnExists('posts', 'show_cover')) {
 if (tableExists('services') && !columnExists('services', 'show_cover')) {
   db.exec('ALTER TABLE services ADD COLUMN show_cover INTEGER NOT NULL DEFAULT 1');
 }
+// users — brute-force koruması: hesap-bazlı kilitleme
+if (tableExists('users') && !columnExists('users', 'failed_attempts')) {
+  db.exec('ALTER TABLE users ADD COLUMN failed_attempts INTEGER NOT NULL DEFAULT 0');
+}
+if (tableExists('users') && !columnExists('users', 'locked_until')) {
+  db.exec('ALTER TABLE users ADD COLUMN locked_until DATETIME');
+}
 if (tableExists('posts') && tableExists('users')) {
   const firstAdmin = db.prepare(`SELECT id FROM users WHERE role = 'admin' ORDER BY id LIMIT 1`).get();
   if (firstAdmin) {

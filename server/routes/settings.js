@@ -48,11 +48,14 @@ function kvkkPayload(language) {
   const lang = language === 'en' ? 'en' : 'tr';
   const fallback = DEFAULT_KVKK[lang] || DEFAULT_KVKK.tr;
   const trFallback = DEFAULT_KVKK.tr;
+  // updated boşsa "yakında güncellenecektir" yerine boş döndür — public sayfa
+  // o zaman gizli/nötr gösterir (aşağıda kvkk.html boşsa satırı gizliyor).
+  const updatedRaw = get(`kvkk_updated_${lang}`) || (lang !== 'tr' ? get('kvkk_updated_tr') : '');
   return {
     language: lang,
     title: get(`kvkk_title_${lang}`) || (lang !== 'tr' ? get('kvkk_title_tr') : '') || fallback.title || trFallback.title,
     body: get(`kvkk_body_${lang}`) || (lang !== 'tr' ? get('kvkk_body_tr') : '') || fallback.body || trFallback.body,
-    updated: get(`kvkk_updated_${lang}`) || (lang !== 'tr' ? get('kvkk_updated_tr') : '') || fallback.updated || trFallback.updated,
+    updated: updatedRaw || '',
   };
 }
 
@@ -107,7 +110,17 @@ router.get('/kvkk', authRequired, requireRole('admin'), requirePermission('kvkk'
 router.put('/kvkk', authRequired, requireRole('admin'), requirePermission('kvkk'), (req, res) => {
   const allowed = ['kvkk_title_tr', 'kvkk_body_tr', 'kvkk_updated_tr', 'kvkk_title_en', 'kvkk_body_en', 'kvkk_updated_en'];
   const body = req.body || {};
-  allowed.forEach(k => set(k, body[k] || ''));
+  const now = new Date();
+  // "Son güncelleme" boş bırakılırsa kayıt anının tarihini otomatik yaz —
+  // böylece public sayfada "yakında güncellenecektir" fallback'i tetiklenmez.
+  const autoDate = (lang) => now.toLocaleDateString(lang === 'en' ? 'en-GB' : 'tr-TR',
+    { day: 'numeric', month: 'long', year: 'numeric' });
+  allowed.forEach(k => {
+    let v = body[k] || '';
+    if (k === 'kvkk_updated_tr' && !v) v = autoDate('tr');
+    if (k === 'kvkk_updated_en' && !v) v = autoDate('en');
+    set(k, v);
+  });
   res.json({ ok: true });
 });
 

@@ -109,7 +109,7 @@
   <h2>7. İletişim ve Başvuru</h2>
   <p>KVKK kapsamındaki taleplerinizi <a href="/#iletisim">iletişim kanallarımız</a> üzerinden Şirketimize iletebilirsiniz. Başvurularınız, yürürlükteki mevzuatta öngörülen süreler içinde yanıtlanacaktır.</p>
 
-  <div class="legal-updated" id="kvkkUpdated">Son güncelleme: Bu metin yakında güncellenecektir.</div>
+  <div class="legal-updated" id="kvkkUpdated" style="display:none"></div>
   </div>
 </main>
 
@@ -175,8 +175,13 @@
         if (titleEl && kvkk.title) titleEl.textContent = kvkk.title;
         if (bodyEl && kvkk.body) bodyEl.innerHTML = kvkk.body;
         if (updatedEl) {
-          updatedEl.textContent = (lang === 'en' ? 'Last updated: ' : 'Son güncelleme: ') + (kvkk.updated || '—');
-          bodyEl && bodyEl.appendChild(updatedEl);
+          if (kvkk.updated) {
+            updatedEl.textContent = (lang === 'en' ? 'Last updated: ' : 'Son güncelleme: ') + kvkk.updated;
+            updatedEl.style.display = '';
+            bodyEl && bodyEl.appendChild(updatedEl);
+          } else {
+            updatedEl.style.display = 'none'; // tarih yoksa satırı gösterme
+          }
         }
         document.title = (kvkk.title || titleEl.textContent) + ' — Form Elektrik';
       })

@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS users (
   permissions  TEXT,                  -- NULL = süper admin (tam yetki), JSON array = kısıtlı
   is_active    INTEGER NOT NULL DEFAULT 1,
   must_change_password INTEGER NOT NULL DEFAULT 0,
+  failed_attempts INTEGER NOT NULL DEFAULT 0,  -- art arda hatalı giriş sayacı
+  locked_until DATETIME,                       -- bu zamana kadar hesap kilitli (brute-force)
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
