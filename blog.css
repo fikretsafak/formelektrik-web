@@ -79,22 +79,46 @@
 .blog-tag-option span { font-weight: 700; }
 .blog-tag-option em { font-style: normal; font-size: 11px; color: var(--text-faint); }
 
-/* Seçili etiket rozeti */
-.blog-active-tag[hidden] { display: none !important; }
-.blog-active-tag {
+/* Seçili etiketler — her biri ayrı chip, satıra sığmazsa alt satıra kayar */
+.blog-active-tags[hidden] { display: none !important; }
+.blog-active-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+.blog-active-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Tek etiket chip'i */
+.blog-active-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 6px 0 14px;
+  gap: 4px;
+  height: 30px;
+  padding: 0 4px 0 12px;
   border-radius: 100px;
   background: var(--cyan);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(42,169,224,0.18);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-.blog-active-tag button {
-  background: transparent;
+.blog-active-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(42,169,224,0.28);
+}
+.blog-active-chip-text { white-space: nowrap; }
+.blog-active-chip-x {
+  background: rgba(255,255,255,0.18);
   border: none;
   cursor: pointer;
   color: #fff;
@@ -103,11 +127,34 @@
   justify-content: center;
   padding: 0;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
-.blog-active-tag button:hover { background: rgba(255,255,255,0.2); }
-.blog-active-tag .material-symbols-rounded { font-size: 16px; }
+.blog-active-chip-x:hover { background: rgba(255,255,255,0.38); }
+.blog-active-chip-x .material-symbols-rounded { font-size: 15px; }
+
+/* "Tümünü temizle" — chip'lerden görsel olarak ayrık, outline stil */
+.blog-active-tags-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 100px;
+  background: transparent;
+  border: 1px solid rgba(42,169,224,0.35);
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.blog-active-tags-clear:hover {
+  background: rgba(42,169,224,0.08);
+  border-color: var(--cyan);
+}
+.blog-active-tags-clear .material-symbols-rounded { font-size: 16px; }
 
 /* ===== Öne çıkan (featured) yazı ===== */
 .blog-featured-section { padding-top: 0; }

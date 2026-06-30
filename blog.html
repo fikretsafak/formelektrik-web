@@ -79,12 +79,13 @@
         <button type="button" id="blogTagButton"><span data-i18n="blogp.allTags">Tüm Etiketler</span><span class="material-symbols-rounded">expand_more</span></button>
         <div class="blog-tag-menu" id="blogTagMenu"></div>
       </div>
-      <span class="blog-active-tag" id="blogActiveTag" hidden>
-        <span id="blogActiveTagLabel"></span>
-        <button type="button" id="blogActiveTagClear" aria-label="Temizle">
+      <div class="blog-active-tags" id="blogActiveTag" hidden>
+        <span id="blogActiveTagLabel" class="blog-active-tags-list"></span>
+        <button type="button" id="blogActiveTagClear" class="blog-active-tags-clear" aria-label="Tümünü temizle">
           <span class="material-symbols-rounded">close</span>
+          <span data-i18n="blogp.clearTags">Temizle</span>
         </button>
-      </span>
+      </div>
     </div>
   </div>
 </section>

@@ -17,6 +17,8 @@
   const featuredEl = document.getElementById('blogFeatured');
 
   function esc(s) { return String(s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+  // CSS selector için güvenli kaçış (etiket adı özel karakter içerebilir)
+  function cssEsc(s) { return (window.CSS && CSS.escape) ? CSS.escape(s) : String(s || '').replace(/["\\\]]/g, '\\$&'); }
   function fmtDate(d) {
     if (!d) return '';
     try {
@@ -160,15 +162,36 @@
       });
     });
   }
+  function removeTag(tag) {
+    activeTags = activeTags.filter(t => t !== tag);
+    // Menüdeki checkbox'ı da senkronla
+    const cb = tagSelectEl.querySelector(`input[value="${cssEsc(tag)}"]`);
+    if (cb) cb.checked = false;
+    updateActiveTagChip();
+    load();
+  }
+
   function updateActiveTagChip() {
     const label = tagButton && tagButton.querySelector('span:first-child');
     const allTagsLabel = ({tr:'Tüm Etiketler',en:'All Tags',de:'Alle Tags'})[lang] || 'Tüm Etiketler';
-    if (label) label.textContent = activeTags.length ? activeTags.length + ' etiket seçildi' : allTagsLabel;
+    const selectedLabel = ({tr:'etiket seçildi',en:'tags selected',de:'Tags ausgewählt'})[lang] || 'etiket seçildi';
+    if (label) label.textContent = activeTags.length ? activeTags.length + ' ' + selectedLabel : allTagsLabel;
     if (activeTags.length) {
       activeTagWrap.hidden = false;
-      activeTagLabel.textContent = activeTags.map(t => '#' + t).join(' ');
+      // Her etiket = kendi × butonlu ayrı chip; flex-wrap ile satıra sığmazsa alt satıra geçer
+      activeTagLabel.innerHTML = activeTags.map(t => `
+        <span class="blog-active-chip">
+          <span class="blog-active-chip-text">#${esc(t)}</span>
+          <button type="button" class="blog-active-chip-x" data-tag="${esc(t)}" aria-label="${esc(t)} etiketini kaldır">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </span>`).join('');
+      activeTagLabel.querySelectorAll('.blog-active-chip-x').forEach(btn => {
+        btn.addEventListener('click', () => removeTag(btn.dataset.tag));
+      });
     } else {
       activeTagWrap.hidden = true;
+      activeTagLabel.innerHTML = '';
     }
   }
 
