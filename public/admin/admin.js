@@ -25,13 +25,13 @@ const I18N = {
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
-    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
+    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.cerez': 'Çerez Politikası', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
-    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
+    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.cerez': 'Cookie Policy', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
   },
 };
 function currentLang() { return localStorage.getItem('e1-lang') || 'tr'; }
@@ -1154,6 +1154,7 @@ async function openUserForm(u, onDone) {
     { code: 'job-applications', label: 'Başvurular' },
     { code: 'users', label: 'Kullanıcılar' },
     { code: 'kvkk', label: 'KVKK / Privacy Notice' },
+    { code: 'cerez', label: 'Çerez Politikası' },
     { code: 'settings', label: 'Ayarlar' },
   ];
   // Mevcut yetkiler: null = tam yetki; array = kısıtlı
@@ -2888,6 +2889,80 @@ routes.kvkk = async (page) => {
     try {
       await api.put('/api/settings', payload);
       toast('KVKK metinleri kaydedildi', 'success');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+};
+
+// ============================================
+// ÇEREZ POLİTİKASI — ayrı içerik yönetimi (KVKK ile aynı desen)
+// ============================================
+routes.cerez = async (page) => {
+  page.innerHTML = '<div class="loader">Yükleniyor...</div>';
+  let settings = {};
+  try {
+    const r = await api.get('/api/settings/cerez');
+    settings = r.settings || {};
+  } catch { page.innerHTML = '<div class="empty"><p>Çerez Politikası metinleri yüklenemedi.</p></div>'; return; }
+
+  page.innerHTML = '';
+  const card = h('div', { class: 'card', style: 'width:100%' });
+  card.innerHTML = `
+    <div style="padding:24px 24px 0">
+      <h3 style="margin:0 0 4px;font-size:18px">Çerez Politikası Metinleri</h3>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">/cerez-politikasi sayfası ve çerez bilgilendirmeleri buradan beslenir. "Son Güncelleme" boş bırakılırsa kayıt tarihi otomatik yazılır.</p>
+    </div>
+    <div class="settings-form" style="padding:8px 24px 24px">
+      <div class="settings-cols">
+        <div class="settings-col">
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezTitleTr">TR Başlık</label>
+            <input class="settings-row-input" id="cerezTitleTr" value="${escapeHtml(settings.cerez_title_tr || 'Çerez Politikası')}">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezUpdatedTr">TR Son Güncelleme</label>
+            <input class="settings-row-input" id="cerezUpdatedTr" value="${escapeHtml(settings.cerez_updated_tr || '')}" placeholder="boş = otomatik tarih">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezBodyTr">TR Metin</label>
+            <textarea class="settings-row-input" id="cerezBodyTr" rows="12">${escapeHtml(settings.cerez_body_tr || '')}</textarea>
+          </div>
+        </div>
+        <div class="settings-col">
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezTitleEn">EN Title</label>
+            <input class="settings-row-input" id="cerezTitleEn" value="${escapeHtml(settings.cerez_title_en || 'Cookie Policy')}">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezUpdatedEn">EN Last Updated</label>
+            <input class="settings-row-input" id="cerezUpdatedEn" value="${escapeHtml(settings.cerez_updated_en || '')}" placeholder="empty = auto date">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="cerezBodyEn">EN Text</label>
+            <textarea class="settings-row-input" id="cerezBodyEn" rows="12">${escapeHtml(settings.cerez_body_en || '')}</textarea>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px">
+        <button class="btn btn-primary" id="cerezSaveBtn"><span class="material-symbols-rounded">save</span> Kaydet</button>
+        <a class="btn btn-ghost" href="/cerez-politikasi" target="_blank" rel="noopener"><span class="material-symbols-rounded">open_in_new</span> Sayfayı Aç</a>
+      </div>
+    </div>
+  `;
+  page.appendChild(card);
+  mountEditor('#cerezBodyTr', settings.cerez_body_tr || '');
+  mountEditor('#cerezBodyEn', settings.cerez_body_en || '');
+  page.querySelector('#cerezSaveBtn').addEventListener('click', async () => {
+    const payload = {
+      cerez_title_tr: page.querySelector('#cerezTitleTr').value.trim(),
+      cerez_body_tr: getEditorContent('#cerezBodyTr'),
+      cerez_updated_tr: page.querySelector('#cerezUpdatedTr').value.trim(),
+      cerez_title_en: page.querySelector('#cerezTitleEn').value.trim(),
+      cerez_body_en: getEditorContent('#cerezBodyEn'),
+      cerez_updated_en: page.querySelector('#cerezUpdatedEn').value.trim(),
+    };
+    try {
+      await api.put('/api/settings/cerez', payload);
+      toast('Çerez Politikası kaydedildi', 'success');
     } catch (e) { toast(e.message, 'error'); }
   });
 };

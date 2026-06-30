@@ -3,22 +3,42 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Blog & Makaleler — Form Elektrik</title>
-<meta name="description" content="Form Elektrik teknik kütüphanesi: AG-OG, otomasyon, GES, BESS ve EV şarj konularında sektörel rehberler, teknik makaleler ve proje notları." />
-<link rel="canonical" href="https://formelektrik.com/blog" />
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="Form Elektrik" />
-<meta property="og:title" content="Blog & Makaleler — Form Elektrik" />
-<meta property="og:description" content="Sektörel gelişmeler, teknik rehberler ve proje notları." />
-<meta property="og:url" content="https://formelektrik.com/blog" />
+<title>Çerez Politikası — Form Elektrik</title>
+<meta name="description" content="Form Elektrik İnş.Müh.A.Ş — internet sitemizde kullanılan çerez türleri, toplanması ve yönetimi hakkında bilgilendirme." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://formelektrik.com/cerez-politikasi" />
 <link rel="icon" type="image/png" href="/assets/main/favicon.png" />
 <link rel="apple-touch-icon" href="/assets/main/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css" />
-<link rel="stylesheet" href="/blog.css" />
+<style>
+  .legal-wrap { max-width: 820px; margin: 0 auto; padding: calc(var(--header-h) + 56px) 20px 90px; }
+  .legal-wrap h1 { font-family: var(--font-head); color: var(--navy); font-size: clamp(1.9rem, 4.5vw, 2.6rem); line-height:1.1; letter-spacing:-0.02em; margin: 16px 0 10px; }
+  .legal-note {
+    display:flex; gap:12px; align-items:flex-start;
+    background: color-mix(in srgb, var(--cyan) 10%, #fff);
+    border: 1px solid color-mix(in srgb, var(--cyan) 35%, transparent);
+    color: var(--text); border-radius: var(--radius-sm); padding: 14px 16px; margin: 24px 0 36px; font-size:.92rem;
+  }
+  .legal-note .material-symbols-rounded { color: var(--cyan); font-size:22px; flex:none; }
+  .legal-wrap h2 { font-family: var(--font-head); font-size: 1.3rem; color: var(--navy); margin: 36px 0 12px; }
+  .legal-wrap p { color: var(--text-soft); margin: 12px 0; line-height: 1.8; }
+  .legal-wrap ul { color: var(--text-soft); margin: 12px 0 12px 22px; line-height: 1.8; }
+  .legal-wrap li { margin: 6px 0; }
+  .legal-wrap a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+  /* Çerez kategorileri tablosu */
+  .legal-wrap table { width:100%; border-collapse: collapse; margin: 18px 0; font-size: .9rem; }
+  .legal-wrap th, .legal-wrap td { border: 1px solid var(--line); padding: 11px 14px; text-align: left; vertical-align: top; }
+  .legal-wrap thead th { background: color-mix(in srgb, var(--cyan) 10%, #fff); color: var(--navy); font-family: var(--font-head); font-weight: 600; }
+  .legal-wrap td { color: var(--text-soft); line-height: 1.6; }
+  .legal-wrap td b { color: var(--navy); }
+  .legal-wrap .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .legal-updated { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--text-faint); font-size: .85rem; }
+  @media (max-width: 560px) { .legal-wrap table { min-width: 480px; } }
+</style>
 <!-- Rybbit Analytics -->
 <script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
 </head>
@@ -33,9 +53,9 @@
     </a>
     <nav class="nav-links">
       <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
-      <a href="/#hakkimizda" data-i18n="nav.about">Kurumsal</a>
       <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
       <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda</a>
       <a href="/blog" data-i18n="nav.blog">Blog</a>
       <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
     </nav>
@@ -51,64 +71,28 @@
 <!-- ===== MOBİL MENÜ ===== -->
 <nav class="mobile-nav" id="mobileNav">
   <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
-  <a href="/#hakkimizda" data-i18n="nav.about">Kurumsal<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
-  <a href="/#iletisim" class="btn btn-primary btn-block" data-i18n="nav.quote">İletişime Geçin</a>
+  <a href="/#iletisim" class="btn btn-primary btn-block" data-i18n="nav.quote">Teklif Al</a>
 </nav>
 
-<!-- ===== SAYFA BAŞLIĞI ===== -->
-<section class="subpage-hero">
-  <div class="wrap">
-    <div class="section-head reveal" style="margin-bottom:28px">
-      <span class="eyebrow" data-i18n="blog.eyebrow">Teknik Kütüphane</span>
-      <h1 class="section-title" data-i18n="blog.title" style="margin-top:14px">Blog & Makaleler</h1>
-      <p class="section-lead" data-i18n="blog.lead">Sektörel gelişmeler, teknik rehberler ve proje notları.</p>
-    </div>
+<!-- ===== İÇERİK ===== -->
+<main class="legal-wrap">
+  <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:16px">cookie</span> ÇEREZ POLİTİKASI</span>
+  <h1 id="cerezTitle">Çerez Politikası</h1>
 
-    <!-- Araç çubuğu: arama + yazar + etiket -->
-    <div class="blog-toolbar reveal">
-      <div class="blog-search">
-        <span class="material-symbols-rounded">search</span>
-        <input type="search" id="blogSearch" data-i18n-placeholder="blogp.search" placeholder="Yazılarda ara…" autocomplete="off" />
-      </div>
-      <select id="blogAuthor" title="Yazar">
-        <option value="" data-i18n="blogp.allAuthors">Tüm Yazarlar</option>
-      </select>
-      <div class="blog-tag-select" id="blogTagSelect">
-        <button type="button" id="blogTagButton"><span data-i18n="blogp.allTags">Tüm Etiketler</span><span class="material-symbols-rounded">expand_more</span></button>
-        <div class="blog-tag-menu" id="blogTagMenu"></div>
-      </div>
-      <div class="blog-active-tags" id="blogActiveTag" hidden>
-        <span id="blogActiveTagLabel" class="blog-active-tags-list"></span>
-        <button type="button" id="blogActiveTagClear" class="blog-active-tags-clear" aria-label="Tümünü temizle">
-          <span class="material-symbols-rounded">close</span>
-          <span data-i18n="blogp.clearTags">Temizle</span>
-        </button>
-      </div>
-    </div>
+  <div id="cerezBody">
+  <div class="legal-note">
+    <span class="material-symbols-rounded">info</span>
+    <span>Bu Çerez Politikası, Form Elektrik İnş.Müh.A.Ş tarafından işletilen internet sitesinde çerezlerin nasıl kullanıldığını açıklar.</span>
   </div>
-</section>
-
-<!-- ===== ÖNE ÇIKAN ===== -->
-<section class="blog-featured-section" id="blogFeaturedWrap" hidden style="padding-top:0">
-  <div class="wrap">
-    <a class="blog-featured" id="blogFeatured" href="#"></a>
+  <p>İçerik yükleniyor…</p>
+  <div class="legal-updated" id="cerezUpdated" style="display:none"></div>
   </div>
-</section>
-
-<!-- ===== LİSTE ===== -->
-<section class="blog-list-section" style="padding-top:24px">
-  <div class="wrap">
-    <div class="blog-grid" id="blogList"></div>
-    <div class="blog-empty" id="blogEmpty" hidden>
-      <span class="material-symbols-rounded">article</span>
-      <p data-i18n="blogp.empty">Aradığınız ölçütlere uyan yazı bulunamadı.</p>
-    </div>
-  </div>
-</section>
+</main>
 
 <!-- ===== FOOTER ===== -->
 <footer class="site-footer">
@@ -151,12 +135,42 @@
     </div>
     <div class="footer-bottom">
       <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
-
     </div>
   </div>
 </footer>
 
 <script src="/script.js"></script>
-<script src="/blog.js"></script>
+<script>
+(() => {
+  const titleEl = document.getElementById('cerezTitle');
+  const bodyEl = document.getElementById('cerezBody');
+  const updatedEl = document.getElementById('cerezUpdated');
+  function loadCerez() {
+    const lang = localStorage.getItem('fe-lang') || 'tr';
+    fetch('/api/settings/public/cerez?language=' + encodeURIComponent(lang))
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        const cerez = data && data.cerez;
+        if (!cerez) return;
+        document.documentElement.lang = cerez.language || lang;
+        if (titleEl && cerez.title) titleEl.textContent = cerez.title;
+        if (bodyEl && cerez.body) bodyEl.innerHTML = cerez.body;
+        if (updatedEl) {
+          if (cerez.updated) {
+            updatedEl.textContent = (lang === 'en' ? 'Last updated: ' : 'Son güncelleme: ') + cerez.updated;
+            updatedEl.style.display = '';
+            bodyEl && bodyEl.appendChild(updatedEl);
+          } else {
+            updatedEl.style.display = 'none';
+          }
+        }
+        document.title = (cerez.title || titleEl.textContent) + ' — Form Elektrik';
+      })
+      .catch(() => {});
+  }
+  loadCerez();
+  window.addEventListener('fe-lang-change', loadCerez);
+})();
+</script>
 </body>
 </html>

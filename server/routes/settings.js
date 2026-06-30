@@ -59,6 +59,68 @@ function kvkkPayload(language) {
   };
 }
 
+const DEFAULT_CEREZ = {
+  tr: {
+    title: 'Çerez Politikası',
+    updated: '',
+    body: `<div class="legal-note"><span class="material-symbols-rounded">info</span><span>Bu Çerez Politikası, Form Elektrik İnş.Müh.A.Ş ("Şirket") tarafından işletilen internet sitesinde çerezlerin nasıl kullanıldığını, hangi tür çerezlerin toplandığını ve bu çerezleri nasıl yönetebileceğinizi açıklar.</span></div>
+<h2>1. Çerez Nedir?</h2><p>Çerezler (cookies), ziyaret ettiğiniz internet siteleri tarafından tarayıcınız aracılığıyla cihazınıza kaydedilen küçük metin dosyalarıdır. Çerezler, sitenin düzgün çalışmasını sağlamak, deneyiminizi iyileştirmek ve site kullanımına ilişkin istatistik üretmek için kullanılır.</p>
+<h2>2. Hangi Çerezleri Kullanıyoruz?</h2>
+<table>
+<thead><tr><th>Çerez Türü</th><th>Amaç</th><th>Saklama Süresi</th></tr></thead>
+<tbody>
+<tr><td><b>Zorunlu Çerezler</b></td><td>Sitenin temel işlevleri için gereklidir: oturum yönetimi, güvenlik (oturum/kimlik doğrulama token'ı), dil tercihinin hatırlanması. Bu çerezler olmadan site düzgün çalışmaz.</td><td>Oturum / 7 gün</td></tr>
+<tr><td><b>İşlevsel Çerezler</b></td><td>Tercihlerinizi (dil seçimi, çerez onayınız) hatırlayarak siteyi kişiselleştirir.</td><td>1 yıl</td></tr>
+<tr><td><b>Analitik / İstatistik Çerezleri</b></td><td>Site kullanımını anonim olarak ölçmek için kullanılır (Rybbit Analytics — gizlilik odaklı, IP anonimleştirilir, kişisel veri toplamaz). Hangi sayfaların ziyaret edildiğini ve site performansını anlamamıza yardımcı olur.</td><td>1 yıl</td></tr>
+<tr><td><b>Pazarlama Çerezleri</b></td><td>Şu anda sitemizde reklam veya pazarlama amaçlı çerez kullanılmamaktadır.</td><td>—</td></tr>
+</tbody>
+</table>
+<h2>3. Üçüncü Taraf Çerezleri</h2><p>Sitemizde analitik amacıyla Rybbit Analytics kullanılmaktadır. Bu hizmet gizlilik odaklıdır; ziyaretçileri tanımlayan kalıcı tanımlayıcılar veya çapraz site takibi yapmaz, IP adreslerini anonimleştirir.</p>
+<h2>4. Çerezleri Nasıl Yönetebilirsiniz?</h2><p>Tarayıcınızın ayarlarından çerezleri silebilir, engelleyebilir veya çerez yerleştirilmeden önce uyarı verilmesini sağlayabilirsiniz. Ancak zorunlu çerezleri engellerseniz sitenin bazı bölümleri düzgün çalışmayabilir.</p>
+<ul>
+<li><b>Chrome:</b> Ayarlar → Gizlilik ve güvenlik → Çerezler ve diğer site verileri</li>
+<li><b>Firefox:</b> Ayarlar → Gizlilik ve Güvenlik → Çerezler ve Site Verileri</li>
+<li><b>Safari:</b> Tercihler → Gizlilik → Çerezleri yönet</li>
+<li><b>Edge:</b> Ayarlar → Çerezler ve site izinleri</li>
+</ul>
+<h2>5. Kişisel Verilerin Korunması</h2><p>Çerezler aracılığıyla işlenen kişisel verileriniz, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında işlenmektedir. Ayrıntılı bilgi için <a href="/kvkk">KVKK Aydınlatma Metni</a>'ni inceleyebilirsiniz.</p>
+<h2>6. İletişim</h2><p>Çerez politikamıza ilişkin sorularınız için <a href="/#iletisim">iletişim kanallarımız</a> üzerinden bize ulaşabilirsiniz.</p>`,
+  },
+  en: {
+    title: 'Cookie Policy',
+    updated: '',
+    body: `<div class="legal-note"><span class="material-symbols-rounded">info</span><span>This Cookie Policy explains how Form Elektrik İnş.Müh.A.Ş ("Company") uses cookies on its website, which types of cookies are collected, and how you can manage them.</span></div>
+<h2>1. What Are Cookies?</h2><p>Cookies are small text files stored on your device by the websites you visit. They help the site function properly, improve your experience and produce usage statistics.</p>
+<h2>2. Which Cookies Do We Use?</h2>
+<table>
+<thead><tr><th>Cookie Type</th><th>Purpose</th><th>Retention</th></tr></thead>
+<tbody>
+<tr><td><b>Strictly Necessary</b></td><td>Required for core functionality: session management, security (auth token), remembering language preference. The site cannot work properly without them.</td><td>Session / 7 days</td></tr>
+<tr><td><b>Functional</b></td><td>Personalize the site by remembering your preferences (language, cookie consent).</td><td>1 year</td></tr>
+<tr><td><b>Analytics</b></td><td>Used to measure site usage anonymously (Rybbit Analytics — privacy-first, IP anonymized, no personal data).</td><td>1 year</td></tr>
+<tr><td><b>Marketing</b></td><td>We currently do not use any advertising or marketing cookies.</td><td>—</td></tr>
+</tbody>
+</table>
+<h2>3. Third-Party Cookies</h2><p>We use Rybbit Analytics for analytics. This service is privacy-first; it does not use persistent identifiers or cross-site tracking and anonymizes IP addresses.</p>
+<h2>4. How to Manage Cookies</h2><p>You can delete or block cookies through your browser settings. However, blocking strictly necessary cookies may break parts of the site.</p>
+<h2>5. Data Protection</h2><p>Personal data processed through cookies is handled under applicable data protection law. See our <a href="/kvkk">Privacy Notice</a> for details.</p>
+<h2>6. Contact</h2><p>For questions about this Cookie Policy, please reach us through our <a href="/#iletisim">contact channels</a>.</p>`,
+  },
+};
+
+function cerezPayload(language) {
+  const lang = language === 'en' ? 'en' : 'tr';
+  const fallback = DEFAULT_CEREZ[lang] || DEFAULT_CEREZ.tr;
+  const trFallback = DEFAULT_CEREZ.tr;
+  const updatedRaw = get(`cerez_updated_${lang}`) || (lang !== 'tr' ? get('cerez_updated_tr') : '');
+  return {
+    language: lang,
+    title: get(`cerez_title_${lang}`) || (lang !== 'tr' ? get('cerez_title_tr') : '') || fallback.title || trFallback.title,
+    body: get(`cerez_body_${lang}`) || (lang !== 'tr' ? get('cerez_body_tr') : '') || fallback.body || trFallback.body,
+    updated: updatedRaw || '',
+  };
+}
+
 // PUBLIC — site analitik takip config'i (script src + ilgili site id).
 // ?site=main|li3|epsis ile hangi sitenin ID'si döneceği seçilir (varsayılan: main).
 // Hassas bilgi yok; site bu bilgiyle Rybbit script'ini yükler.
@@ -76,6 +138,11 @@ router.get('/public/analytics', (req, res) => {
 // PUBLIC — KVKK / Privacy Notice metni. Admin panelden yönetilir.
 router.get('/public/kvkk', (req, res) => {
   res.json({ kvkk: kvkkPayload(req.query.language || 'tr') });
+});
+
+// PUBLIC — Çerez Politikası metni. Admin panelden yönetilir.
+router.get('/public/cerez', (req, res) => {
+  res.json({ cerez: cerezPayload(req.query.language || 'tr') });
 });
 
 // PUBLIC — iletişim bilgileri (telefon, e-posta, adres, harita, sosyal). Admin panelden yönetilir.
@@ -124,6 +191,34 @@ router.put('/kvkk', authRequired, requireRole('admin'), requirePermission('kvkk'
   res.json({ ok: true });
 });
 
+// Admin — Çerez Politikası metinleri
+router.get('/cerez', authRequired, requireRole('admin'), requirePermission('cerez'), (req, res) => {
+  const all = getAll();
+  res.json({ settings: {
+    cerez_title_tr: all.cerez_title_tr || '',
+    cerez_body_tr: all.cerez_body_tr || '',
+    cerez_updated_tr: all.cerez_updated_tr || '',
+    cerez_title_en: all.cerez_title_en || '',
+    cerez_body_en: all.cerez_body_en || '',
+    cerez_updated_en: all.cerez_updated_en || '',
+  }});
+});
+
+router.put('/cerez', authRequired, requireRole('admin'), requirePermission('cerez'), (req, res) => {
+  const allowed = ['cerez_title_tr', 'cerez_body_tr', 'cerez_updated_tr', 'cerez_title_en', 'cerez_body_en', 'cerez_updated_en'];
+  const body = req.body || {};
+  const now = new Date();
+  const autoDate = (lang) => now.toLocaleDateString(lang === 'en' ? 'en-GB' : 'tr-TR',
+    { day: 'numeric', month: 'long', year: 'numeric' });
+  allowed.forEach(k => {
+    let v = body[k] || '';
+    if (k === 'cerez_updated_tr' && !v) v = autoDate('tr');
+    if (k === 'cerez_updated_en' && !v) v = autoDate('en');
+    set(k, v);
+  });
+  res.json({ ok: true });
+});
+
 // GET — tüm ayarları getir (şifre/key maskelenmiş)
 router.get('/', authRequired, requireRole('admin'), requirePermission('settings'), (req, res) => {
   const all = getAll();
@@ -139,6 +234,7 @@ router.put('/', authRequired, requireRole('admin'), requirePermission('settings'
     'appointment_notify_bess', 'appointment_notify_emobility',
     'contact_phone', 'contact_email', 'contact_address',
     'kvkk_title_tr', 'kvkk_body_tr', 'kvkk_updated_tr', 'kvkk_title_en', 'kvkk_body_en', 'kvkk_updated_en',
+    'cerez_title_tr', 'cerez_body_tr', 'cerez_updated_tr', 'cerez_title_en', 'cerez_body_en', 'cerez_updated_en',
     'maps_embed_url', 'maps_lat', 'maps_lng', 'social_linkedin', 'social_instagram', 'social_youtube', 'social_facebook',
     'rybbit_script_src', 'rybbit_site_id',
     'rybbit_site_id_li3', 'rybbit_site_id_epsis',
