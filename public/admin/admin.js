@@ -1611,6 +1611,10 @@ routes.services = async (page) => {
         <div><span class="field-label">Kart İkonu</span>${iconPickerHtml(row.icon)}</div>
         <div class="full"><span class="field-label">Özet</span><textarea id="${prefix}_summary" rows="3" placeholder="Kısa özet metni...">${escapeHtml(row.summary||'')}</textarea></div>
         ${coverUploaderHtml(prefix + '_cover_image', row.cover_image, 'Kapak Görseli')}
+        <label class="cover-toggle full">
+          <input type="checkbox" id="${prefix}_show_cover" ${(row.show_cover === undefined || row.show_cover) ? 'checked' : ''}>
+          <span>Kapağı detay sayfasında göster</span>
+        </label>
         <div class="full"><span class="field-label">İçerik</span><textarea id="${prefix}_body" rows="10">${escapeHtml(row.body||'')}</textarea></div>
         <div><span class="field-label">Sıra</span><input type="number" id="${prefix}_sort_order" value="${row.sort_order ?? 0}"></div>
         <div><span class="field-label">Durum</span><select id="${prefix}_status">${[['draft','Taslak'],['published','Yayında']].map(([v,l])=>`<option value="${v}" ${(row.status||'draft')===v?'selected':''}>${l}</option>`).join('')}</select></div>
@@ -1663,6 +1667,7 @@ routes.services = async (page) => {
         summary: wrap.querySelector(prefix + '_summary').value.trim() || null,
         icon: normalizeServiceIcon(iconInput ? iconInput.value : ''),
         cover_image: wrap.querySelector(prefix + '_cover_image').value.trim() || null,
+        show_cover: wrap.querySelector(prefix + '_show_cover')?.checked ? 1 : 0,
         body: getEditorContent(lang === 'tr' ? trBodySel : enBodySel),
         sort_order: Number(wrap.querySelector(prefix + '_sort_order').value) || 0,
         status: wrap.querySelector(prefix + '_status').value,
