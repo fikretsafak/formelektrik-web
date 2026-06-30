@@ -12,9 +12,11 @@ db.exec(schema);
 console.log('✓ Şema uygulandı.');
 
 // === Seed: Hizmetler ===
+// ÖNEMLİ: Bu seed yalnızca İLK kurulumda (services tablosu boşken) çalışır.
+// Sonraki update'lerde dokunulmaz — admin panelinden eklenen/silinen/düzenlenen
+// hizmetler korunur. (Eskiden ON CONFLICT DO UPDATE vardı; silinen hizmet geri
+// gelir + admin düzenlemesini ezerdi. Kaldırıldı.)
 const services = [
-  { code: 'ag-og',     icon: 'bolt',          title: 'AG-OG Projelendirme',
-    summary: 'Alçak ve orta gerilim elektrik tesisleri için anahtar teslim projelendirme, taahhüt ve devreye alma.' },
   { code: 'otomasyon', icon: 'settings_input_component', title: 'Şebeke Koruma ve Otomasyon',
     summary: 'Koruma röleleri, SCADA, trafo merkezi otomasyonu ve şebeke izleme çözümleri.' },
   { code: 'ges',       icon: 'solar_power',   title: 'Yenilenebilir Enerji (GES)',
@@ -25,16 +27,19 @@ const services = [
     summary: 'Elektrikli araç şarj altyapısı kurulumu, yük yönetimi ve işletme çözümleri.' },
 ];
 
-const insertService = db.prepare(`
-  INSERT INTO services (slug, code, title, summary, body, icon, language, sort_order, status)
-  VALUES (@slug, @code, @title, @summary, '', @icon, 'tr', @sort_order, 'published')
-  ON CONFLICT(slug, language) DO UPDATE SET
-    code=excluded.code, title=excluded.title, summary=excluded.summary, icon=excluded.icon, sort_order=excluded.sort_order
-`);
-const svcTxn = db.transaction(items => items.forEach((s, i) =>
-  insertService.run({ slug: s.code, code: s.code, title: s.title, summary: s.summary, icon: s.icon, sort_order: i })));
-svcTxn(services);
-console.log(`✓ ${services.length} hizmet seed edildi.`);
+const serviceCount = db.prepare('SELECT COUNT(*) AS n FROM services').get().n;
+if (serviceCount === 0) {
+  const insertService = db.prepare(`
+    INSERT INTO services (slug, code, title, summary, body, icon, language, sort_order, status)
+    VALUES (@slug, @code, @title, @summary, '', @icon, 'tr', @sort_order, 'published')
+  `);
+  const svcTxn = db.transaction(items => items.forEach((s, i) =>
+    insertService.run({ slug: s.code, code: s.code, title: s.title, summary: s.summary, icon: s.icon, sort_order: i })));
+  svcTxn(services);
+  console.log(`✓ ${services.length} hizmet seed edildi (ilk kurulum).`);
+} else {
+  console.log(`✓ Hizmetler mevcut (${serviceCount}), seed atlandı — veriye dokunulmadı.`);
+}
 
 // === Seed: Markalar (çatı altındaki alt markalar) ===
 const brands = [

@@ -265,7 +265,7 @@ if (tableExists('appointment_topics')) {
   const cnt = db.prepare('SELECT COUNT(*) AS c FROM appointment_topics').get().c;
   if (cnt === 0) {
     const ins = db.prepare('INSERT INTO appointment_topics (title, sort_order) VALUES (?, ?)');
-    ['AG-OG Projelendirme', 'Şebeke Koruma ve Otomasyon', 'Yenilenebilir Enerji (GES)', 'Enerji Depolama (BESS)', 'E-Mobility / EV Şarj']
+    ['Şebeke Koruma ve Otomasyon', 'Yenilenebilir Enerji (GES)', 'Enerji Depolama (BESS)', 'E-Mobility / EV Şarj']
       .forEach((title, i) => ins.run(title, i));
   }
 }
