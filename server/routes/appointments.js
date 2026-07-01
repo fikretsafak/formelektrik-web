@@ -116,7 +116,13 @@ router.get('/slots', (req, res) => {
 router.post('/', bookLimiter, async (req, res) => {
   const { slotId, firstName, lastName, email, phone, company, product, notes, topics } = req.body || {};
 
-  if (!slotId || !isNonEmptyString(firstName, 80) || !isNonEmptyString(lastName, 80) || !isEmail(email)) {
+  if (!slotId || !isNonEmptyString(firstName, 80) || !isNonEmptyString(lastName, 80) ||
+      !isEmail(email) || !isNonEmptyString(company, 120)) {
+    return res.status(400).json({ error: 'invalid_input' });
+  }
+  // Telefon zorunlu + en az 7 rakam (fake tek haneli girişleri ele)
+  const phoneDigits = String(phone || '').replace(/\D/g, '');
+  if (phoneDigits.length < 7 || phoneDigits.length > 20) {
     return res.status(400).json({ error: 'invalid_input' });
   }
 

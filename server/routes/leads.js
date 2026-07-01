@@ -13,7 +13,13 @@ router.post('/', submitLimiter, async (req, res) => {
   const { firstName, lastName, email, phone, company, products, message } = req.body || {};
 
   if (!isNonEmptyString(firstName, 80) || !isNonEmptyString(lastName, 80) ||
-      !isEmail(email) || !Array.isArray(products) || products.length === 0) {
+      !isEmail(email) || !isNonEmptyString(company, 120) ||
+      !Array.isArray(products) || products.length === 0) {
+    return res.status(400).json({ error: 'invalid_input' });
+  }
+  // Telefon zorunlu + en az 7 rakam (fake tek haneli girişleri ele)
+  const phoneDigits = String(phone || '').replace(/\D/g, '');
+  if (phoneDigits.length < 7 || phoneDigits.length > 20) {
     return res.status(400).json({ error: 'invalid_input' });
   }
   // İlgilenilen konular: randevu konusu başlıkları (serbest metin) ya da eski sabit hizmet kodları.
