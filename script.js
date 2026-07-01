@@ -512,13 +512,24 @@
     if (!list.length) { const sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
     const sec = grid.closest('section'); if (sec) sec.style.display = '';
     grid.innerHTML = list.map(b => {
-      const ext = b.url ? `href="${esc(b.url)}" target="_blank" rel="noopener"` : '';
-      return `<a class="brand-card reveal" ${ext}>
+      // Kart → marka detay sayfası; "Siteyi ziyaret et" → dış site (yeni sekme).
+      // Buton karta gömülü ayrı <a>; iç içe <a> geçersiz olduğu için kart <div>.
+      const detailHref = b.slug ? `/marka?slug=${encodeURIComponent(b.slug)}` : '';
+      const visitBtn = b.url
+        ? `<a class="visit" href="${esc(b.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(t('brands.visit'))} <span class="material-symbols-rounded">north_east</span></a>`
+        : '';
+      return `<div class="brand-card reveal" ${detailHref ? `data-href="${esc(detailHref)}" role="link" tabindex="0" style="cursor:pointer"` : ''}>
         <div class="brand-logo-box">${b.logo_url ? `<img src="${esc(b.logo_url)}" alt="${esc(b.name)}" />` : `<span class="brand-logo-text">${esc(b.name)}</span>`}</div>
         <p>${esc(b.description || '')}</p>
-        ${b.url ? `<span class="visit">${esc(t('brands.visit'))} <span class="material-symbols-rounded">north_east</span></span>` : ''}
-      </a>`;
+        ${visitBtn}
+      </div>`;
     }).join('');
+    // Kart tıklaması → detay (buton hariç, o stopPropagation ile dış siteye gider)
+    grid.querySelectorAll('.brand-card[data-href]').forEach(card => {
+      const go = () => { location.href = card.dataset.href; };
+      card.addEventListener('click', go);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    });
     bindReveal();
   }
 

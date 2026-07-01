@@ -152,7 +152,9 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
 
 /* ===== Çözümlerimiz — görselli kart grid ===== */
-.solutions-grid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+/* Flexbox — son satırdaki eksik kartlar ortalansın (grid'de sola yaslıydı) */
+.solutions-grid { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
+.solutions-grid .solution-card { flex: 1 1 300px; max-width: calc((100% - 44px) / 3); } /* 3 sütun (2×22px gap) */
 .solution-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform .22s, box-shadow .22s, border-color .22s; }
 .solution-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
 .solution-media { position: relative; height: 200px; overflow: hidden; background: linear-gradient(135deg, var(--navy), var(--navy-2)); }
@@ -423,7 +425,8 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .brand-logo-box img { max-height: 46px; width: auto; object-fit: contain; }
 .brand-logo-text { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700; color: var(--navy); }
 .brand-card p { color: var(--text-soft); font-size: 0.95rem; flex: 1; }
-.brand-card .visit { display: inline-flex; align-items: center; gap: 6px; color: var(--cyan-2); font-weight: 600; font-size: 0.92rem; margin-top: 20px; }
+.brand-card .visit { display: inline-flex; align-items: center; gap: 6px; color: var(--cyan-2); font-weight: 600; font-size: 0.92rem; margin-top: 20px; text-decoration: none; align-self: flex-start; }
+.brand-card .visit:hover { text-decoration: underline; }
 .brand-card .visit .material-symbols-rounded { font-size: 18px; }
 
 /* ============================================
@@ -791,7 +794,7 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
    ============================================ */
 @media (max-width: 980px) {
   .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .solutions-grid { grid-template-columns: repeat(2, 1fr); }
+  .solutions-grid .solution-card { max-width: calc((100% - 22px) / 2); }
   .services-showcase { min-height: auto; }
   .services-showcase-card { position: relative; inset: auto; margin: 28px; grid-template-columns: 1fr; }
   .services-showcase-media { min-height: 320px; }
@@ -818,7 +821,7 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 }
 @media (max-width: 760px) {
   .services-grid { grid-template-columns: 1fr; }
-  .solutions-grid { grid-template-columns: 1fr; }
+  .solutions-grid .solution-card { max-width: 100%; }
   .services-showcase-card { margin: 14px; border-width: 8px; border-radius: 22px; }
   .services-showcase-media { min-height: 240px; }
   .services-showcase-panel { padding: 24px 18px; }
