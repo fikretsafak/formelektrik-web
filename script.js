@@ -12,7 +12,7 @@
   const I18N = {
     tr: {
       'nav.services': 'Çözümler', 'nav.about': 'Kurumsal', 'nav.projects': 'Referanslar',
-      'nav.brands': 'Markalarımız', 'nav.blog': 'Blog', 'nav.contact': 'İletişim', 'nav.quote': 'İletişime Geçin',
+      'nav.brands': 'Markalarımız', 'nav.blog': 'Blog', 'nav.careers': 'Kariyer', 'nav.contact': 'İletişim', 'nav.quote': 'İletişime Geçin',
       'hero.eyebrow': "2000'den beri enerji mühendisliği",
       'hero.title': 'Geleceğin enerjisini bugünden şekillendiriyoruz.',
       'hero.sub': 'Şebeke koruma ve otomasyondan yenilenebilir enerjiye, enerji depolamadan e-mobiliteye — enerjinin iletim, dağıtım ve tüketim süreçlerinde uçtan uca akıllı çözümler sunuyoruz.',
@@ -152,7 +152,7 @@
     },
     en: {
       'nav.services': 'Solutions', 'nav.about': 'Company', 'nav.projects': 'References',
-      'nav.brands': 'Our Brands', 'nav.blog': 'Blog', 'nav.contact': 'Contact', 'nav.quote': 'Get in Touch',
+      'nav.brands': 'Our Brands', 'nav.blog': 'Blog', 'nav.careers': 'Careers', 'nav.contact': 'Contact', 'nav.quote': 'Get in Touch',
       'hero.eyebrow': 'Energy engineering since 2000',
       'hero.title': 'Shaping the energy of the future, today.',
       'hero.sub': 'From grid protection and automation to renewable energy, from energy storage to e-mobility — we deliver end-to-end smart solutions across transmission, distribution and consumption.',

@@ -822,6 +822,19 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 @media (max-width: 760px) {
   .services-grid { grid-template-columns: 1fr; }
   .solutions-grid .solution-card { max-width: 100%; }
+  /* Randevu takvimi mobil: dar padding, slotlar 2 sütun, esnek yükseklik */
+  .cta-calendar-card { padding: 18px 16px; }
+  .cta-calendar-card .qa-step { height: auto; min-height: 300px; max-height: 62vh; }
+  .qa-slots { grid-template-columns: repeat(2, 1fr); }
+  .qa-opt, .qa-slot { padding: 13px 12px; font-size: .92rem; }
+  /* Footer mobil: marka üstte tam genişlik, linkler 2 sütun düzenli */
+  .site-footer { padding-top: 48px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 28px 20px; padding-bottom: 36px; }
+  .footer-brand { grid-column: 1 / -1; text-align: center; }
+  .footer-brand img { height: 64px; margin-left: auto; margin-right: auto; }
+  .footer-brand p { max-width: 100%; margin-left: auto; margin-right: auto; }
+  .footer-brand .footer-contact-line { justify-content: center; }
+  .footer-col h4 { margin-bottom: 12px; }
   .services-showcase-card { margin: 14px; border-width: 8px; border-radius: 22px; }
   .services-showcase-media { min-height: 240px; }
   .services-showcase-panel { padding: 24px 18px; }

@@ -355,7 +355,8 @@
 @media (max-width: 900px) {
   .blog-featured { grid-template-columns: 1fr; }
   .post-shell { grid-template-columns: 1fr; padding-left: 20px; padding-right: 20px; }
-  .post-toc { position: static; }
+  /* Mobilde içindekiler (TOC) gizli — üstte yer kaplayıp yazıya ulaşmayı zorlaştırıyordu */
+  .post-toc { display: none !important; }
   .post-related-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px) {
