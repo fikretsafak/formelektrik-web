@@ -135,13 +135,14 @@
         <h2 data-i18n="career.applyTitle">Başvurunuzu yapın</h2>
         <p data-i18n="career.applySub">Açık bir pozisyona ya da genel havuza başvurabilirsiniz. CV'nizi ekleyin, sizinle iletişime geçelim.</p>
         <form id="applyForm">
+          <p class="form-required-note"><span class="req-star">*</span><span data-i18n="form.requiredNote">işaretli alanlar zorunludur</span></p>
           <div class="field-row">
-            <div class="field"><label data-i18n="form.firstName">Ad</label><input name="firstName" required maxlength="80" /></div>
-            <div class="field"><label data-i18n="form.lastName">Soyad</label><input name="lastName" required maxlength="80" /></div>
+            <div class="field"><label data-i18n="form.firstName">Ad <span class="req-star">*</span></label><input name="firstName" required maxlength="80" /></div>
+            <div class="field"><label data-i18n="form.lastName">Soyad <span class="req-star">*</span></label><input name="lastName" required maxlength="80" /></div>
           </div>
           <div class="field-row">
-            <div class="field"><label data-i18n="form.email">E-posta</label><input name="email" type="email" required /></div>
-            <div class="field"><label data-i18n="form.phone">Telefon</label><input name="phone" /></div>
+            <div class="field"><label data-i18n="form.email">E-posta <span class="req-star">*</span></label><input name="email" type="email" required /></div>
+            <div class="field"><label data-i18n="form.phone">Telefon <span class="req-star">*</span></label><input name="phone" type="tel" required /></div>
           </div>
           <div class="field">
             <label data-i18n="career.position">Pozisyon</label>

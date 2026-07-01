@@ -131,6 +131,11 @@ router.post('/apply', applyLimiter, async (req, res) => {
   if (!isNonEmptyString(firstName, 80) || !isNonEmptyString(lastName, 80) || !isEmail(email)) {
     return res.status(400).json({ error: 'invalid_input' });
   }
+  // Telefon zorunlu + en az 7 rakam (fake tek haneli girişleri ele)
+  const phoneDigits = String(phone || '').replace(/\D/g, '');
+  if (phoneDigits.length < 7 || phoneDigits.length > 20) {
+    return res.status(400).json({ error: 'invalid_input' });
+  }
   // cvUrl yalnızca kendi upload dizinimizden kabul edilir
   const cleanCv = (typeof cvUrl === 'string' && /^\/uploads\/[A-Za-z0-9._-]+$/.test(cvUrl)) ? cvUrl : null;
   // CV zorunlu

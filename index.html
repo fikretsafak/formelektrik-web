@@ -359,14 +359,15 @@
       <h3 data-i18n="appt.formTitle">Bilgileriniz</h3>
       <p class="modal-sub" id="apptFormSub"></p>
       <form id="apptForm">
+        <p class="form-required-note"><span class="req-star">*</span><span data-i18n="form.requiredNote">işaretli alanlar zorunludur</span></p>
         <div class="field-row">
-          <div class="field"><label data-i18n="form.firstName">Ad</label><input name="firstName" required maxlength="80" /></div>
-          <div class="field"><label data-i18n="form.lastName">Soyad</label><input name="lastName" required maxlength="80" /></div>
+          <div class="field"><label data-i18n="form.firstName">Ad <span class="req-star">*</span></label><input name="firstName" required maxlength="80" /></div>
+          <div class="field"><label data-i18n="form.lastName">Soyad <span class="req-star">*</span></label><input name="lastName" required maxlength="80" /></div>
         </div>
-        <div class="field"><label data-i18n="form.email">E-posta</label><input name="email" type="email" required /></div>
+        <div class="field"><label data-i18n="form.email">E-posta <span class="req-star">*</span></label><input name="email" type="email" required /></div>
         <div class="field-row">
-          <div class="field"><label data-i18n="form.phone">Telefon</label><input name="phone" type="tel" required /></div>
-          <div class="field"><label data-i18n="form.company">Şirket</label><input name="company" required maxlength="120" /></div>
+          <div class="field"><label data-i18n="form.phone">Telefon <span class="req-star">*</span></label><input name="phone" type="tel" required /></div>
+          <div class="field"><label data-i18n="form.company">Şirket <span class="req-star">*</span></label><input name="company" required maxlength="120" /></div>
         </div>
         <div class="field"><label data-i18n="form.message">Not</label><textarea name="notes"></textarea></div>
         <button type="submit" class="btn btn-primary btn-block"><span class="material-symbols-rounded">check</span> <span data-i18n="appt.confirm">Randevuyu Oluştur</span></button>
@@ -389,14 +390,15 @@
     <h3 data-i18n="contactForm.title">İletişime Geçin</h3>
     <p class="modal-sub" data-i18n="contactForm.sub">İhtiyacınızı paylaşın, uzman ekibimiz en kısa sürede dönüş yapsın.</p>
     <form id="leadForm">
+      <p class="form-required-note"><span class="req-star">*</span><span data-i18n="form.requiredNote">işaretli alanlar zorunludur</span></p>
       <div class="field-row">
-        <div class="field"><label data-i18n="form.firstName">Ad</label><input name="firstName" required maxlength="80" /></div>
-        <div class="field"><label data-i18n="form.lastName">Soyad</label><input name="lastName" required maxlength="80" /></div>
+        <div class="field"><label data-i18n="form.firstName">Ad <span class="req-star">*</span></label><input name="firstName" required maxlength="80" /></div>
+        <div class="field"><label data-i18n="form.lastName">Soyad <span class="req-star">*</span></label><input name="lastName" required maxlength="80" /></div>
       </div>
-      <div class="field"><label data-i18n="form.email">E-posta</label><input name="email" type="email" required /></div>
+      <div class="field"><label data-i18n="form.email">E-posta <span class="req-star">*</span></label><input name="email" type="email" required /></div>
       <div class="field-row">
-        <div class="field"><label data-i18n="form.phone">Telefon</label><input name="phone" type="tel" required /></div>
-        <div class="field"><label data-i18n="form.company">Şirket</label><input name="company" required maxlength="120" /></div>
+        <div class="field"><label data-i18n="form.phone">Telefon <span class="req-star">*</span></label><input name="phone" type="tel" required /></div>
+        <div class="field"><label data-i18n="form.company">Şirket <span class="req-star">*</span></label><input name="company" required maxlength="120" /></div>
       </div>
       <div class="field">
         <label data-i18n="contactForm.services">İlgilendiğiniz konular</label>

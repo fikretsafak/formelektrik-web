@@ -564,6 +564,9 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .form-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(28px, 4vw, 40px); box-shadow: var(--shadow-sm); }
 .field { margin-bottom: 18px; }
 .field label { display: block; font-size: 0.85rem; color: var(--navy); margin-bottom: 8px; font-weight: 600; }
+.req-star { color: #ef4444; font-weight: 700; margin-left: 2px; }
+.form-required-note { font-size: 0.8rem; color: var(--text-faint); margin: 0 0 14px; }
+.form-required-note .req-star { margin-left: 0; margin-right: 3px; }
 .field input, .field textarea, .field select { width: 100%; background: var(--bg-soft); border: 1px solid var(--line-2); border-radius: var(--radius-sm); padding: 13px 15px; color: var(--text); font-size: 0.96rem; transition: border-color .15s, box-shadow .15s; }
 .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(42,169,224,0.15); background: #fff; }
 .field textarea { resize: vertical; min-height: 110px; }
@@ -802,6 +805,8 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
   .hero-visual { max-width: 520px; min-height: 380px; }
   .about-grid { grid-template-columns: 1fr; gap: 40px; }
   .about-hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  /* Randevu bölümü: yazı + takvim alt alta (tablette de yan yana taşıyordu) */
+  .cta-scheduler { grid-template-columns: 1fr; gap: 32px; }
   .about-hero-visual { max-width: 420px; }
   .about-fields { grid-template-columns: repeat(2, 1fr); }
   .about-fields-4 { grid-template-columns: repeat(2, 1fr); }
@@ -822,7 +827,10 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 @media (max-width: 760px) {
   .services-grid { grid-template-columns: 1fr; }
   .solutions-grid .solution-card { max-width: 100%; }
-  /* Randevu takvimi mobil: dar padding, slotlar 2 sütun, esnek yükseklik */
+  /* Randevu bölümü mobil: yazı + takvim ALT ALTA (yan yana taşıyordu) */
+  .cta-scheduler { grid-template-columns: 1fr; gap: 28px; }
+  .cta-scheduler-copy h2, .cta-scheduler-copy p { max-width: 100%; }
+  .cta-scheduler .hero-cta { flex-direction: column; align-items: stretch; }
   .cta-calendar-card { padding: 18px 16px; }
   .cta-calendar-card .qa-step { height: auto; min-height: 300px; max-height: 62vh; }
   .qa-slots { grid-template-columns: repeat(2, 1fr); }
