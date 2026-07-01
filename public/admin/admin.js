@@ -370,6 +370,43 @@ function canAccessSection(route) {
   return userPermissions.includes(route);
 }
 
+// Menü gruplarını açılıp daralan hale getir; durum localStorage'da saklanır.
+function setupCollapsibleNav() {
+  const COLLAPSE_KEY = 'fe-admin-nav-collapsed';
+  let collapsed = [];
+  try { collapsed = JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '[]'); } catch { collapsed = []; }
+
+  document.querySelectorAll('.nav-group').forEach((group, i) => {
+    const title = group.querySelector('.nav-group-title');
+    if (!title) return;
+    // Grup kimliği: başlığın data-i18n'i (kalıcı, sıradan bağımsız)
+    const key = title.querySelector('[data-i18n]')?.getAttribute('data-i18n') || ('group-' + i);
+
+    // Başlıktan sonraki linkleri tek bir kaba sar (yoksa)
+    let items = group.querySelector('.nav-group-items');
+    if (!items) {
+      items = document.createElement('div');
+      items.className = 'nav-group-items';
+      const links = [...group.querySelectorAll('.side-link')];
+      links.forEach(l => items.appendChild(l));
+      group.appendChild(items);
+    }
+
+    if (collapsed.includes(key)) { group.classList.add('collapsed'); title.setAttribute('aria-expanded', 'false'); }
+
+    title.addEventListener('click', () => {
+      const nowCollapsed = group.classList.toggle('collapsed');
+      title.setAttribute('aria-expanded', String(!nowCollapsed));
+      // Sakla
+      try {
+        const set = new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '[]'));
+        if (nowCollapsed) set.add(key); else set.delete(key);
+        localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...set]));
+      } catch { /* sessiz */ }
+    });
+  });
+}
+
 async function init() {
   // Auth check
   let me;
@@ -397,6 +434,7 @@ async function init() {
     const anyVisible = [...group.querySelectorAll('.side-link')].some(l => l.style.display !== 'none');
     if (!anyVisible) group.hidden = true;
   });
+  setupCollapsibleNav();
 
   renderWhoBlock(me);
   document.getElementById('logoutBtn').onclick = async () => {
