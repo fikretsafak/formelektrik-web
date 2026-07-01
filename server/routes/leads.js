@@ -3,11 +3,20 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
 const { isEmail, isNonEmptyString } = require('../middleware/validate');
-const { sendMail } = require('../mailer');
+const { sendMail, wrapEmail, mailRow, mailTable } = require('../mailer');
 
 const router = express.Router();
 
 const submitLimiter = rateLimit({ windowMs: 60 * 1000, max: 5 });
+
+// Bildirim adresi: DB (admin panel) → .env → varsayılan
+function leadNotifyTo() {
+  try {
+    const row = db.prepare("SELECT value FROM settings WHERE key = 'lead_notify_email'").get();
+    if (row && row.value && row.value.trim()) return row.value.trim();
+  } catch { /* yoksa .env'e düş */ }
+  return process.env.LEAD_NOTIFY_TO || null;
+}
 
 router.post('/', submitLimiter, async (req, res) => {
   const { firstName, lastName, email, phone, company, products, message } = req.body || {};
@@ -47,20 +56,18 @@ router.post('/', submitLimiter, async (req, res) => {
   );
 
   // Notify admin (fire-and-forget)
-  const notifyTo = process.env.LEAD_NOTIFY_TO;
+  const notifyTo = leadNotifyTo();
   if (notifyTo) {
     const subject = `Yeni teklif talebi — ${firstName} ${lastName} (${company || 'şirket belirtilmemiş'})`;
-    const html = `
-      <h2>Yeni Teklif / İletişim Talebi</h2>
-      <table style="border-collapse:collapse">
-        <tr><td><b>Ad Soyad</b></td><td>${escapeHtml(firstName)} ${escapeHtml(lastName)}</td></tr>
-        <tr><td><b>E-posta</b></td><td>${escapeHtml(email)}</td></tr>
-        <tr><td><b>Telefon</b></td><td>${escapeHtml(phone || '-')}</td></tr>
-        <tr><td><b>Şirket</b></td><td>${escapeHtml(company || '-')}</td></tr>
-        <tr><td><b>İlgilenilen Hizmetler</b></td><td>${cleanProducts.join(', ')}</td></tr>
-        <tr><td valign="top"><b>Mesaj</b></td><td>${escapeHtml(message || '-')}</td></tr>
-      </table>
-    `;
+    const rows = mailTable(
+      mailRow('Ad Soyad', `${escapeHtml(firstName)} ${escapeHtml(lastName)}`) +
+      mailRow('E-posta', `<a href="mailto:${escapeHtml(email)}" style="color:#2aa9e0">${escapeHtml(email)}</a>`) +
+      mailRow('Telefon', escapeHtml(phone || '-')) +
+      mailRow('Şirket', escapeHtml(company || '-')) +
+      mailRow('İlgilenilen Konular', escapeHtml(cleanProducts.join(', '))) +
+      mailRow('Mesaj', escapeHtml(message || '-').replace(/\n/g, '<br>'))
+    );
+    const html = wrapEmail(rows, { title: 'Yeni Teklif / İletişim Talebi', preheader: `${firstName} ${lastName} — ${company || ''}` });
     sendMail({ to: notifyTo, subject, html, replyTo: email }).catch(() => {});
   }
 

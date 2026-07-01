@@ -3025,13 +3025,27 @@ routes.settings = async (page) => {
           <div class="settings-section-title">Bildirim E-postaları</div>
           <div class="settings-row">
             <label class="settings-row-label" for="appointmentNotifyTo">
-              Genel Bildirim
+              Randevu Bildirimi (genel)
               <small>Konuya özel adres tanımlı değilse buraya gider</small>
             </label>
             <input class="settings-row-input" id="appointmentNotifyTo" value="${escapeHtml(settings.appointment_notify_to || '')}" placeholder="admin@formelektrik.com">
           </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="leadNotifyEmail">
+              İletişim Talebi Bildirimi
+              <small>İletişim formundan gelen teklif talepleri bu adrese düşer</small>
+            </label>
+            <input class="settings-row-input" id="leadNotifyEmail" value="${escapeHtml(settings.lead_notify_email || '')}" placeholder="info@formelektrik.com">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="careerNotifyEmail">
+              Kariyer Başvuru Bildirimi
+              <small>Kariyer sayfasından gelen iş başvuruları bu adrese düşer</small>
+            </label>
+            <input class="settings-row-input" id="careerNotifyEmail" value="${escapeHtml(settings.career_notify_email || '')}" placeholder="ik@formelektrik.com">
+          </div>
           <div style="font-size:12px;color:var(--text-dim);background:rgba(0,212,255,0.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.5">
-            Konuya özel bildirim e-postaları artık <b style="color:var(--text)">Randevu Konuları</b> sayfasından yönetilir. Her konu için ayrı bir adres girebilirsin; randevu o konuyla geldiğinde mail oraya gider.
+            Konuya özel randevu bildirimleri <b style="color:var(--text)">Randevu Konuları</b> sayfasından yönetilir. Adresler boşsa .env'deki genel adrese düşer.
           </div>
         </div>
       </div>
@@ -3130,6 +3144,8 @@ routes.settings = async (page) => {
       smtp_pass: page.querySelector('#smtpPass').value,
       smtp_from: page.querySelector('#smtpFrom').value.trim(),
       appointment_notify_to: page.querySelector('#appointmentNotifyTo').value.trim(),
+      lead_notify_email: page.querySelector('#leadNotifyEmail').value.trim(),
+      career_notify_email: page.querySelector('#careerNotifyEmail').value.trim(),
       contact_phone: page.querySelector('#contactPhone').value.trim(),
       contact_email: page.querySelector('#contactEmail').value.trim(),
       contact_address: page.querySelector('#contactAddress').value.trim(),

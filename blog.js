@@ -118,8 +118,8 @@
     a.innerHTML = `
       ${cover}
       <div class="post-body">
-        ${tags.length ? `<div class="post-tags">${tags.map(t => `<span class="post-tag">#${esc(t)}</span>`).join('')}</div>` : ''}
         <h3>${esc(p.title)}</h3>
+        ${tags.length ? `<div class="post-tags">${tags.map(t => `<span class="post-tag">#${esc(t)}</span>`).join('')}</div>` : ''}
         <p>${esc(p.excerpt || '')}</p>
         <div class="post-card-foot">
           ${p.author_avatar

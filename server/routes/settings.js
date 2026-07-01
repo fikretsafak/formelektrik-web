@@ -230,8 +230,9 @@ router.get('/', authRequired, requireRole('admin'), requirePermission('settings'
 // PUT — ayarları güncelle
 router.put('/', authRequired, requireRole('admin'), requirePermission('settings'), (req, res) => {
   const allowed = ['smtp_host', 'smtp_port', 'smtp_secure', 'smtp_user', 'smtp_pass', 'smtp_from', 'appointment_notify_to',
-    'appointment_notify_ag-og', 'appointment_notify_otomasyon', 'appointment_notify_ges',
+    'appointment_notify_otomasyon', 'appointment_notify_ges',
     'appointment_notify_bess', 'appointment_notify_emobility',
+    'lead_notify_email', 'career_notify_email',
     'contact_phone', 'contact_email', 'contact_address',
     'kvkk_title_tr', 'kvkk_body_tr', 'kvkk_updated_tr', 'kvkk_title_en', 'kvkk_body_en', 'kvkk_updated_en',
     'cerez_title_tr', 'cerez_body_tr', 'cerez_updated_tr', 'cerez_title_en', 'cerez_body_en', 'cerez_updated_en',

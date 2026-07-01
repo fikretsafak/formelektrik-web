@@ -3,13 +3,12 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
 const { isEmail, isNonEmptyString } = require('../middleware/validate');
-const { sendMail } = require('../mailer');
+const { sendMail, wrapEmail, mailRow, mailTable } = require('../mailer');
 const { buildIcs } = require('../ics');
 
 const router = express.Router();
 
 const APP_BASE_URL = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
-const LOGO_URL = `${APP_BASE_URL}/assets/main/logo-light.png`;
 
 const bookLimiter = rateLimit({ windowMs: 60 * 1000, max: 5 });
 
@@ -196,51 +195,38 @@ router.post('/', bookLimiter, async (req, res) => {
   } catch {}
   if (!notifyTo) notifyTo = process.env.APPOINTMENT_NOTIFY_TO || process.env.LEAD_NOTIFY_TO;
   if (notifyTo) {
+    const adminRows = mailTable(
+      (topicsStr ? mailRow('Konular', escapeHtml(topicsStr)) : mailRow('Ürün', escapeHtml(productLabel(product)))) +
+      mailRow('Tarih', escapeHtml(dateStr)) +
+      mailRow('Saat', escapeHtml(timeStr)) +
+      mailRow('Ad Soyad', `${escapeHtml(firstName)} ${escapeHtml(lastName)}`) +
+      mailRow('E-posta', `<a href="mailto:${escapeHtml(email)}" style="color:#2aa9e0">${escapeHtml(email)}</a>`) +
+      mailRow('Telefon', escapeHtml(phone || '-')) +
+      mailRow('Şirket', escapeHtml(company || '-')) +
+      mailRow('Not', escapeHtml(notes || '-').replace(/\n/g, '<br>'))
+    );
     sendMail({
       to: notifyTo,
       subject: `Yeni randevu [${productLabel(product)}] — ${firstName} ${lastName} (${dateStr} ${timeStr})`,
-      html: `
-        <h2>Yeni Görüşme Randevusu</h2>
-        <table style="border-collapse:collapse;font-family:Arial,sans-serif">
-          ${topicsStr ? `<tr><td style="padding:6px 12px"><b>Konular</b></td><td style="padding:6px 12px">${escapeHtml(topicsStr)}</td></tr>` : `<tr><td style="padding:6px 12px"><b>Ürün</b></td><td style="padding:6px 12px">${escapeHtml(productLabel(product))}</td></tr>`}
-          <tr><td style="padding:6px 12px"><b>Tarih</b></td><td style="padding:6px 12px">${escapeHtml(dateStr)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Saat</b></td><td style="padding:6px 12px">${escapeHtml(timeStr)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Ad Soyad</b></td><td style="padding:6px 12px">${escapeHtml(firstName)} ${escapeHtml(lastName)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>E-posta</b></td><td style="padding:6px 12px">${escapeHtml(email)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Telefon</b></td><td style="padding:6px 12px">${escapeHtml(phone || '-')}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Şirket</b></td><td style="padding:6px 12px">${escapeHtml(company || '-')}</td></tr>
-          <tr><td style="padding:6px 12px" valign="top"><b>Not</b></td><td style="padding:6px 12px">${escapeHtml(notes || '-')}</td></tr>
-        </table>
-      `,
+      html: wrapEmail(adminRows, { title: 'Yeni Görüşme Randevusu', preheader: `${firstName} ${lastName} — ${dateStr} ${timeStr}` }),
       replyTo: email,
     }).catch(() => {});
   }
 
   // Kullanıcıya onay maili
+  const userBody = `
+    <p style="margin:0 0 16px;color:#4a5573;font-size:15px;line-height:1.7">Merhaba <b>${escapeHtml(firstName)}</b>, görüşme randevunuz başarıyla oluşturuldu.</p>
+    <div style="background:#eaf7fd;padding:18px;border-radius:10px;margin:20px 0;border-left:4px solid #2aa9e0">
+      <p style="margin:0;font-size:15px;font-weight:700;color:#0f1640">${escapeHtml(dateStr)}</p>
+      <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#2aa9e0">${escapeHtml(timeStr)}</p>
+      <p style="margin:8px 0 0;color:#4a5573;font-size:13px">30 dakikalık görüşme</p>
+    </div>
+    <p style="margin:0;color:#4a5573;font-size:14px;line-height:1.7">Randevunuz onaylandığında size ayrıca bilgi vereceğiz. Sorularınız için
+      <a href="mailto:info@formelektrik.com" style="color:#2aa9e0">info@formelektrik.com</a> adresine yazabilirsiniz.</p>`;
   sendMail({
     to: email,
     subject: `Randevu Talebiniz Alındı — ${dateStr} ${timeStr}`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;background:#f5f7fb;border-radius:12px">
-        <div style="background:#0a0e1a;padding:24px;border-radius:8px;text-align:center;margin-bottom:24px">
-          <img src="${LOGO_URL}" alt="Form Elektrik" style="height:36px;display:inline-block" />
-        </div>
-        <div style="background:#ffffff;padding:32px;border-radius:8px">
-          <h2 style="color:#0a1024;font-size:20px;margin:0 0 16px">Merhaba ${escapeHtml(firstName)},</h2>
-          <p style="color:#4a5573;line-height:1.6">Görüşme randevunuz başarıyla oluşturuldu.</p>
-          <div style="background:#f0f9ff;padding:16px;border-radius:8px;margin:20px 0;border-left:4px solid #00d4ff">
-            <p style="margin:0;font-size:16px;font-weight:700;color:#0a1024">${escapeHtml(dateStr)}</p>
-            <p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#00d4ff">${escapeHtml(timeStr)}</p>
-            <p style="margin:8px 0 0;color:#4a5573;font-size:13px">30 dakikalık görüşme</p>
-          </div>
-          <p style="color:#4a5573;line-height:1.6">Randevunuz onaylandığında size ayrıca bilgi vereceğiz.</p>
-          <div style="border-top:1px solid #e5e8ef;margin-top:24px;padding-top:16px;color:#7a849c;font-size:12px">
-            <p>Sorularınız için <a href="mailto:info@formelektrik.com" style="color:#0091c2">info@formelektrik.com</a> adresine yazabilirsiniz.</p>
-          </div>
-        </div>
-        <p style="text-align:center;color:#7a849c;font-size:11px;margin-top:16px">© 2026 Form Elektrik. Güç ve Güven.</p>
-      </div>
-    `,
+    html: wrapEmail(userBody, { title: 'Randevu Talebiniz Alındı', preheader: `${dateStr} ${timeStr} — 30 dk görüşme` }),
   }).catch(() => {});
 
   res.status(201).json({ ok: true, id: appointmentId });

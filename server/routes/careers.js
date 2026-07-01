@@ -6,7 +6,16 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
 const { isEmail, isNonEmptyString } = require('../middleware/validate');
-const { sendMail } = require('../mailer');
+const { sendMail, wrapEmail, mailRow, mailTable } = require('../mailer');
+
+// Kariyer bildirim adresi: DB (admin) → .env → genel
+function careerNotifyTo() {
+  try {
+    const row = db.prepare("SELECT value FROM settings WHERE key = 'career_notify_email'").get();
+    if (row && row.value && row.value.trim()) return row.value.trim();
+  } catch { /* .env'e düş */ }
+  return process.env.LEAD_NOTIFY_TO || process.env.APPOINTMENT_NOTIFY_TO || null;
+}
 
 const router = express.Router();
 
@@ -150,22 +159,21 @@ router.post('/apply', applyLimiter, async (req, res) => {
   );
 
   // Admin bildirim maili
-  const notifyTo = process.env.LEAD_NOTIFY_TO || process.env.APPOINTMENT_NOTIFY_TO;
+  const notifyTo = careerNotifyTo();
   if (notifyTo) {
     const base = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+    const rows = mailTable(
+      mailRow('Pozisyon', escapeHtml(jobTitle || 'Genel Başvuru')) +
+      mailRow('Ad Soyad', `${escapeHtml(firstName)} ${escapeHtml(lastName)}`) +
+      mailRow('E-posta', `<a href="mailto:${escapeHtml(email)}" style="color:#2aa9e0">${escapeHtml(email)}</a>`) +
+      mailRow('Telefon', escapeHtml(phone || '-')) +
+      mailRow('Mesaj', escapeHtml(message || '-').replace(/\n/g, '<br>')) +
+      (cleanCv ? mailRow('CV', `<a href="${base}${escapeHtml(cleanCv)}" style="color:#2aa9e0">CV'yi görüntüle</a>`) : '')
+    );
     sendMail({
       to: notifyTo,
       subject: `Yeni iş başvurusu — ${firstName} ${lastName}${jobTitle ? ' (' + jobTitle + ')' : ''}`,
-      html: `
-        <h2>Yeni Kariyer Başvurusu</h2>
-        <table style="border-collapse:collapse;font-family:Arial,sans-serif">
-          <tr><td style="padding:6px 12px"><b>Pozisyon</b></td><td style="padding:6px 12px">${escapeHtml(jobTitle || 'Genel Başvuru')}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Ad Soyad</b></td><td style="padding:6px 12px">${escapeHtml(firstName)} ${escapeHtml(lastName)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>E-posta</b></td><td style="padding:6px 12px">${escapeHtml(email)}</td></tr>
-          <tr><td style="padding:6px 12px"><b>Telefon</b></td><td style="padding:6px 12px">${escapeHtml(phone || '-')}</td></tr>
-          <tr><td style="padding:6px 12px" valign="top"><b>Mesaj</b></td><td style="padding:6px 12px">${escapeHtml(message || '-')}</td></tr>
-          ${cleanCv ? `<tr><td style="padding:6px 12px"><b>CV</b></td><td style="padding:6px 12px"><a href="${base}${cleanCv}">${base}${cleanCv}</a></td></tr>` : ''}
-        </table>`,
+      html: wrapEmail(rows, { title: 'Yeni Kariyer Başvurusu', preheader: `${firstName} ${lastName} — ${jobTitle || 'Genel'}` }),
       replyTo: email,
     }).catch(() => {});
   }

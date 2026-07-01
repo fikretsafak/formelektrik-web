@@ -15,7 +15,7 @@
       'nav.brands': 'Markalarımız', 'nav.blog': 'Blog', 'nav.contact': 'İletişim', 'nav.quote': 'İletişime Geçin',
       'hero.eyebrow': "2000'den beri enerji mühendisliği",
       'hero.title': 'Geleceğin enerjisini bugünden şekillendiriyoruz.',
-      'hero.sub': 'Endüstriyel tesislerden konuta, AG-OG projelendirmeden e-mobilite çözümlerine — enerjinin üretim, iletim, dağıtım ve tüketim süreçlerinde uçtan uca akıllı çözümler sunuyoruz.',
+      'hero.sub': 'Şebeke koruma ve otomasyondan yenilenebilir enerjiye, enerji depolamadan e-mobiliteye — enerjinin iletim, dağıtım ve tüketim süreçlerinde uçtan uca akıllı çözümler sunuyoruz.',
       'hero.cta1': 'İletişime Geçin', 'hero.cta2': 'Çözümlerimiz',
       'hero.b1': '25+ yıl deneyim', 'hero.b2': 'Mühendislik odaklı', 'hero.b3': 'Dünya markaları', 'hero.float': 'Tamamlanan proje',
       'stat.years': 'Yıl Deneyim', 'stat.experts': 'Uzman Kadro', 'stat.projects': 'Proje ve Çözüm', 'stat.products': 'Ürün ve Ekipman',
@@ -155,7 +155,7 @@
       'nav.brands': 'Our Brands', 'nav.blog': 'Blog', 'nav.contact': 'Contact', 'nav.quote': 'Get in Touch',
       'hero.eyebrow': 'Energy engineering since 2000',
       'hero.title': 'Shaping the energy of the future, today.',
-      'hero.sub': 'From industrial facilities to homes, from MV/LV design to e-mobility — we deliver end-to-end smart solutions across generation, transmission, distribution and consumption.',
+      'hero.sub': 'From grid protection and automation to renewable energy, from energy storage to e-mobility — we deliver end-to-end smart solutions across transmission, distribution and consumption.',
       'hero.cta1': 'Get in Touch', 'hero.cta2': 'Our Solutions',
       'hero.b1': '25+ years', 'hero.b2': 'Engineering-led', 'hero.b3': 'Global brands', 'hero.float': 'Completed projects',
       'stat.years': 'Years', 'stat.experts': 'Experts', 'stat.projects': 'Projects & Solutions', 'stat.products': 'Products & Equipment',
@@ -545,8 +545,8 @@
       return `<a class="post-card reveal" href="/post?slug=${encodeURIComponent(p.slug)}">
         <div class="post-thumb">${p.cover_image ? `<img src="${esc(p.cover_image)}" alt="${esc(p.title)}" loading="lazy" />` : ''}</div>
         <div class="post-body">
-          ${tags.length ? `<div class="post-tags">${tags.map(tg => `<span class="post-tag">${esc(tg)}</span>`).join('')}</div>` : ''}
           <h3>${esc(p.title)}</h3>
+          ${tags.length ? `<div class="post-tags">${tags.map(tg => `<span class="post-tag">${esc(tg)}</span>`).join('')}</div>` : ''}
           <p>${esc(p.excerpt || '')}</p>
           <span class="post-date"><span class="material-symbols-rounded">schedule</span>${fmtDate(p.published_at)}</span>
         </div>
