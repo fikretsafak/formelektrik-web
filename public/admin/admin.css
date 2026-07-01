@@ -142,6 +142,18 @@ select option:hover {
   gap: 2px;
   overflow-y: auto;
 }
+/* Menü grupları */
+.nav-group { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; }
+.nav-group[hidden] { display: none; }
+.nav-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 6px 14px 4px;
+  opacity: 0.75;
+}
 .side-link {
   display: flex;
   align-items: center;

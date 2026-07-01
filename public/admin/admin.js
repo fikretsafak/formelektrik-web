@@ -22,12 +22,14 @@ function setupTheme() {
 // ===== i18n (panel arayüzü) =====
 const I18N = {
   tr: {
+    'navgroup.content': 'İçerik Yönetimi', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK / Privacy Notice', 'nav.cerez': 'Çerez Politikası', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
+    'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
@@ -389,6 +391,11 @@ async function init() {
   // İzinsiz nav linklerini gizle
   document.querySelectorAll('.side-link').forEach(link => {
     if (!canAccessSection(link.dataset.route)) link.style.display = 'none';
+  });
+  // Tüm linkleri gizlenen menü gruplarının başlığını da gizle (boş grup kalmasın)
+  document.querySelectorAll('.nav-group').forEach(group => {
+    const anyVisible = [...group.querySelectorAll('.side-link')].some(l => l.style.display !== 'none');
+    if (!anyVisible) group.hidden = true;
   });
 
   renderWhoBlock(me);
