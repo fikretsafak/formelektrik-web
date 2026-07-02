@@ -31,6 +31,14 @@ app.use('/api/settings',      require('./routes/settings'));
 // Health
 app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
+// /kvkk → kvkk.html (hub sayfası).
+// ROOT'taki 'kvkk/' klasörü (kaynak PDF'ler) express.static tarafından dizin sanılıp
+// /kvkk isteğini /kvkk/'e yönlendiriyor ve 404 veriyordu; bu route çakışmayı önler.
+// Not: /kvkk/*.pdf gizli tutulur (aşağıda), belgeler yalnızca site içinde okunur.
+app.get('/kvkk', (req, res) => res.sendFile(path.join(ROOT, 'kvkk.html')));
+// Kaynak KVKK PDF klasörünü web'den gizle (indirme/dizin listeleme yok).
+app.use('/kvkk', (req, res) => res.status(404).send('Not found'));
+
 // Static: uploads
 app.use('/uploads', express.static(path.join(ROOT, 'uploads'), { maxAge: '1d' }));
 

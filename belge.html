@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>KVKK Aydınlatma Metni — Form Elektrik</title>
-<meta name="description" content="Form Elektrik İnş.Müh.A.Ş — 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aydınlatma metni." />
+<title>Belge — Form Elektrik</title>
+<meta name="description" content="Form Elektrik İnş.Müh.A.Ş — 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında yasal belgeler." />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://formelektrik.com/kvkk" />
 <link rel="icon" type="image/png" href="/assets/main/favicon.png" />
 <link rel="apple-touch-icon" href="/assets/main/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css" />
 <style>
-  .legal-wrap { max-width: 760px; margin: 0 auto; padding: calc(var(--header-h) + 56px) 20px 90px; }
+  .legal-wrap { max-width: 820px; margin: 0 auto; padding: calc(var(--header-h) + 56px) 20px 90px; }
   .legal-wrap h1 { font-family: var(--font-head); color: var(--navy); font-size: clamp(1.9rem, 4.5vw, 2.6rem); line-height:1.1; letter-spacing:-0.02em; margin: 16px 0 10px; }
   .legal-note {
     display:flex; gap:12px; align-items:flex-start;
@@ -31,12 +30,14 @@
   .legal-wrap li { margin: 6px 0; }
   .legal-wrap a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
   .legal-wrap code { font-family: var(--font-mono, monospace); font-size: .88em; background: color-mix(in srgb, var(--navy) 6%, #fff); padding: 1px 5px; border-radius: 4px; }
+  /* Tablolar */
   .legal-wrap table { width:100%; border-collapse: collapse; margin: 18px 0; font-size: .9rem; }
   .legal-wrap th, .legal-wrap td { border: 1px solid var(--line); padding: 11px 14px; text-align: left; vertical-align: top; }
   .legal-wrap thead th { background: color-mix(in srgb, var(--cyan) 10%, #fff); color: var(--navy); font-family: var(--font-head); font-weight: 600; }
   .legal-wrap td { color: var(--text-soft); line-height: 1.6; }
   .legal-wrap td b { color: var(--navy); }
   .legal-wrap .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* PDF'ten korunmuş düz metin bloğu (tablo/form yerleşimleri) */
   .legal-wrap .legal-pre {
     white-space: pre-wrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
     font-family: var(--font-mono, monospace); font-size: .82rem; line-height: 1.6;
@@ -44,19 +45,6 @@
     border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; margin: 16px 0;
   }
   .legal-updated { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--text-faint); font-size: .85rem; }
-  /* İlgili belgeler kart listesi */
-  .doc-links { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
-  .doc-links h2 { font-family: var(--font-head); font-size: 1.3rem; color: var(--navy); margin: 0 0 16px; }
-  .doc-links-grid { display: grid; gap: 12px; }
-  .doc-link-card {
-    display: flex; align-items: center; gap: 14px; padding: 16px 18px;
-    border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff;
-    text-decoration: none !important; color: var(--navy); transition: border-color .15s, transform .15s, box-shadow .15s;
-  }
-  .doc-link-card:hover { border-color: var(--cyan); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.06); }
-  .doc-link-card .material-symbols-rounded { color: var(--cyan); font-size: 26px; flex: none; }
-  .doc-link-card .doc-link-title { font-family: var(--font-head); font-weight: 600; }
-  .doc-link-card .doc-link-arrow { margin-left: auto; color: var(--text-faint); }
   @media (max-width: 560px) { .legal-wrap table { min-width: 480px; } }
 </style>
 <!-- Rybbit Analytics -->
@@ -101,19 +89,15 @@
 
 <!-- ===== İÇERİK ===== -->
 <main class="legal-wrap">
-  <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:16px">shield</span> KVKK &amp; BELGELER</span>
-  <h1 id="kvkkTitle">KVKK Aydınlatma Metni</h1>
+  <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:16px">shield</span> <a href="/kvkk" style="text-decoration:none;color:inherit">KVKK & BELGELER</a></span>
+  <h1 id="docTitle">Belge</h1>
 
-  <div id="kvkkBody">
+  <div id="docBody">
     <p>İçerik yükleniyor…</p>
-    <div class="legal-updated" id="kvkkUpdated" style="display:none"></div>
   </div>
+  <div class="legal-updated" id="docUpdated" style="display:none"></div>
 
-  <!-- İlgili Belgeler (hub) — /api/settings/public/belgeler'den doldurulur -->
-  <section class="doc-links" id="docLinks" style="display:none">
-    <h2 id="docLinksTitle">İlgili Belgeler</h2>
-    <div class="doc-links-grid" id="docLinksGrid"></div>
-  </section>
+  <p style="margin-top:36px"><a href="/kvkk"><span class="material-symbols-rounded" style="font-size:15px;vertical-align:-2px">arrow_back</span> <span id="backLink">Tüm belgeler</span></a></p>
 </main>
 
 <!-- ===== FOOTER ===== -->
@@ -145,7 +129,7 @@
       <div class="footer-col">
         <h4>Diğer</h4>
         <a href="/blog" data-i18n="nav.blog">Blog</a>
-        <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatması</a>
+        <a href="/kvkk" data-i18n="footer.kvkk">KVKK & Belgeler</a>
         <a href="/cerez-politikasi" data-i18n="footer.cookie">Çerez Politikası</a>
         <a href="/belge?slug=basvuru-formu" data-i18n="doc.basvuru-formu">Başvuru Formu</a>
         <a href="/belge?slug=calisan-adayi" data-i18n="doc.calisan-adayi">Çalışan Adayı Aydınlatma Metni</a>
@@ -160,7 +144,6 @@
     </div>
     <div class="footer-bottom">
       <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
-
     </div>
   </div>
 </footer>
@@ -168,65 +151,41 @@
 <script src="/script.js"></script>
 <script>
 (() => {
-  const titleEl = document.getElementById('kvkkTitle');
-  const bodyEl = document.getElementById('kvkkBody');
-  const updatedEl = document.getElementById('kvkkUpdated');
-  function loadKvkk() {
+  const VALID = ['kvkk-politikasi', 'basvuru-formu', 'calisan-adayi', 'imha-politikasi'];
+  const slug = new URLSearchParams(location.search).get('slug');
+  // Geçersiz/eksik slug → hub sayfasına düş.
+  if (!slug || !VALID.includes(slug)) { location.replace('/kvkk'); return; }
+
+  const titleEl = document.getElementById('docTitle');
+  const bodyEl = document.getElementById('docBody');
+  const updatedEl = document.getElementById('docUpdated');
+  const backEl = document.getElementById('backLink');
+
+  function loadDoc() {
     const lang = localStorage.getItem('fe-lang') || 'tr';
-    fetch('/api/settings/public/kvkk?language=' + encodeURIComponent(lang))
+    if (backEl) backEl.textContent = lang === 'en' ? 'All documents' : 'Tüm belgeler';
+    fetch('/api/settings/public/belge/' + encodeURIComponent(slug) + '?language=' + encodeURIComponent(lang))
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        const kvkk = data && data.kvkk;
-        if (!kvkk) return;
-        document.documentElement.lang = kvkk.language || lang;
-        if (titleEl && kvkk.title) titleEl.textContent = kvkk.title;
-        if (bodyEl && kvkk.body) bodyEl.innerHTML = kvkk.body;
+        const doc = data && data.doc;
+        if (!doc) { location.replace('/kvkk'); return; }
+        document.documentElement.lang = doc.language || lang;
+        if (titleEl && doc.title) titleEl.textContent = doc.title;
+        if (bodyEl && doc.body) bodyEl.innerHTML = doc.body;
         if (updatedEl) {
-          if (kvkk.updated) {
-            updatedEl.textContent = (lang === 'en' ? 'Last updated: ' : 'Son güncelleme: ') + kvkk.updated;
+          if (doc.updated) {
+            updatedEl.textContent = (lang === 'en' ? 'Last updated: ' : 'Son güncelleme: ') + doc.updated;
             updatedEl.style.display = '';
-            bodyEl && bodyEl.appendChild(updatedEl);
           } else {
-            updatedEl.style.display = 'none'; // tarih yoksa satırı gösterme
+            updatedEl.style.display = 'none';
           }
         }
-        document.title = (kvkk.title || titleEl.textContent) + ' — Form Elektrik';
+        document.title = (doc.title || titleEl.textContent) + ' — Form Elektrik';
       })
       .catch(() => {});
   }
-  // İlgili Belgeler (hub) — diğer belgeleri listele
-  const linksSection = document.getElementById('docLinks');
-  const linksGrid = document.getElementById('docLinksGrid');
-  const linksTitle = document.getElementById('docLinksTitle');
-  const DOC_ICONS = {
-    'kvkk-politikasi': 'policy',
-    'basvuru-formu': 'assignment',
-    'calisan-adayi': 'badge',
-    'imha-politikasi': 'auto_delete',
-  };
-  function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  function loadDocLinks() {
-    const lang = localStorage.getItem('fe-lang') || 'tr';
-    if (linksTitle) linksTitle.textContent = lang === 'en' ? 'Related Documents' : 'İlgili Belgeler';
-    fetch('/api/settings/public/belgeler?language=' + encodeURIComponent(lang))
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        const docs = (data && data.docs) || [];
-        if (!docs.length || !linksGrid) return;
-        linksGrid.innerHTML = docs.map(d => `
-          <a class="doc-link-card" href="/belge?slug=${encodeURIComponent(d.slug)}">
-            <span class="material-symbols-rounded">${DOC_ICONS[d.slug] || 'description'}</span>
-            <span class="doc-link-title">${esc(d.title)}</span>
-            <span class="material-symbols-rounded doc-link-arrow">chevron_right</span>
-          </a>`).join('');
-        linksSection.style.display = '';
-      })
-      .catch(() => {});
-  }
-
-  loadKvkk();
-  loadDocLinks();
-  window.addEventListener('fe-lang-change', () => { loadKvkk(); loadDocLinks(); });
+  loadDoc();
+  window.addEventListener('fe-lang-change', loadDoc);
 })();
 </script>
 </body>

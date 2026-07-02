@@ -923,6 +923,17 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .kvkk-consent-body p { margin: 0 0 14px; }
 .kvkk-consent-body ul, .kvkk-consent-body ol { margin: 12px 0 12px 22px; }
 .kvkk-consent-body .legal-note { margin-top: 0; }
+/* Belgelerdeki tablolar + PDF'ten korunmuş metin blokları (consent popup içi) */
+.kvkk-consent-body .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.kvkk-consent-body table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .86rem; }
+.kvkk-consent-body th, .kvkk-consent-body td { border: 1px solid var(--line); padding: 9px 11px; text-align: left; vertical-align: top; }
+.kvkk-consent-body thead th { background: color-mix(in srgb, var(--cyan) 10%, #fff); color: var(--navy); font-weight: 600; }
+.kvkk-consent-body .legal-pre {
+  white-space: pre-wrap; overflow-x: auto; font-family: var(--font-mono, monospace);
+  font-size: .78rem; line-height: 1.55; background: color-mix(in srgb, var(--navy) 4%, #fff);
+  border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; margin: 12px 0;
+}
+.kvkk-consent-body code { font-family: var(--font-mono, monospace); font-size: .86em; background: color-mix(in srgb, var(--navy) 6%, #fff); padding: 1px 5px; border-radius: 4px; }
 .kvkk-consent-actions { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 16px; }
 .kvkk-consent-actions a { color: var(--cyan); text-decoration: underline; }
 .kvkk-consent-actions .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }

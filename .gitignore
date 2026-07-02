@@ -37,3 +37,6 @@ npm-debug.log*
 
 # Pazarlama sunumu — deploy için gerekli değil
 *.pptx
+
+# KVKK kaynak PDF'leri — içerik server/data/legal-docs.js'e derlenir; markdown'lar repoda kalır
+kvkk/*.pdf

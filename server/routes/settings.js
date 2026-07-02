@@ -1,6 +1,9 @@
 const express = require('express');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
+// Markdown'dan üretilmiş başlangıç (default) belge içerikleri. DB boşken kullanılır.
+let LEGAL_DOCS = {};
+try { LEGAL_DOCS = require('../data/legal-docs'); } catch { LEGAL_DOCS = {}; }
 
 const router = express.Router();
 
@@ -21,27 +24,15 @@ function set(key, value) {
     .run(key, value, value);
 }
 
+// KVKK Aydınlatma Metni default içeriği artık markdown'dan üretiliyor (legal-docs).
+// DB'de kvkk_* anahtarları varsa onlar kullanılır; yoksa buradaki default gösterilir.
+const KVKK_FALLBACK = {
+  tr: { title: 'KVKK Aydınlatma Metni', updated: '', body: '<p>İçerik yakında eklenecektir.</p>' },
+  en: { title: 'Privacy Notice', updated: '', body: '<p>Content will be added soon.</p>' },
+};
 const DEFAULT_KVKK = {
-  tr: {
-    title: 'KVKK Aydınlatma Metni',
-    updated: 'Bu metin yakında güncellenecektir.',
-    body: `<div class="legal-note"><span class="material-symbols-rounded">info</span><span>Bu metin taslak niteliğindedir ve <b>yakında güncellenecektir.</b> Aşağıdaki başlıklar 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) çerçevesinin genel yapısını yansıtır.</span></div>
-<h2>1. Veri Sorumlusu</h2><p>6698 sayılı Kişisel Verilerin Korunması Kanunu uyarınca, kişisel verileriniz veri sorumlusu sıfatıyla Form Elektrik İnş.Müh.A.Ş tarafından işlenebilecektir.</p>
-<h2>2. İşlenen Kişisel Veriler</h2><ul><li>Kimlik bilgileri (ad, soyad)</li><li>İletişim bilgileri (e-posta, telefon, şirket/kurum bilgisi)</li><li>Talep ve mesaj içeriğiniz</li><li>İnternet sitemizi kullanımınıza ilişkin teknik kayıtlar ve çerezler</li></ul>
-<h2>3. İşlenme Amaçları</h2><p>Kişisel verileriniz taleplerinize cevap verilmesi, teklif ve randevu süreçlerinin yürütülmesi, yasal yükümlülüklerin yerine getirilmesi ve sizinle iletişim kurulması amaçlarıyla işlenmektedir.</p>
-<h2>4. Aktarım</h2><p>Kişisel verileriniz yalnızca gerekli olduğu ölçüde ve mevzuata uygun olarak yetkili kişi, kurum ve iş ortaklarıyla paylaşılabilir.</p>
-<h2>5. Haklarınız</h2><p>KVKK’nın 11. maddesi kapsamındaki haklarınızı iletişim kanallarımız üzerinden Şirketimize iletebilirsiniz.</p>`,
-  },
-  en: {
-    title: 'Privacy Notice',
-    updated: 'This notice will be updated soon.',
-    body: `<div class="legal-note"><span class="material-symbols-rounded">info</span><span>This notice is a draft and will be updated soon. It summarizes how Form Elektrik handles personal data under applicable data protection rules.</span></div>
-<h2>1. Data Controller</h2><p>Your personal data may be processed by Form Elektrik İnş.Müh.A.Ş as data controller.</p>
-<h2>2. Personal Data We Process</h2><ul><li>Identity data such as name and surname</li><li>Contact data such as email, phone, company/organization</li><li>Your request and message content</li><li>Technical website usage records and cookies</li></ul>
-<h2>3. Purposes of Processing</h2><p>We process personal data to respond to requests, manage quotation and appointment processes, meet legal obligations, improve our services and contact you.</p>
-<h2>4. Transfers</h2><p>Your personal data may be shared with authorized persons, public authorities and business partners only where necessary and in accordance with applicable law.</p>
-<h2>5. Your Rights</h2><p>You may contact us through our communication channels to exercise your rights regarding personal data.</p>`,
-  },
+  tr: (LEGAL_DOCS.kvkk && LEGAL_DOCS.kvkk.tr) || KVKK_FALLBACK.tr,
+  en: (LEGAL_DOCS.kvkk && LEGAL_DOCS.kvkk.en) || KVKK_FALLBACK.en,
 };
 
 function kvkkPayload(language) {
@@ -121,6 +112,49 @@ function cerezPayload(language) {
   };
 }
 
+// ============================================
+// KVKK BELGELERİ — generic (kvkk hariç 4 ek belge)
+// İçerik settings tablosunda doc_<slug>_{title,body,updated}_{tr,en} anahtarlarında saklanır.
+// Default içerik markdown'dan üretilen legal-docs.js'ten gelir.
+// ============================================
+// Geçerli belge slug'ları ve public/admin başlıkları (menüde ve yetkide kullanılır).
+const DOC_SLUGS = ['kvkk-politikasi', 'basvuru-formu', 'calisan-adayi', 'imha-politikasi'];
+
+function docDefault(slug, lang) {
+  const d = LEGAL_DOCS[slug] && LEGAL_DOCS[slug][lang];
+  return d || { title: '', updated: '', body: '<p>İçerik yakında eklenecektir.</p>' };
+}
+
+// Bir belgenin public payload'ı: DB değeri > legal-docs default > TR fallback.
+function docPayload(slug, language) {
+  const lang = language === 'en' ? 'en' : 'tr';
+  const def = docDefault(slug, lang);
+  const trDef = docDefault(slug, 'tr');
+  const k = (field, l) => get(`doc_${slug}_${field}_${l}`);
+  const updatedRaw = k('updated', lang) || (lang !== 'tr' ? k('updated', 'tr') : '');
+  return {
+    slug,
+    language: lang,
+    title: k('title', lang) || (lang !== 'tr' ? k('title', 'tr') : '') || def.title || trDef.title,
+    body: k('body', lang) || (lang !== 'tr' ? k('body', 'tr') : '') || def.body || trDef.body,
+    updated: updatedRaw || '',
+  };
+}
+
+// Admin GET/PUT için bir belgenin tüm ham anahtarlarını döndürür (boşsa default doldurulur).
+function docAdminSettings(slug) {
+  const trDef = docDefault(slug, 'tr');
+  const enDef = docDefault(slug, 'en');
+  return {
+    [`doc_${slug}_title_tr`]: get(`doc_${slug}_title_tr`) || trDef.title || '',
+    [`doc_${slug}_body_tr`]: get(`doc_${slug}_body_tr`) || trDef.body || '',
+    [`doc_${slug}_updated_tr`]: get(`doc_${slug}_updated_tr`) || '',
+    [`doc_${slug}_title_en`]: get(`doc_${slug}_title_en`) || enDef.title || '',
+    [`doc_${slug}_body_en`]: get(`doc_${slug}_body_en`) || enDef.body || '',
+    [`doc_${slug}_updated_en`]: get(`doc_${slug}_updated_en`) || '',
+  };
+}
+
 // PUBLIC — site analitik takip config'i (script src + ilgili site id).
 // ?site=main|li3|epsis ile hangi sitenin ID'si döneceği seçilir (varsayılan: main).
 // Hassas bilgi yok; site bu bilgiyle Rybbit script'ini yükler.
@@ -143,6 +177,23 @@ router.get('/public/kvkk', (req, res) => {
 // PUBLIC — Çerez Politikası metni. Admin panelden yönetilir.
 router.get('/public/cerez', (req, res) => {
   res.json({ cerez: cerezPayload(req.query.language || 'tr') });
+});
+
+// PUBLIC — KVKK belgeleri (kvkk hariç). Slug whitelist ile. Admin panelden yönetilir.
+router.get('/public/belge/:slug', (req, res) => {
+  const { slug } = req.params;
+  if (!DOC_SLUGS.includes(slug)) return res.status(404).json({ error: 'not_found' });
+  res.json({ doc: docPayload(slug, req.query.language || 'tr') });
+});
+
+// PUBLIC — belge listesi (hub sayfası için başlık + slug). Dile göre başlık döner.
+router.get('/public/belgeler', (req, res) => {
+  const lang = req.query.language === 'en' ? 'en' : 'tr';
+  const docs = DOC_SLUGS.map(slug => {
+    const p = docPayload(slug, lang);
+    return { slug: p.slug, title: p.title, updated: p.updated };
+  });
+  res.json({ docs });
 });
 
 // PUBLIC — iletişim bilgileri (telefon, e-posta, adres, harita, sosyal). Admin panelden yönetilir.
@@ -215,6 +266,35 @@ router.put('/cerez', authRequired, requireRole('admin'), requirePermission('cere
     if (k === 'cerez_updated_tr' && !v) v = autoDate('tr');
     if (k === 'cerez_updated_en' && !v) v = autoDate('en');
     set(k, v);
+  });
+  res.json({ ok: true });
+});
+
+// Admin — KVKK belgeleri (kvkk hariç). Slug yetki koduyla korunur.
+router.get('/doc/:slug', authRequired, requireRole('admin'), (req, res, next) => {
+  requirePermission(req.params.slug)(req, res, next);
+}, (req, res) => {
+  const { slug } = req.params;
+  if (!DOC_SLUGS.includes(slug)) return res.status(404).json({ error: 'not_found' });
+  res.json({ settings: docAdminSettings(slug) });
+});
+
+router.put('/doc/:slug', authRequired, requireRole('admin'), (req, res, next) => {
+  requirePermission(req.params.slug)(req, res, next);
+}, (req, res) => {
+  const { slug } = req.params;
+  if (!DOC_SLUGS.includes(slug)) return res.status(404).json({ error: 'not_found' });
+  const fields = ['title_tr', 'body_tr', 'updated_tr', 'title_en', 'body_en', 'updated_en'];
+  const body = req.body || {};
+  const now = new Date();
+  const autoDate = (lang) => now.toLocaleDateString(lang === 'en' ? 'en-GB' : 'tr-TR',
+    { day: 'numeric', month: 'long', year: 'numeric' });
+  fields.forEach(f => {
+    const key = `doc_${slug}_${f}`;
+    let v = body[key] || '';
+    if (f === 'updated_tr' && !v) v = autoDate('tr');
+    if (f === 'updated_en' && !v) v = autoDate('en');
+    set(key, v);
   });
   res.json({ ok: true });
 });

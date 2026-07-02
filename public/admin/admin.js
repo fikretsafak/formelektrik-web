@@ -26,14 +26,16 @@ const I18N = {
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
-    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.cerez': 'Çerez Politikası', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
+    'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
+    'nav.cerez': 'Çerez Politikası', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
     'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
-    'nav.kvkk': 'KVKK / Privacy Notice', 'nav.cerez': 'Cookie Policy', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
+    'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
+    'nav.cerez': 'Cookie Policy', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
   },
 };
 function currentLang() { return localStorage.getItem('e1-lang') || 'tr'; }
@@ -1198,7 +1200,11 @@ async function openUserForm(u, onDone) {
     { code: 'careers', label: 'Kariyer / İlanlar' },
     { code: 'job-applications', label: 'Başvurular' },
     { code: 'users', label: 'Kullanıcılar' },
-    { code: 'kvkk', label: 'KVKK / Privacy Notice' },
+    { code: 'kvkk', label: 'KVKK Aydınlatma Metni' },
+    { code: 'kvkk-politikasi', label: 'Genel KVKK Politikası' },
+    { code: 'basvuru-formu', label: 'Başvuru Formu' },
+    { code: 'calisan-adayi', label: 'Çalışan Adayı Metni' },
+    { code: 'imha-politikasi', label: 'İmha Politikası' },
     { code: 'cerez', label: 'Çerez Politikası' },
     { code: 'settings', label: 'Ayarlar' },
   ];
@@ -3011,6 +3017,89 @@ routes.cerez = async (page) => {
     } catch (e) { toast(e.message, 'error'); }
   });
 };
+
+// ============================================
+// KVKK BELGELERİ (kvkk hariç 4 belge) — generic içerik yönetimi
+// KVKK / Çerez ile aynı desen; slug bazlı /api/settings/doc/:slug kullanır.
+// ============================================
+function makeDocRoute(slug, titleTr, titleEn, publicPath) {
+  return async (page) => {
+    page.innerHTML = '<div class="loader">Yükleniyor...</div>';
+    let settings = {};
+    try {
+      const r = await api.get('/api/settings/doc/' + slug);
+      settings = r.settings || {};
+    } catch { page.innerHTML = '<div class="empty"><p>Belge metinleri yüklenemedi.</p></div>'; return; }
+
+    const g = (k, d = '') => settings['doc_' + slug + '_' + k] || d;
+    page.innerHTML = '';
+    const card = h('div', { class: 'card', style: 'width:100%' });
+    card.innerHTML = `
+      <div style="padding:24px 24px 0">
+        <h3 style="margin:0 0 4px;font-size:18px">${escapeHtml(titleTr)}</h3>
+        <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Bu belge <code>${escapeHtml(publicPath)}</code> sayfasında ve ilgili form onaylarında gösterilir. "Son Güncelleme" boş bırakılırsa kayıt tarihi otomatik yazılır.</p>
+      </div>
+      <div class="settings-form" style="padding:8px 24px 24px">
+        <div class="settings-cols">
+          <div class="settings-col">
+            <div class="settings-row">
+              <label class="settings-row-label" for="docTitleTr">TR Başlık</label>
+              <input class="settings-row-input" id="docTitleTr" value="${escapeHtml(g('title_tr', titleTr))}">
+            </div>
+            <div class="settings-row">
+              <label class="settings-row-label" for="docUpdatedTr">TR Son Güncelleme</label>
+              <input class="settings-row-input" id="docUpdatedTr" value="${escapeHtml(g('updated_tr'))}" placeholder="boş = otomatik tarih">
+            </div>
+            <div class="settings-row">
+              <label class="settings-row-label" for="docBodyTr">TR Metin</label>
+              <textarea class="settings-row-input" id="docBodyTr" rows="14">${escapeHtml(g('body_tr'))}</textarea>
+            </div>
+          </div>
+          <div class="settings-col">
+            <div class="settings-row">
+              <label class="settings-row-label" for="docTitleEn">EN Title</label>
+              <input class="settings-row-input" id="docTitleEn" value="${escapeHtml(g('title_en', titleEn))}">
+            </div>
+            <div class="settings-row">
+              <label class="settings-row-label" for="docUpdatedEn">EN Last Updated</label>
+              <input class="settings-row-input" id="docUpdatedEn" value="${escapeHtml(g('updated_en'))}" placeholder="empty = auto date">
+            </div>
+            <div class="settings-row">
+              <label class="settings-row-label" for="docBodyEn">EN Text</label>
+              <textarea class="settings-row-input" id="docBodyEn" rows="14">${escapeHtml(g('body_en'))}</textarea>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px">
+          <button class="btn btn-primary" id="docSaveBtn"><span class="material-symbols-rounded">save</span> Kaydet</button>
+          <a class="btn btn-ghost" href="${publicPath}" target="_blank" rel="noopener"><span class="material-symbols-rounded">open_in_new</span> Sayfayı Aç</a>
+        </div>
+      </div>
+    `;
+    page.appendChild(card);
+    mountEditor('#docBodyTr', g('body_tr'));
+    mountEditor('#docBodyEn', g('body_en'));
+    page.querySelector('#docSaveBtn').addEventListener('click', async () => {
+      const payload = {
+        ['doc_' + slug + '_title_tr']: page.querySelector('#docTitleTr').value.trim(),
+        ['doc_' + slug + '_body_tr']: getEditorContent('#docBodyTr'),
+        ['doc_' + slug + '_updated_tr']: page.querySelector('#docUpdatedTr').value.trim(),
+        ['doc_' + slug + '_title_en']: page.querySelector('#docTitleEn').value.trim(),
+        ['doc_' + slug + '_body_en']: getEditorContent('#docBodyEn'),
+        ['doc_' + slug + '_updated_en']: page.querySelector('#docUpdatedEn').value.trim(),
+      };
+      try {
+        await api.put('/api/settings/doc/' + slug, payload);
+        toast('Belge kaydedildi', 'success');
+      } catch (e) { toast(e.message, 'error'); }
+    });
+  };
+}
+
+routes['kvkk-politikasi'] = makeDocRoute('kvkk-politikasi', 'Genel KVKK Politikası', 'General PDPL Policy', '/belge?slug=kvkk-politikasi');
+routes['basvuru-formu'] = makeDocRoute('basvuru-formu', 'Kişisel Veri Sahibi Başvuru Formu', 'Data Subject Application Form', '/belge?slug=basvuru-formu');
+routes['calisan-adayi'] = makeDocRoute('calisan-adayi', 'Çalışan Adayı Aydınlatma ve Açık Rıza Metni', 'Candidate Applicant Notice and Explicit Consent', '/belge?slug=calisan-adayi');
+routes['imha-politikasi'] = makeDocRoute('imha-politikasi', 'Kişisel Veri Saklama ve İmha Politikası', 'Personal Data Retention and Destruction Policy', '/belge?slug=imha-politikasi');
 
 // ============================================
 // SETTINGS — SMTP ve genel ayarlar

@@ -126,6 +126,8 @@
       'footer.about': "Enerji altyapıları ve güç sistemleri alanında mühendislik odaklı, uçtan uca çözüm sağlayıcısı. 2000'den bu yana güvenilir çözüm ortağınız.",
       'footer.solutions': 'Çözümlerimiz', 'footer.corporate': 'Kurumsal', 'footer.contact': 'İletişim',
       'footer.kvkk': 'KVKK Aydınlatması', 'footer.cookie': 'Çerez Politikası', 'footer.rights': '© 2026 Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.',
+      'doc.kvkk-politikasi': 'Genel KVKK Politikası', 'doc.basvuru-formu': 'Başvuru Formu',
+      'doc.calisan-adayi': 'Çalışan Adayı Aydınlatma Metni', 'doc.imha-politikasi': 'İmha Politikası',
       'common.loading': 'Yükleniyor…', 'common.close': 'Kapat', 'common.more': 'Detaylı bilgi',
       'appt.title': 'Görüşme Planla', 'appt.calSub': 'Uygun bir tarih seçin.',
       'appt.quick': 'Hızlı Randevu', 'appt.quickSub': '30 dakikalık ücretsiz görüşme',
@@ -266,6 +268,8 @@
       'footer.about': 'Engineering-led, end-to-end solution provider in energy infrastructure and power systems. Your trusted partner since 2000.',
       'footer.solutions': 'Solutions', 'footer.corporate': 'Company', 'footer.contact': 'Contact',
       'footer.kvkk': 'Privacy Notice', 'footer.cookie': 'Cookie Policy', 'footer.rights': '© 2026 Form Elektrik — All rights reserved.',
+      'doc.kvkk-politikasi': 'General PDPL Policy', 'doc.basvuru-formu': 'Application Form',
+      'doc.calisan-adayi': 'Candidate Applicant Notice', 'doc.imha-politikasi': 'Retention & Destruction Policy',
       'common.loading': 'Loading…', 'common.close': 'Close', 'common.more': 'Learn more',
       'appt.title': 'Book a Meeting', 'appt.calSub': 'Pick an available date.',
       'appt.quick': 'Quick Booking', 'appt.quickSub': 'Free 30-minute meeting',
@@ -776,29 +780,44 @@
     });
   }
 
-  /* ===== KVKK onay checkbox'ı (popup + sona kaydırma zorunlu) ===== */
-  async function getKvkkContent() {
-    const data = await getJSON('/api/settings/public/kvkk?language=' + LANG);
-    const kvkk = data && data.kvkk;
-    return kvkk || {
+  /* ===== KVKK / belge onay checkbox'ı (popup + sona kaydırma zorunlu) =====
+     docSlug ile bağlama göre farklı belge gösterilir:
+       'kvkk'          → İletişim/Randevu formlarında KVKK Aydınlatma Metni
+       'calisan-adayi' → Kariyer başvurusunda Çalışan Adayı Aydınlatma ve Açık Rıza Metni
+  */
+  // Belge slug → public sayfa yolu ve API ucu.
+  function docEndpoint(slug) {
+    return slug === 'kvkk'
+      ? '/api/settings/public/kvkk?language=' + LANG
+      : '/api/settings/public/belge/' + encodeURIComponent(slug) + '?language=' + LANG;
+  }
+  function docPageHref(slug) {
+    return slug === 'kvkk' ? '/kvkk' : '/belge?slug=' + encodeURIComponent(slug);
+  }
+  async function getConsentContent(slug) {
+    const data = await getJSON(docEndpoint(slug));
+    const doc = data && (data.kvkk || data.doc);
+    return doc || {
       title: LANG === 'en' ? 'Privacy Notice' : 'KVKK Aydınlatma Metni',
       body: `<p>${esc(t('msg.kvkk'))}</p>`,
       updated: '',
     };
   }
 
-  function openKvkkConsent(checkbox) {
+  function openKvkkConsent(checkbox, docSlug) {
     if (!checkbox) return;
+    const slug = docSlug || 'kvkk';
+    const fallbackTitle = LANG === 'en' ? 'Privacy Notice' : 'KVKK Aydınlatma Metni';
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay kvkk-consent-overlay open';
     overlay.innerHTML = `
       <div class="modal kvkk-consent-modal" role="dialog" aria-modal="true" aria-labelledby="kvkkConsentTitle">
         <button type="button" class="modal-close" data-kvkk-close aria-label="Kapat"><span class="material-symbols-rounded">close</span></button>
-        <h3 id="kvkkConsentTitle">${esc(LANG === 'en' ? 'Privacy Notice' : 'KVKK Aydınlatma Metni')}</h3>
+        <h3 id="kvkkConsentTitle">${esc(fallbackTitle)}</h3>
         <p class="modal-sub">${esc(t('kvkk.scrollHint'))}</p>
         <div class="kvkk-consent-body"><div class="post-loading">${esc(t('common.loading'))}</div></div>
         <div class="kvkk-consent-actions">
-          <a href="/kvkk" target="_blank" rel="noopener">${esc(t('footer.kvkk'))}</a>
+          <a href="${docPageHref(slug)}" target="_blank" rel="noopener">${esc(t('kvkk.open'))}</a>
           <button type="button" class="btn btn-primary" data-kvkk-accept disabled>${esc(t('kvkk.accept'))}</button>
         </div>
       </div>`;
@@ -823,9 +842,9 @@
     });
     body.addEventListener('scroll', unlockIfBottom, { passive: true });
 
-    getKvkkContent().then(kvkk => {
-      overlay.querySelector('#kvkkConsentTitle').textContent = kvkk.title || (LANG === 'en' ? 'Privacy Notice' : 'KVKK Aydınlatma Metni');
-      body.innerHTML = kvkk.body || '';
+    getConsentContent(slug).then(doc => {
+      overlay.querySelector('#kvkkConsentTitle').textContent = doc.title || fallbackTitle;
+      body.innerHTML = doc.body || '';
       requestAnimationFrame(() => {
         if (body.scrollHeight <= body.clientHeight + 12) accept.disabled = false;
       });
@@ -835,25 +854,28 @@
     });
   }
 
-  function injectKvkkCheckbox(form, id) {
+  // form: hedef form, id: checkbox id, opts: { docSlug, label } (bağlam belgesi)
+  function injectKvkkCheckbox(form, id, opts) {
     if (!form || form.querySelector('#' + id)) return; // idempotent
     const submitBtn = form.querySelector('button[type=submit]');
     if (!submitBtn) return;
+    const docSlug = (opts && opts.docSlug) || 'kvkk';
+    const label = (opts && opts.label) || t('kvkk.checkboxLabel');
     const wrap = document.createElement('label');
     wrap.className = 'kvkk-check';
-    wrap.innerHTML = `<input type="checkbox" id="${id}" readonly><span>${t('kvkk.checkboxLabel')} <button type="button" class="kvkk-open-link">${t('kvkk.open')}</button></span>`;
+    wrap.innerHTML = `<input type="checkbox" id="${id}" readonly><span>${label} <button type="button" class="kvkk-open-link">${t('kvkk.open')}</button></span>`;
     const checkbox = wrap.querySelector('input');
     const openBtn = wrap.querySelector('.kvkk-open-link');
     checkbox.addEventListener('click', e => {
       if (checkbox.dataset.kvkkAccepted !== '1') {
         e.preventDefault();
         checkbox.checked = false;
-        openKvkkConsent(checkbox);
+        openKvkkConsent(checkbox, docSlug);
       }
     });
     openBtn.addEventListener('click', e => {
       e.preventDefault();
-      openKvkkConsent(checkbox);
+      openKvkkConsent(checkbox, docSlug);
     });
     submitBtn.before(wrap);
   }
@@ -1116,11 +1138,16 @@
     const yr = $('#year'); if (yr) yr.textContent = new Date().getFullYear();
     applyLang(); bindLang(); bindHeader(); markActiveNav(); bindReveal(); bindParallaxBg(); bindCountUp();
     bindLeadForm(); bindAppointment();
-    // Kariyer başvuru formu (varsa) — popup'lı KVKK onay checkbox'ı enjekte et.
+    // Kariyer başvuru formu (varsa) — Çalışan Adayı Aydınlatma ve Açık Rıza Metni onayı.
     // Kariyer'in kendi submit handler'ı #applyKvkk.checked bekliyor; inject o id
-    // ile "Metni aç ve onayla" popup'lı checkbox üretir (iletişim/randevu ile aynı).
+    // ile "Metni aç ve onayla" popup'lı checkbox üretir ama bağlam belgesi calisan-adayi.
     const applyForm = $('#applyForm');
-    if (applyForm) injectKvkkCheckbox(applyForm, 'applyKvkk');
+    if (applyForm) injectKvkkCheckbox(applyForm, 'applyKvkk', {
+      docSlug: 'calisan-adayi',
+      label: LANG === 'en'
+        ? 'I have read and accept the Candidate Applicant Notice and Explicit Consent.'
+        : 'Çalışan Adayı Aydınlatma ve Açık Rıza Metni\'ni okudum ve onaylıyorum.',
+    });
     loadServices(); loadProjects(); loadBrands(); loadBlog(); loadAnnouncements();
     loadPartners(); loadRefs(); loadContact(); initAnnouncementPopup();
     initCookieBanner();
