@@ -11,9 +11,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://formelektrik.com/hakkimizda</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://formelektrik.com/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://formelektrik.com/kariyer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://formelektrik.com/duyurular</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://formelektrik.com/hizmet?slug=ag-og</loc>

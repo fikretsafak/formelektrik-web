@@ -40,6 +40,34 @@ app.get('/kvkk', (req, res) => res.sendFile(path.join(ROOT, 'kvkk.html')));
 // Kaynak KVKK PDF klasörünü web'den gizle (indirme/dizin listeleme yok).
 app.use('/kvkk', (req, res) => res.status(404).send('Not found'));
 
+// ---- Eski site URL'leri → 301 kalıcı yönlendirme (SEO) ----
+// Eski sitede düz URL'ler vardı (/kurumsal, /iletisim...); Google index'i bunları arıyor.
+// Mevcut yapıda bazıları ayrı sayfa (/hakkimizda), bazıları ana sayfa bölümü (/#iletisim).
+// 301 ile Google eski linki tanıyıp yeni hedefe taşır; kullanıcı da doğru yere düşer.
+// STATIC'TEN ÖNCE tanımlı olmalı — yoksa static önce eşleşir.
+// Not: liste tahminidir; Search Console'dan eski URL'ler netleşince genişletilebilir.
+const LEGACY_REDIRECTS = {
+  '/kurumsal': '/hakkimizda',
+  '/hakkimizda.html': '/hakkimizda',
+  '/iletisim': '/#iletisim',
+  '/contact': '/#iletisim',
+  '/cozumlerimiz': '/#hizmetler',
+  '/cozumler': '/#hizmetler',
+  '/hizmetler': '/#hizmetler',
+  '/hizmetlerimiz': '/#hizmetler',
+  '/markalar': '/#markalar',
+  '/markalarimiz': '/#markalar',
+  '/referanslar': '/#projeler',
+  '/projelerimiz': '/projeler',
+  '/anasayfa': '/',
+  '/index.html': '/',
+  '/kariyer.html': '/kariyer',
+  '/blog.html': '/blog',
+};
+Object.entries(LEGACY_REDIRECTS).forEach(([from, to]) => {
+  app.get(from, (req, res) => res.redirect(301, to));
+});
+
 // Static: uploads
 app.use('/uploads', express.static(path.join(ROOT, 'uploads'), { maxAge: '1d' }));
 
