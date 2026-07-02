@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garanti Sorgulama — Form Elektrik</title>
+<!-- Gizli sayfa: arama motorlarına kapalı, nav'da linklenmez -->
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/png" href="/assets/main/favicon.png" />
+<link rel="apple-touch-icon" href="/assets/main/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<style>
+  /* Sticky footer: içerik az olsa da footer dibe otursun */
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  main.warranty-wrap { flex: 1 0 auto; }
+
+  .warranty-wrap { width: 100%; max-width: 640px; margin: 0 auto; padding: calc(var(--header-h) + 64px) 20px 80px; }
+  .warranty-head { text-align: center; margin-bottom: 30px; }
+  .warranty-head .eyebrow { justify-content: center; }
+  .warranty-wrap h1 { font-family: var(--font-head); color: var(--navy); font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.12; letter-spacing: -0.02em; margin: 14px 0 10px; }
+  .warranty-wrap .sub { color: var(--text-soft); margin: 0 auto; max-width: 480px; line-height: 1.7; }
+
+  .warranty-card { background:#fff; border:1px solid var(--line); border-radius: var(--radius); padding: 30px 28px; box-shadow: 0 10px 40px rgba(11,31,59,.06); }
+  .warranty-card .field { margin-bottom: 6px; }
+  .serial-input-wrap { position: relative; }
+  .serial-input-wrap .material-symbols-rounded { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-faint); font-size:20px; pointer-events:none; }
+  .serial-input-wrap input { padding-left: 44px !important; letter-spacing:.3px; }
+
+  .recaptcha-box { margin: 18px 0 6px; display:flex; justify-content:center; min-height: 0; }
+  .recaptcha-box:empty { display:none; }
+  #warrantyBtn { margin-top: 20px; }
+
+  .warranty-note { margin-top: 16px; font-size: .84rem; color: var(--text-faint); text-align:center; line-height:1.6; }
+  .warranty-note a { color: var(--cyan); }
+
+  /* Sonuç */
+  .warranty-result { margin-top: 24px; display:none; animation: wFade .3s ease; }
+  .warranty-result.show { display:block; }
+  @keyframes wFade { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  .warranty-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:.85rem; font-weight:600; margin-bottom:16px; }
+  .warranty-badge.active { background:#e9f9f0; color:#0f9d58; }
+  .warranty-badge.expired { background:#fdecec; color:#d93025; }
+  .result-title { font-family: var(--font-head); color: var(--navy); font-size: 1.05rem; margin: 0 0 14px; display:flex; align-items:center; gap:8px; }
+  .result-title .material-symbols-rounded { color: var(--cyan); font-size:22px; }
+  .result-grid { border:1px solid var(--line); border-radius: var(--radius-sm); overflow:hidden; }
+  .result-row { display:grid; grid-template-columns: 42% 58%; }
+  .result-row:not(:last-child) { border-bottom:1px solid var(--line); }
+  .result-row .k { background: color-mix(in srgb, var(--navy) 4%, #fff); padding: 13px 15px; font-weight:600; color: var(--navy); font-size:.88rem; }
+  .result-row .v { padding: 13px 15px; color: var(--text-soft); font-size:.92rem; word-break: break-word; }
+  .result-row .v.mask { font-family: var(--font-mono, monospace); letter-spacing: 1px; color: var(--navy); }
+  @media (max-width: 480px){ .result-row { grid-template-columns: 1fr; } .result-row .k { border-bottom:1px dashed var(--line); } .warranty-card { padding: 24px 18px; } }
+</style>
+<!-- Rybbit Analytics -->
+<script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Form Elektrik">
+      <img src="/assets/main/logo-white.png" alt="Form Elektrik" onerror="this.onerror=null;this.src='/assets/main/logo.png'" />
+      <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
+      <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+      <a href="/blog" data-i18n="nav.blog">Blog</a>
+      <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MOBİL MENÜ ===== -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#hakkimizda" data-i18n="nav.about">Hakkımızda<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" class="btn btn-primary btn-block" data-i18n="nav.quote">Teklif Al</a>
+</nav>
+
+<!-- ===== İÇERİK ===== -->
+<main class="warranty-wrap">
+  <div class="warranty-head">
+    <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:16px">verified_user</span> <span id="wEyebrow">GARANTİ SORGULAMA</span></span>
+    <h1 id="wTitle">Garanti Sorgulama</h1>
+    <p class="sub" id="wSub">Inverter seri numaranızı girerek ürününüzün garanti durumunu sorgulayabilirsiniz.</p>
+  </div>
+
+  <div class="warranty-card">
+    <form id="warrantyForm" autocomplete="off">
+      <div class="field">
+        <label for="serialNo" id="wSerialLabel">Inverter Seri Numarası</label>
+        <div class="serial-input-wrap">
+          <span class="material-symbols-rounded">qr_code_2</span>
+          <input type="text" id="serialNo" name="serialNo" required maxlength="120" placeholder="Örn. INV-2024-XXXXXX">
+        </div>
+      </div>
+      <div class="recaptcha-box" id="recaptchaBox"><!-- reCAPTCHA v2 render edilir --></div>
+      <button type="submit" class="btn btn-primary btn-block" id="warrantyBtn">
+        <span class="material-symbols-rounded" style="font-size:18px;vertical-align:-3px">search</span>
+        <span id="wQueryBtn">Sorgula</span>
+      </button>
+      <div class="form-msg" id="warrantyMsg"></div>
+      <p class="warranty-note" id="wNote">Sorgulama sonucunda görüntülenen müşteri bilgileri gizlilik gereği maskelenmektedir.</p>
+    </form>
+
+    <div class="warranty-result" id="warrantyResult">
+      <div id="resultBadge"></div>
+      <div class="result-title"><span class="material-symbols-rounded">receipt_long</span> <span id="wResultTitle">Garanti Bilgileri</span></div>
+      <div class="result-grid">
+        <div class="result-row"><div class="k" id="wkInvDate">Fatura Tarihi</div><div class="v" id="rInvoiceDate">—</div></div>
+        <div class="result-row"><div class="k" id="wkInvNo">Fatura No</div><div class="v" id="rInvoiceNo">—</div></div>
+        <div class="result-row"><div class="k" id="wkWStart">Garanti Başlangıç Tarihi</div><div class="v" id="rWStart">—</div></div>
+        <div class="result-row"><div class="k" id="wkWEnd">Garanti Bitiş Tarihi</div><div class="v" id="rWEnd">—</div></div>
+        <div class="result-row"><div class="k" id="wkCust">Müşteri Adı</div><div class="v mask" id="rCustomer">—</div></div>
+        <div class="result-row"><div class="k" id="wkTax">Vergi No</div><div class="v mask" id="rTaxNo">—</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer" style="flex-shrink:0">
+  <div class="wrap">
+    <div class="footer-bottom" style="border:none;padding-top:0;justify-content:center;text-align:center">
+      <span id="wRights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(() => {
+  const I18N = {
+    tr: {
+      eyebrow: 'GARANTİ SORGULAMA',
+      title: 'Garanti Sorgulama',
+      sub: 'Ürün seri numaranızı girerek ürününüzün garanti durumunu sorgulayabilirsiniz.',
+      serialLabel: 'Ürün Seri Numarası',
+      serialPh: 'Örn. 2024-XXXXXXXX',
+      query: 'Sorgula',
+      note: 'Sorgulama sonucunda görüntülenen müşteri bilgileri gizlilik gereği maskelenmektedir.',
+      resultTitle: 'Garanti Bilgileri',
+      invoiceDate: 'Fatura Tarihi', invoiceNo: 'Fatura No',
+      wStart: 'Garanti Başlangıç Tarihi', wEnd: 'Garanti Bitiş Tarihi',
+      customer: 'Müşteri Adı', taxNo: 'Vergi No',
+      rights: '© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.',
+      empty: 'Lütfen seri numarası girin.',
+      captcha: 'Lütfen "Ben robot değilim" doğrulamasını tamamlayın.',
+      notConfigured: 'Garanti sorgulama servisi henüz aktif değil. Lütfen daha sonra tekrar deneyin.',
+      erpError: 'Sorgu sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+      notFound: 'Bu seri numarasına ait garanti kaydı bulunamadı. Lütfen numarayı kontrol edin.',
+      querying: 'Sorgulanıyor…',
+      active: 'Garanti Aktif', expired: 'Garanti Süresi Dolmuş',
+    },
+    en: {
+      eyebrow: 'WARRANTY QUERY',
+      title: 'Warranty Query',
+      sub: 'Enter your product serial number to check your product\'s warranty status.',
+      serialLabel: 'Product Serial Number',
+      serialPh: 'e.g. 2024-XXXXXXXX',
+      query: 'Search',
+      note: 'Customer details shown in the result are masked for privacy reasons.',
+      resultTitle: 'Warranty Information',
+      invoiceDate: 'Invoice Date', invoiceNo: 'Invoice No',
+      wStart: 'Warranty Start Date', wEnd: 'Warranty End Date',
+      customer: 'Customer Name', taxNo: 'Tax No',
+      rights: '© <span id="year">2026</span> Form Elektrik — All rights reserved.',
+      empty: 'Please enter a serial number.',
+      captcha: 'Please complete the "I\'m not a robot" verification.',
+      notConfigured: 'The warranty query service is not active yet. Please try again later.',
+      erpError: 'An error occurred during the query. Please try again.',
+      notFound: 'No warranty record found for this serial number. Please check the number.',
+      querying: 'Querying…',
+      active: 'Warranty Active', expired: 'Warranty Expired',
+    },
+  };
+
+  let LANG = (localStorage.getItem('fe-lang') === 'en') ? 'en' : 'tr';
+  let T = I18N[LANG];
+
+  const $ = (id) => document.getElementById(id);
+  const form = $('warrantyForm'), msg = $('warrantyMsg'), btn = $('warrantyBtn');
+  const resultEl = $('warrantyResult'), badgeEl = $('resultBadge'), box = $('recaptchaBox');
+  let widgetId = null, siteKey = '';
+
+  // Sayfa metinlerini seçili dile göre bas
+  function applyTexts() {
+    T = I18N[LANG];
+    document.documentElement.lang = LANG;
+    $('wEyebrow').textContent = T.eyebrow;
+    $('wTitle').textContent = T.title;
+    $('wSub').textContent = T.sub;
+    $('wSerialLabel').textContent = T.serialLabel;
+    $('serialNo').placeholder = T.serialPh;
+    $('wQueryBtn').textContent = T.query;
+    $('wNote').textContent = T.note;
+    $('wResultTitle').textContent = T.resultTitle;
+    $('wkInvDate').textContent = T.invoiceDate;
+    $('wkInvNo').textContent = T.invoiceNo;
+    $('wkWStart').textContent = T.wStart;
+    $('wkWEnd').textContent = T.wEnd;
+    $('wkCust').textContent = T.customer;
+    $('wkTax').textContent = T.taxNo;
+    $('wRights').innerHTML = T.rights;
+    document.title = T.title + ' — Form Elektrik';
+    const yr = $('year'); if (yr) yr.textContent = new Date().getFullYear();
+  }
+  applyTexts();
+  // script.js dil değiştirince (bayrak toggle) bu sayfayı da güncelle
+  window.addEventListener('fe-lang-change', () => {
+    LANG = (localStorage.getItem('fe-lang') === 'en') ? 'en' : 'tr';
+    applyTexts();
+  });
+
+  // Config: reCAPTCHA site key
+  fetch('/api/warranty/config').then(r => r.json()).then(cfg => {
+    siteKey = cfg.recaptcha_site_key || '';
+    if (siteKey) loadRecaptcha();
+  }).catch(() => {});
+
+  window.__wOnRecaptcha = () => {
+    if (window.grecaptcha && siteKey && box) widgetId = window.grecaptcha.render(box, { sitekey: siteKey });
+  };
+  function loadRecaptcha() {
+    if (document.getElementById('recaptcha-script')) { window.__wOnRecaptcha(); return; }
+    const s = document.createElement('script');
+    s.id = 'recaptcha-script';
+    s.src = 'https://www.google.com/recaptcha/api.js?onload=__wOnRecaptcha&render=explicit&hl=' + LANG;
+    s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  }
+
+  function setMsg(text, kind) { msg.className = 'form-msg ' + (kind || ''); msg.textContent = text || ''; }
+  const esc = (s) => String(s == null ? '' : s);
+  function fmtDate(v) {
+    if (!v) return '—';
+    const d = new Date(v);
+    if (!isNaN(d.getTime()) && /\d{4}-\d{2}-\d{2}/.test(String(v))) {
+      return d.toLocaleDateString(LANG === 'en' ? 'en-GB' : 'tr-TR', { day:'2-digit', month:'long', year:'numeric' });
+    }
+    return esc(v);
+  }
+
+  function showResult(w) {
+    $('rInvoiceDate').textContent = fmtDate(w.invoiceDate);
+    $('rInvoiceNo').textContent = esc(w.invoiceNo) || '—';
+    $('rWStart').textContent = fmtDate(w.warrantyStart);
+    $('rWEnd').textContent = fmtDate(w.warrantyEnd);
+    $('rCustomer').textContent = esc(w.customerName) || '—';
+    $('rTaxNo').textContent = esc(w.taxNo) || '—';
+    badgeEl.innerHTML = '';
+    const end = new Date(w.warrantyEnd);
+    if (!isNaN(end.getTime())) {
+      const active = end.getTime() >= Date.now();
+      const b = document.createElement('span');
+      b.className = 'warranty-badge ' + (active ? 'active' : 'expired');
+      b.innerHTML = `<span class="material-symbols-rounded" style="font-size:16px">${active ? 'check_circle' : 'cancel'}</span> ${active ? T.active : T.expired}`;
+      badgeEl.appendChild(b);
+    }
+    resultEl.classList.add('show');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setMsg('', ''); resultEl.classList.remove('show');
+    const serialNo = $('serialNo').value.trim();
+    if (!serialNo) { setMsg(T.empty, 'err'); return; }
+
+    let recaptchaToken = '';
+    if (siteKey && window.grecaptcha && widgetId !== null) {
+      recaptchaToken = window.grecaptcha.getResponse(widgetId);
+      if (!recaptchaToken) { setMsg(T.captcha, 'err'); return; }
+    }
+
+    btn.disabled = true;
+    const oldHtml = btn.innerHTML;
+    btn.innerHTML = `<span class="material-symbols-rounded" style="font-size:18px;vertical-align:-3px">progress_activity</span> ${T.querying}`;
+    try {
+      const r = await fetch('/api/warranty/query', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serialNo, recaptchaToken }),
+      });
+      if (r.status === 503) { setMsg(T.notConfigured, 'err'); return; }
+      if (r.status === 400) { setMsg(T.captcha, 'err'); return; }
+      if (!r.ok) { setMsg(T.erpError, 'err'); return; }
+      const data = await r.json();
+      if (!data.found) { setMsg(T.notFound, 'err'); return; }
+      showResult(data.warranty);
+    } catch {
+      setMsg(T.erpError, 'err');
+    } finally {
+      btn.disabled = false; btn.innerHTML = oldHtml;
+      if (siteKey && window.grecaptcha && widgetId !== null) window.grecaptcha.reset(widgetId);
+    }
+  });
+})();
+</script>
+</body>
+</html>

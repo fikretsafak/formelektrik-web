@@ -27,7 +27,7 @@ const I18N = {
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
-    'nav.cerez': 'Çerez Politikası', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
+    'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
     'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
@@ -35,7 +35,7 @@ const I18N = {
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
-    'nav.cerez': 'Cookie Policy', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
+    'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
   },
 };
 function currentLang() { return localStorage.getItem('e1-lang') || 'tr'; }
@@ -1206,6 +1206,8 @@ async function openUserForm(u, onDone) {
     { code: 'calisan-adayi', label: 'Çalışan Adayı Metni' },
     { code: 'imha-politikasi', label: 'İmha Politikası' },
     { code: 'cerez', label: 'Çerez Politikası' },
+    { code: 'warranty', label: 'Garanti Ayarları' },
+    { code: 'warranty-logs', label: 'Garanti Sorguları' },
     { code: 'settings', label: 'Ayarlar' },
   ];
   // Mevcut yetkiler: null = tam yetki; array = kısıtlı
@@ -3100,6 +3102,176 @@ routes['kvkk-politikasi'] = makeDocRoute('kvkk-politikasi', 'Genel KVKK Politika
 routes['basvuru-formu'] = makeDocRoute('basvuru-formu', 'Kişisel Veri Sahibi Başvuru Formu', 'Data Subject Application Form', '/belge?slug=basvuru-formu');
 routes['calisan-adayi'] = makeDocRoute('calisan-adayi', 'Çalışan Adayı Aydınlatma ve Açık Rıza Metni', 'Candidate Applicant Notice and Explicit Consent', '/belge?slug=calisan-adayi');
 routes['imha-politikasi'] = makeDocRoute('imha-politikasi', 'Kişisel Veri Saklama ve İmha Politikası', 'Personal Data Retention and Destruction Policy', '/belge?slug=imha-politikasi');
+
+// ============================================
+// GARANTİ SORGULAMA — Navision ERP + reCAPTCHA ayarları
+// (Sorgu logları ayrı bölümde: routes['warranty-logs'])
+// ============================================
+routes.warranty = async (page) => {
+  page.innerHTML = '<div class="loader">Yükleniyor...</div>';
+  let s = {};
+  try {
+    const r = await api.get('/api/warranty/settings');
+    s = r.settings || {};
+  } catch { page.innerHTML = '<div class="empty"><p>Garanti ayarları yüklenemedi.</p></div>'; return; }
+
+  const v = (k) => escapeHtml(s[k] || '');
+  page.innerHTML = '';
+  const card = h('div', { class: 'card', style: 'width:100%' });
+  card.innerHTML = `
+    <div style="padding:24px 24px 0">
+      <h3 style="margin:0 0 4px;font-size:18px">Garanti Sorgulama Ayarları</h3>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfası buradan beslenir. Navision ERP bağlantısı ve reCAPTCHA anahtarları. Şifre/anahtar alanları maskelidir; değiştirmezseniz eski değer korunur.</p>
+    </div>
+    <div class="settings-form" style="padding:8px 24px 24px">
+      <h4 style="margin:14px 0 10px;color:var(--navy);font-size:14px">Navision ERP Bağlantısı</h4>
+      <div class="settings-cols">
+        <div class="settings-col">
+          <div class="settings-row">
+            <label class="settings-row-label" for="wUrl">API URL</label>
+            <input class="settings-row-input" id="wUrl" value="${v('navision_api_url')}" placeholder="https://erp.../warranty?serial={serial}">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="wAuth">Kimlik Doğrulama</label>
+            <select class="settings-row-input" id="wAuth">
+              <option value="none"${(s.navision_auth_type||'none')==='none'?' selected':''}>Yok</option>
+              <option value="basic"${s.navision_auth_type==='basic'?' selected':''}>Basic (kullanıcı/şifre)</option>
+              <option value="bearer"${s.navision_auth_type==='bearer'?' selected':''}>Bearer / API Key</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="wUser">Kullanıcı (Basic)</label>
+            <input class="settings-row-input" id="wUser" value="${v('navision_user')}">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="wPass">Şifre (Basic)</label>
+            <input class="settings-row-input" id="wPass" type="password" value="${v('navision_pass')}" placeholder="••••••••">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="wKey">API Key (Bearer)</label>
+            <input class="settings-row-input" id="wKey" type="password" value="${v('navision_api_key')}" placeholder="••••••••">
+          </div>
+        </div>
+        <div class="settings-col">
+          <p style="margin:0 0 10px;font-size:12px;color:var(--text-dim)">Yanıttaki alan yolları (nokta gösterimi, örn. <code>data.invoiceDate</code>). Boş bırakılırsa yaygın alan adları denenir.</p>
+          <div class="settings-row"><label class="settings-row-label" for="fInvDate">Fatura Tarihi alanı</label><input class="settings-row-input" id="fInvDate" value="${v('navision_field_invoice_date')}" placeholder="invoiceDate"></div>
+          <div class="settings-row"><label class="settings-row-label" for="fInvNo">Fatura No alanı</label><input class="settings-row-input" id="fInvNo" value="${v('navision_field_invoice_no')}" placeholder="invoiceNo"></div>
+          <div class="settings-row"><label class="settings-row-label" for="fWStart">Garanti Başlangıç alanı</label><input class="settings-row-input" id="fWStart" value="${v('navision_field_warranty_start')}" placeholder="warrantyStart"></div>
+          <div class="settings-row"><label class="settings-row-label" for="fWEnd">Garanti Bitiş alanı</label><input class="settings-row-input" id="fWEnd" value="${v('navision_field_warranty_end')}" placeholder="warrantyEnd"></div>
+          <div class="settings-row"><label class="settings-row-label" for="fCust">Müşteri Adı alanı</label><input class="settings-row-input" id="fCust" value="${v('navision_field_customer_name')}" placeholder="customerName"></div>
+          <div class="settings-row"><label class="settings-row-label" for="fTax">Vergi No alanı</label><input class="settings-row-input" id="fTax" value="${v('navision_field_tax_no')}" placeholder="taxNo"></div>
+        </div>
+      </div>
+
+      <h4 style="margin:22px 0 10px;color:var(--navy);font-size:14px;border-top:1px solid var(--border);padding-top:18px">reCAPTCHA v2 (bot koruması)</h4>
+      <div class="settings-cols">
+        <div class="settings-col">
+          <div class="settings-row"><label class="settings-row-label" for="rSite">Site Key</label><input class="settings-row-input" id="rSite" value="${v('recaptcha_site_key')}"></div>
+        </div>
+        <div class="settings-col">
+          <div class="settings-row"><label class="settings-row-label" for="rSecret">Secret Key</label><input class="settings-row-input" id="rSecret" type="password" value="${v('recaptcha_secret')}" placeholder="••••••••"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="wSaveBtn"><span class="material-symbols-rounded">save</span> Kaydet</button>
+        <span style="display:inline-flex;gap:8px;align-items:center">
+          <input class="settings-row-input" id="wTestSerial" style="width:200px" placeholder="Test seri no">
+          <button class="btn btn-ghost" id="wTestBtn"><span class="material-symbols-rounded">bolt</span> Bağlantıyı Test Et</button>
+        </span>
+        <a class="btn btn-ghost" href="/garanti" target="_blank" rel="noopener"><span class="material-symbols-rounded">open_in_new</span> Sayfayı Aç</a>
+      </div>
+      <div id="wTestOut" style="margin-top:12px;font-size:13px"></div>
+    </div>
+  `;
+  page.appendChild(card);
+
+  const collect = () => ({
+    navision_api_url: page.querySelector('#wUrl').value.trim(),
+    navision_auth_type: page.querySelector('#wAuth').value,
+    navision_user: page.querySelector('#wUser').value.trim(),
+    navision_pass: page.querySelector('#wPass').value,
+    navision_api_key: page.querySelector('#wKey').value,
+    navision_field_invoice_date: page.querySelector('#fInvDate').value.trim(),
+    navision_field_invoice_no: page.querySelector('#fInvNo').value.trim(),
+    navision_field_warranty_start: page.querySelector('#fWStart').value.trim(),
+    navision_field_warranty_end: page.querySelector('#fWEnd').value.trim(),
+    navision_field_customer_name: page.querySelector('#fCust').value.trim(),
+    navision_field_tax_no: page.querySelector('#fTax').value.trim(),
+    recaptcha_site_key: page.querySelector('#rSite').value.trim(),
+    recaptcha_secret: page.querySelector('#rSecret').value,
+  });
+
+  page.querySelector('#wSaveBtn').addEventListener('click', async () => {
+    try {
+      await api.put('/api/warranty/settings', collect());
+      toast('Garanti ayarları kaydedildi', 'success');
+    } catch (e) { toast(e.message, 'error'); }
+  });
+
+  page.querySelector('#wTestBtn').addEventListener('click', async () => {
+    const out = page.querySelector('#wTestOut');
+    const serialNo = page.querySelector('#wTestSerial').value.trim() || 'TEST';
+    out.innerHTML = '<span style="color:var(--text-dim)">Test ediliyor…</span>';
+    try {
+      const r = await api.post('/api/warranty/test', { serialNo });
+      if (r.found) out.innerHTML = '<span style="color:#0f9d58">✓ Bağlantı başarılı, kayıt bulundu.</span><pre style="margin-top:6px;background:var(--bg-soft);padding:10px;border-radius:6px;overflow:auto">' + escapeHtml(JSON.stringify(r.raw, null, 2)) + '</pre>';
+      else out.innerHTML = '<span style="color:#f4b400">Bağlantı çalışıyor ama bu seri için kayıt yok.</span>';
+    } catch (e) {
+      const m = (e && e.message) || '';
+      out.innerHTML = '<span style="color:#d93025">✗ ' + escapeHtml(m.includes('not_configured') ? 'Navision API URL girilmemiş.' : 'Bağlantı hatası: ' + m) + '</span>';
+    }
+  });
+};
+
+// ============================================
+// GARANTİ SORGU LOGLARI — ayrı bölüm/yetki ('warranty-logs')
+// Ayarları göremeyen bir kullanıcı yalnızca logları görebilsin diye ayrıldı.
+// ============================================
+routes['warranty-logs'] = async (page) => {
+  page.innerHTML = '<div class="loader">Yükleniyor...</div>';
+  let logs = [];
+  try {
+    const lr = await api.get('/api/warranty/logs?limit=200');
+    logs = lr.logs || [];
+  } catch { page.innerHTML = '<div class="empty"><p>Sorgu logları yüklenemedi.</p></div>'; return; }
+
+  const fmtResult = (r) => ({
+    found: '<span style="color:#0f9d58">Bulundu</span>',
+    not_found: '<span style="color:#f4b400">Kayıt yok</span>',
+    error: '<span style="color:#d93025">Hata</span>',
+    not_configured: '<span style="color:var(--text-dim)">Yapılandırılmadı</span>',
+    captcha_failed: '<span style="color:#d93025">Captcha başarısız</span>',
+  }[r] || escapeHtml(r || ''));
+
+  page.innerHTML = '';
+  const card = h('div', { class: 'card', style: 'width:100%' });
+  card.innerHTML = `
+    <div style="padding:24px 24px 4px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <h3 style="margin:0 0 4px;font-size:18px">Garanti Sorgu Geçmişi</h3>
+        <p style="margin:0;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfasından yapılan sorgular (${logs.length} kayıt). Kişisel veri saklanmaz.</p>
+      </div>
+      <button class="btn btn-ghost" id="wlRefresh"><span class="material-symbols-rounded">refresh</span> Yenile</button>
+    </div>
+    <div style="padding:12px 24px 24px;overflow-x:auto">
+      ${logs.length ? `<table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="text-align:left;border-bottom:1px solid var(--border)">
+          <th style="padding:9px 8px">Tarih</th><th style="padding:9px 8px">Seri No</th><th style="padding:9px 8px">Sonuç</th><th style="padding:9px 8px">IP</th>
+        </tr></thead>
+        <tbody>${logs.map(l => `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:9px 8px;white-space:nowrap">${escapeHtml(l.created_at || '')}</td>
+          <td style="padding:9px 8px;font-family:monospace">${escapeHtml(l.serial_no || '')}</td>
+          <td style="padding:9px 8px">${fmtResult(l.result)}</td>
+          <td style="padding:9px 8px;color:var(--text-dim)">${escapeHtml(l.ip || '')}</td>
+        </tr>`).join('')}</tbody>
+      </table>` : '<p style="color:var(--text-dim);font-size:13px;padding:8px 0">Henüz sorgu yapılmamış.</p>'}
+    </div>
+  `;
+  page.appendChild(card);
+  const rb = page.querySelector('#wlRefresh');
+  if (rb) rb.addEventListener('click', () => routes['warranty-logs'](page));
+};
 
 // ============================================
 // SETTINGS — SMTP ve genel ayarlar

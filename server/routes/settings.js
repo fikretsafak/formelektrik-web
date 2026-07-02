@@ -349,4 +349,5 @@ router.post('/test-mail', authRequired, requireRole('admin'), requirePermission(
 
 module.exports = router;
 module.exports.getSetting = get;
+module.exports.setSetting = set;
 module.exports.getAllSettings = getAll;

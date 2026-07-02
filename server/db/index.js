@@ -381,4 +381,17 @@ if (!tableExists('settings')) {
   )`);
 }
 
+// === Garanti sorgu logları ===
+// Gizli /garanti sayfasından yapılan Navision garanti sorguları burada tutulur.
+// Kişisel veri saklamaz; yalnızca seri no + sonuç durumu + IP + zaman (kötüye kullanım takibi).
+if (!tableExists('warranty_queries')) {
+  db.exec(`CREATE TABLE IF NOT EXISTS warranty_queries (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    serial_no  TEXT,
+    result     TEXT,                        -- 'found' | 'not_found' | 'error' | 'not_configured' | 'captcha_failed'
+    ip         TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`);
+}
+
 module.exports = db;
