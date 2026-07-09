@@ -194,6 +194,13 @@ if (tableExists('brands') && !columnExists('brands', 'type')) {
   db.exec("ALTER TABLE brands ADD COLUMN type TEXT NOT NULL DEFAULT 'umbrella'");
 }
 
+// show_on_homepage: partner markalar da anasayfada gösterilebilsin
+if (tableExists('brands') && !columnExists('brands', 'show_on_homepage')) {
+  db.exec("ALTER TABLE brands ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0");
+  // Mevcut umbrella markalar varsayılan olarak anasayfada gösterilsin
+  db.exec("UPDATE brands SET show_on_homepage = 1 WHERE type IS NULL OR type = 'umbrella'");
+}
+
 // Marka ↔ hizmet ilişkisi (bir marka birden çok hizmette çözüm ortağı olabilir)
 if (!tableExists('brand_services')) {
   db.exec(`CREATE TABLE IF NOT EXISTS brand_services (
@@ -373,6 +380,18 @@ if (tableExists('announcements') && /slug\s+TEXT\s+NOT\s+NULL\s+UNIQUE/i.test(ta
   `);
 }
 
+// === Proje ↔ Marka ilişkisi ===
+if (!tableExists('project_brands')) {
+  db.exec(`CREATE TABLE IF NOT EXISTS project_brands (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    brand_id   INTEGER NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+    UNIQUE(project_id, brand_id)
+  )`);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_project_brands_project ON project_brands(project_id)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_project_brands_brand ON project_brands(brand_id)');
+}
+
 // === Ayarlar ===
 if (!tableExists('settings')) {
   db.exec(`CREATE TABLE IF NOT EXISTS settings (
@@ -392,6 +411,25 @@ if (!tableExists('warranty_queries')) {
     ip         TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   )`);
+}
+
+// === Referans Logoları (Bize Güvenen Kurumlar) ===
+if (!tableExists('reference_logos')) {
+  db.exec(`CREATE TABLE IF NOT EXISTS reference_logos (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    logo_url   TEXT,
+    url        TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_active  INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+  // Mevcut statik logoları seed et
+  const seed = db.prepare('INSERT INTO reference_logos (name, logo_url, sort_order) VALUES (?, ?, ?)');
+  ['socar','world-bank','bedas','ayedas','baskent-edas','dicle-elektrik','uedas','yedas',
+   'gdz-elektrik','aras-elektrik','ck-enerji','erciyes-anadolu','astor','sanko','dogus',
+   'antalya-buyuksehir','ego','gaski','ilbank','karacabey-belediyesi','nero-industries','siskom-enerji','gamador',
+   'bogazici-elektrik'].forEach((n, i) => seed.run(n, `/assets/references/${n}.png`, i));
 }
 
 module.exports = db;

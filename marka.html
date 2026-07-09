@@ -48,10 +48,9 @@
   .brand-hero-body p { color: var(--text-soft); font-size: clamp(0.95rem, 1.4vw, 1.02rem); max-width: 620px; line-height: 1.55; }
   .brand-hero-link { display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:14px; font-weight:600; color:var(--cyan); }
   .brand-hero-link .material-symbols-rounded { font-size:18px; }
-  .brand-cover { width:100%; border-radius: var(--radius); border:1px solid var(--line); margin-top: 28px; }
+  .brand-cover { width:100%; max-height:500px; object-fit:cover; border-radius: var(--radius); border:1px solid var(--line); margin-top: 28px; display:block; }
   .detail-body {
     font-family: 'Lora', Georgia, serif; font-size: 17px; line-height: 1.85; color: var(--text);
-    max-width: 800px;
   }
   .detail-body h1, .detail-body h2, .detail-body h3, .detail-body h4 { font-family: var(--font-head); color: var(--navy); margin: 32px 0 14px; line-height:1.3; }
   .detail-body h2 { font-size: 24px; }
@@ -59,7 +58,7 @@
   .detail-body p { margin: 16px 0; }
   .detail-body ul, .detail-body ol { margin: 16px 0 16px 24px; }
   .detail-body li { margin: 7px 0; }
-  .detail-body img { max-width:100%; border-radius: var(--radius-sm); margin: 20px 0; }
+  .detail-body img { max-width:100%; height:auto; border-radius: var(--radius-sm); margin: 20px 0; display:block; }
   .detail-body a { color: var(--cyan); text-decoration: underline; text-underline-offset:3px; }
   .detail-body blockquote { border-left:3px solid var(--cyan); padding-left:18px; margin:20px 0; color:var(--text); font-style:italic; }
   .detail-body table { width:100%; border-collapse:collapse; margin:20px 0; font-family: var(--font); font-size:.95rem; }
@@ -140,6 +139,12 @@
       <div class="brand-svc-grid" id="brandSvcGrid"></div>
     </div>
 
+    <!-- Marka projeleri -->
+    <div id="brandProjectsWrap" style="margin-top:48px; display:none">
+      <h3 class="section-title" style="font-size:1.3rem" id="brandPrjTitle">Bu marka ile tamamladığımız projeler</h3>
+      <div class="svc-prj-slider" id="brandPrjSlider"></div>
+    </div>
+
     <!-- CTA -->
     <div class="cta-band brand-cta-band" id="brandCta" style="display:none">
       <h2 id="ctaTitle">Bu marka hakkında bilgi alın</h2>
@@ -207,11 +212,11 @@
   const lang = localStorage.getItem('fe-lang') || 'tr';
   const T = {
     tr: { back:'Markalar', notFound:'Marka bulunamadı', notFoundSub:'Aradığınız marka bulunamadı ya da yayında değil.', home:'Ana sayfaya dön',
-          ctaTitle:'Bu marka hakkında bilgi alın', ctaSub:'Uzman ekibimiz doğru ürün ve çözüm seçiminde size yardımcı olsun.', ctaQuote:'İletişime Geçin', ctaBook:'Görüşme Planla',
-          svcTitle:'Bu markayı sunduğumuz hizmetler', visitSite:'Marka sitesini ziyaret et', eyebrow:'Çözüm Ortağı' },
+          ctaTitle:'Projeniz için bizimle iletişime geçin', ctaSub:'Enerji altyapısı ve güç sistemleri konusunda uzman ekibimiz size yardımcı olmaya hazır.', ctaQuote:'İletişime Geçin', ctaBook:'Görüşme Planla',
+          svcTitle:'Bu markayı sunduğumuz hizmetler', prjTitle:'Bu marka ile tamamladığımız projeler', visitSite:'Marka sitesini ziyaret et', eyebrow:'Çözüm Ortağı' },
     en: { back:'Brands', notFound:'Brand not found', notFoundSub:'The brand you are looking for was not found or is unpublished.', home:'Back to home',
-          ctaTitle:'Get information about this brand', ctaSub:'Let our team help you choose the right product and solution.', ctaQuote:'Get in Touch', ctaBook:'Book a Meeting',
-          svcTitle:'Services where we offer this brand', visitSite:'Visit brand website', eyebrow:'Solution Partner' },
+          ctaTitle:'Get in touch for your project', ctaSub:'Our expert team in energy infrastructure and power systems is ready to help you.', ctaQuote:'Contact Us', ctaBook:'Book a Meeting',
+          svcTitle:'Services where we offer this brand', prjTitle:'Projects completed with this brand', visitSite:'Visit brand website', eyebrow:'Solution Partner' },
   };
   const t = T[lang] || T.tr;
   const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]);
@@ -231,6 +236,7 @@
   document.getElementById('ctaQuote').textContent = t.ctaQuote;
   document.getElementById('ctaBook').textContent = t.ctaBook;
   document.getElementById('brandSvcTitle').textContent = t.svcTitle;
+  document.getElementById('brandPrjTitle').textContent = t.prjTitle;
 
   const head = document.getElementById('brandHead');
   const bodyWrap = document.getElementById('brandBodyWrap');
@@ -287,8 +293,58 @@
         }).join('');
       }
       document.getElementById('brandCta').style.display = '';
+
+      // Markanın doğrudan ilişkilendirilmiş projelerini yükle
+      loadBrandProjects(brand.id);
     })
     .catch(showError);
+
+  function loadBrandProjects(brandId) {
+    fetch('/api/projects/by-brand/' + brandId + '?language=' + lang)
+      .then(r => r.json())
+      .then(data => {
+        const list = (data && data.projects) || [];
+        if (!list.length) return;
+        const wrap = document.getElementById('brandProjectsWrap');
+        const slider = document.getElementById('brandPrjSlider');
+        wrap.style.display = '';
+        slider.innerHTML = `
+          <button type="button" class="svc-prj-nav svc-prj-prev" aria-label="Önceki"><span class="material-symbols-rounded">chevron_left</span></button>
+          <div class="svc-prj-track">
+            ${list.map(p => `
+              <a class="svc-prj-card" href="/proje?slug=${encodeURIComponent(p.slug)}">
+                <div class="svc-prj-thumb">
+                  ${p.cover_image ? `<img src="${esc(p.cover_image)}" alt="${esc(p.title)}" loading="lazy" />` : `<span class="material-symbols-rounded ph-ico">apartment</span>`}
+                  ${p.category ? `<span class="project-cat">${esc(p.category)}</span>` : ''}
+                </div>
+                <div class="svc-prj-body">
+                  <h4>${esc(p.title)}</h4>
+                  ${p.client ? `<span class="svc-prj-meta"><span class="material-symbols-rounded">business</span>${esc(p.client)}</span>` : ''}
+                  ${p.capacity ? `<span class="svc-prj-cap">${esc(p.capacity)}</span>` : ''}
+                </div>
+              </a>`).join('')}
+          </div>
+          <button type="button" class="svc-prj-nav svc-prj-next" aria-label="Sonraki"><span class="material-symbols-rounded">chevron_right</span></button>`;
+        const track = slider.querySelector('.svc-prj-track');
+        const prevBtn = slider.querySelector('.svc-prj-prev');
+        const nextBtn = slider.querySelector('.svc-prj-next');
+        const scrollByCard = (dir) => {
+          const card = track.firstElementChild;
+          const step = card ? card.offsetWidth + 16 : track.clientWidth * 0.8;
+          track.scrollBy({ left: dir * step, behavior: 'smooth' });
+        };
+        const updateNav = () => {
+          const canScroll = track.scrollWidth - track.clientWidth > 8;
+          prevBtn.hidden = !canScroll;
+          nextBtn.hidden = !canScroll;
+        };
+        prevBtn.onclick = () => scrollByCard(-1);
+        nextBtn.onclick = () => scrollByCard(1);
+        track.addEventListener('scroll', () => requestAnimationFrame(updateNav), { passive: true });
+        window.addEventListener('resize', updateNav);
+        updateNav();
+      });
+  }
 
   // Dil değişince içeriği yeniden çek
   document.querySelectorAll('#langToggle button').forEach(b => b.addEventListener('click', () => {

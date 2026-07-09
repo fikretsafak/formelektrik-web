@@ -28,6 +28,7 @@ app.use('/api/appointments',  require('./routes/appointments'));
 app.use('/api/careers',       require('./routes/careers'));
 app.use('/api/settings',      require('./routes/settings'));
 app.use('/api/warranty',      require('./routes/warranty'));
+app.use('/api/references',   require('./routes/references'));
 
 // Health
 app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));

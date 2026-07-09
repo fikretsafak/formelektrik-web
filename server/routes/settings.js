@@ -196,6 +196,14 @@ router.get('/public/belgeler', (req, res) => {
   res.json({ docs });
 });
 
+// PUBLIC — video URL'leri (hero + tanıtım). Admin panelden yönetilir.
+router.get('/public/videos', (req, res) => {
+  res.json({
+    hero_video_url: get('hero_video_url') || '/assets/form.mp4',
+    intro_video_url: get('intro_video_url') || '/assets/form.mp4',
+  });
+});
+
 // PUBLIC — iletişim bilgileri (telefon, e-posta, adres, harita, sosyal). Admin panelden yönetilir.
 router.get('/public/contact', (req, res) => {
   res.json({
@@ -319,7 +327,8 @@ router.put('/', authRequired, requireRole('admin'), requirePermission('settings'
     'maps_embed_url', 'maps_lat', 'maps_lng', 'social_linkedin', 'social_instagram', 'social_youtube', 'social_facebook',
     'rybbit_script_src', 'rybbit_site_id',
     'rybbit_site_id_li3', 'rybbit_site_id_epsis',
-    'rybbit_api_base', 'rybbit_api_key'];
+    'rybbit_api_base', 'rybbit_api_key',
+    'intro_video_url', 'hero_video_url'];
   const body = req.body || {};
   Object.entries(body).forEach(([k, v]) => {
     if (!allowed.includes(k)) return;

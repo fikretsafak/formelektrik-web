@@ -154,10 +154,11 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 /* ===== Çözümlerimiz — görselli kart grid ===== */
 /* Flexbox — son satırdaki eksik kartlar ortalansın (grid'de sola yaslıydı) */
 .solutions-grid { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
-.solutions-grid .solution-card { flex: 1 1 300px; max-width: calc((100% - 44px) / 3); } /* 3 sütun (2×22px gap) */
-.solution-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform .22s, box-shadow .22s, border-color .22s; }
+.solution-wrap { flex: 1 1 300px; max-width: calc((100% - 44px) / 3); display: flex; flex-direction: column; }
+.solution-wrap .solution-card { flex: 1; max-width: 100%; }
+.solution-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow-sm); transition: transform .22s, box-shadow .22s, border-color .22s; }
 .solution-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
-.solution-media { position: relative; height: 200px; overflow: hidden; background: linear-gradient(135deg, var(--navy), var(--navy-2)); }
+.solution-media { position: relative; height: 200px; overflow: hidden; border-radius: 19px 19px 0 0; background: linear-gradient(135deg, var(--navy), var(--navy-2)); }
 .solution-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .solution-card:hover .solution-media img { transform: scale(1.07); }
 .solution-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,19,48,0) 40%, rgba(10,19,48,.55)); }
@@ -174,6 +175,29 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .solution-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; color: var(--cyan); font-weight: 700; font-size: .9rem; }
 .solution-more .material-symbols-rounded { font-size: 18px; transition: transform .2s; }
 .solution-card:hover .solution-more .material-symbols-rounded { transform: translateX(4px); }
+
+/* Yatay marka marquee — her çözüm kartının içinde */
+.solution-brands-marquee {
+  overflow: hidden; border-top: 1px solid var(--line); padding: 10px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.vmarquee-track {
+  display: flex; gap: 24px; align-items: center; width: max-content;
+  animation: hmarquee 14s linear infinite;
+}
+.vmarquee-item {
+  display: flex; align-items: center; justify-content: center; flex: none;
+  height: 40px; padding: 4px 12px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: opacity .2s;
+}
+.vmarquee-item:hover { opacity: .7; }
+.vmarquee-item img { max-height: 32px; max-width: 100px; width: auto; object-fit: contain; filter: grayscale(.3); opacity: .75; transition: filter .2s, opacity .2s; }
+.vmarquee-item:hover img { filter: grayscale(0); opacity: 1; }
+.vmarquee-text { font-family: var(--font-head); font-size: .8rem; font-weight: 700; color: var(--navy); white-space: nowrap; }
+@keyframes hmarquee { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
+
 .service-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; transition: transform .2s, box-shadow .2s, border-color .2s; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .service-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: transparent; }
 .service-ico { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cyan-soft), #fff); border: 1px solid var(--line); margin-bottom: 20px; transition: .2s; }
@@ -411,23 +435,89 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 .project-cap { margin-top: 14px; font-weight: 700; font-size: 0.9rem; color: var(--cyan); }
 
 /* ============================================
+   ÇÖZÜM ALTINDA PROJE SLIDER
+   ============================================ */
+.svc-prj-slider { position: relative; display: flex; align-items: center; gap: 8px; }
+.svc-prj-track {
+  display: flex; gap: 16px; flex: 1; min-width: 0;
+  overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 2px 10px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.svc-prj-track::-webkit-scrollbar { display: none; }
+.svc-prj-card {
+  flex: 0 0 260px; scroll-snap-align: start;
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: #fff; transition: transform .2s, box-shadow .2s;
+  display: flex; flex-direction: column; text-decoration: none; color: inherit;
+}
+.svc-prj-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.svc-prj-thumb {
+  aspect-ratio: 16/10; background: linear-gradient(135deg, var(--navy), var(--navy-2));
+  position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.svc-prj-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.svc-prj-card:hover .svc-prj-thumb img { transform: scale(1.06); }
+.svc-prj-thumb .ph-ico { font-size: 36px; color: rgba(255,255,255,.4); }
+.svc-prj-thumb .project-cat { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 4px 9px; border-radius: 100px; background: #fff; color: var(--cyan); box-shadow: var(--shadow-sm); }
+.svc-prj-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.svc-prj-body h4 { font-family: var(--font-head); font-size: 1rem; color: var(--navy); margin: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.svc-prj-meta { display: inline-flex; align-items: center; gap: 4px; color: var(--text-faint); font-size: .8rem; }
+.svc-prj-meta .material-symbols-rounded { font-size: 14px; }
+.svc-prj-cap { font-weight: 700; font-size: .82rem; color: var(--cyan); }
+.svc-prj-nav {
+  flex: none; width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid var(--line); color: var(--navy);
+  cursor: pointer; transition: background .18s, border-color .18s, color .18s; z-index: 2;
+  box-shadow: var(--shadow-sm);
+}
+.svc-prj-nav[hidden] { display: none; }
+.svc-prj-nav:hover { background: var(--cyan); border-color: var(--cyan); color: #fff; }
+.svc-prj-nav .material-symbols-rounded { font-size: 22px; }
+.btn-sm { font-size: .85rem; padding: 8px 18px; }
+@media (max-width: 720px) {
+  .svc-prj-card { flex-basis: 78%; }
+  .svc-prj-nav { display: none; }
+}
+
+/* ============================================
    MARKALAR (çatı)
    ============================================ */
 .brands { background: var(--navy-deep); overflow: hidden; }
-.brands .section-head { display: none; }
+.brands .section-title { color: #fff; }
+.brands .section-lead { color: var(--text-on-navy-soft, rgba(255,255,255,.65)); }
+.brands .eyebrow { color: var(--cyan); }
 .brands::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(42,169,224,0.18), transparent 34%), radial-gradient(circle at 86% 70%, rgba(63,184,239,0.12), transparent 32%); pointer-events: none; }
 .brands .wrap { position: relative; z-index: 1; }
-.brands-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
-.brand-card { display: flex; flex-direction: column; padding: 34px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.92); transition: transform .2s, box-shadow .2s, border-color .2s; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
-.brand-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--navy), var(--cyan)); }
-.brand-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
-.brand-logo-box { height: 54px; display: flex; align-items: center; margin-bottom: 18px; }
-.brand-logo-box img { max-height: 46px; width: auto; object-fit: contain; }
-.brand-logo-text { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700; color: var(--navy); }
-.brand-card p { color: var(--text-soft); font-size: 0.95rem; flex: 1; }
-.brand-card .visit { display: inline-flex; align-items: center; gap: 6px; color: var(--cyan-2); font-weight: 600; font-size: 0.92rem; margin-top: 20px; text-decoration: none; align-self: flex-start; }
-.brand-card .visit:hover { text-decoration: underline; }
-.brand-card .visit .material-symbols-rounded { font-size: 18px; }
+/* 4 çözüm grubunda dikey kayan marka slotları */
+.brands-grid { }
+.brand-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; align-items: start; }
+.bslot { display: flex; flex-direction: column; gap: 14px; }
+.bslot-title { font-family: var(--font-head); font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.45); text-align: center; text-transform: uppercase; letter-spacing: 1.2px; }
+.bslot-viewport {
+  width: 100%; height: 280px; overflow: hidden; border-radius: var(--radius);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 6%, #000 94%, transparent);
+}
+.bslot-track {
+  display: flex; flex-direction: column; align-items: stretch; gap: 16px; padding: 16px 0;
+  animation: vmarquee 18s linear infinite;
+}
+.bslot-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; flex: none;
+  height: 248px; padding: 28px 20px; text-align: center;
+  background: rgba(255,255,255,.95); border-radius: 16px; backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.15);
+  text-decoration: none; color: inherit; transition: transform .2s, box-shadow .2s;
+}
+.bslot-item:hover { transform: scale(1.03); box-shadow: 0 6px 24px rgba(0,0,0,.18); }
+.bslot-logo { display: flex; align-items: center; justify-content: center; height: 56px; margin-bottom: 16px; }
+.bslot-logo img { max-height: 52px; max-width: 180px; width: auto; object-fit: contain; }
+.bslot-name { font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; color: var(--navy); }
+.bslot-desc { font-size: .86rem; color: var(--text-soft); line-height: 1.55; margin: 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+@keyframes vmarquee { from { transform: translateY(0); } to { transform: translateY(-33.333%); } }
+@media (max-width: 900px) { .brand-slots { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .brand-slots { grid-template-columns: 1fr; } .bslot-viewport { height: 220px; } .bslot-item { height: 188px; } }
 
 /* ============================================
    TANITIM VİDEOSU
@@ -797,7 +887,7 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
    ============================================ */
 @media (max-width: 980px) {
   .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .solutions-grid .solution-card { max-width: calc((100% - 22px) / 2); }
+  .solution-wrap { max-width: calc((100% - 22px) / 2); }
   .services-showcase { min-height: auto; }
   .services-showcase-card { position: relative; inset: auto; margin: 28px; grid-template-columns: 1fr; }
   .services-showcase-media { min-height: 320px; }
@@ -826,7 +916,7 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 }
 @media (max-width: 760px) {
   .services-grid { grid-template-columns: 1fr; }
-  .solutions-grid .solution-card { max-width: 100%; }
+  .solution-wrap { max-width: 100%; }
   /* Randevu bölümü mobil: yazı + takvim ALT ALTA (yan yana taşıyordu) */
   .cta-scheduler { grid-template-columns: 1fr; gap: 28px; }
   .cta-scheduler-copy h2, .cta-scheduler-copy p { max-width: 100%; }

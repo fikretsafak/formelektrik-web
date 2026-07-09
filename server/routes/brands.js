@@ -5,15 +5,18 @@ const { isNonEmptyString, slugify } = require('../middleware/validate');
 
 const router = express.Router();
 
-// Public: ana sayfa çatı markaları (Li3/Epsis). Çözüm ortağı markalar (type=partner) hariç.
+// Public: ana sayfa markaları — show_on_homepage işaretli olanlar (umbrella veya partner)
 router.get('/', (req, res) => {
   const { language = 'tr' } = req.query;
+  const svcStmt = db.prepare('SELECT service_code FROM brand_services WHERE brand_id = ? ORDER BY sort_order, id');
   function build(lang) {
-    return db.prepare(`
-      SELECT id, name, slug, description, logo_url, url, sort_order
-      FROM brands WHERE is_active = 1 AND language = ? AND (type IS NULL OR type = 'umbrella')
+    const rows = db.prepare(`
+      SELECT id, name, slug, description, logo_url, url, type, sort_order
+      FROM brands WHERE is_active = 1 AND language = ? AND show_on_homepage = 1
       ORDER BY sort_order, id
     `).all(lang);
+    rows.forEach(r => { r.services = svcStmt.all(r.id).map(s => s.service_code); });
+    return rows;
   }
   let brands = build(language);
   if (!brands.length && language !== 'tr') brands = build('tr');
@@ -70,14 +73,16 @@ function setBrandServices(brandId, codes) {
 }
 
 router.post('/', authRequired, requireRole('admin'), requirePermission('brands'), (req, res) => {
-  const { name, description, body, cover_image, logo_url, url, type, language = 'tr', sort_order = 0, is_active, slug, service_codes } = req.body || {};
+  const { name, description, body, cover_image, logo_url, url, type, language = 'tr', sort_order = 0, is_active, show_on_homepage, slug, service_codes } = req.body || {};
   if (!isNonEmptyString(name, 120)) return res.status(400).json({ error: 'invalid_input' });
+  const finalType = type === 'partner' ? 'partner' : 'umbrella';
   const info = db.prepare(`
-    INSERT INTO brands (name, slug, description, body, cover_image, logo_url, url, type, language, sort_order, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO brands (name, slug, description, body, cover_image, logo_url, url, type, language, sort_order, is_active, show_on_homepage)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(name, (slug && slugify(slug)) || slugify(name), description || null, body || '', cover_image || null,
-    logo_url || null, url || null, (type === 'partner' ? 'partner' : 'umbrella'),
-    language, Number(sort_order) || 0, is_active === undefined ? 1 : (is_active ? 1 : 0));
+    logo_url || null, url || null, finalType,
+    language, Number(sort_order) || 0, is_active === undefined ? 1 : (is_active ? 1 : 0),
+    show_on_homepage !== undefined ? (show_on_homepage ? 1 : 0) : (finalType === 'umbrella' ? 1 : 0));
   setBrandServices(info.lastInsertRowid, service_codes);
   res.status(201).json({ ok: true, id: info.lastInsertRowid });
 });
@@ -98,11 +103,12 @@ router.put('/:id', authRequired, requireRole('admin'), requirePermission('brands
     language: b.language ?? existing.language,
     sort_order: b.sort_order === undefined ? existing.sort_order : Number(b.sort_order) || 0,
     is_active: b.is_active === undefined ? existing.is_active : (b.is_active ? 1 : 0),
+    show_on_homepage: b.show_on_homepage === undefined ? existing.show_on_homepage : (b.show_on_homepage ? 1 : 0),
   };
   db.prepare(`UPDATE brands SET
-    name=?, slug=?, description=?, body=?, cover_image=?, logo_url=?, url=?, type=?, language=?, sort_order=?, is_active=?, updated_at=CURRENT_TIMESTAMP
+    name=?, slug=?, description=?, body=?, cover_image=?, logo_url=?, url=?, type=?, language=?, sort_order=?, is_active=?, show_on_homepage=?, updated_at=CURRENT_TIMESTAMP
     WHERE id=?`).run(next.name, next.slug, next.description, next.body, next.cover_image, next.logo_url, next.url,
-    next.type, next.language, next.sort_order, next.is_active, req.params.id);
+    next.type, next.language, next.sort_order, next.is_active, next.show_on_homepage, req.params.id);
   if (b.service_codes !== undefined) setBrandServices(Number(req.params.id), b.service_codes);
   res.json({ ok: true });
 });

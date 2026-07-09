@@ -340,7 +340,7 @@
   function bindLang() {
     $$('#langToggle button').forEach(b => b.addEventListener('click', () => {
       LANG = b.dataset.lang; localStorage.setItem('fe-lang', LANG);
-      applyLang(); loadServices(); loadProjects(); loadBrands(); loadBlog(); loadAnnouncements();
+      applyLang(); loadServices(); loadBrands(); loadBlog(); loadAnnouncements();
       window.dispatchEvent(new Event('fe-lang-change'));
     }));
   }
@@ -466,75 +466,89 @@
     });
     grid.innerHTML = `<div class="solutions-grid reveal">
       ${cards.map(s => `
-        <a class="solution-card" href="${s.href}">
-          <div class="solution-media">
-            ${s.img ? `<img src="${esc(s.img)}" alt="${esc(s.title)}" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()">` : ''}
-            <span class="solution-ico"><span class="material-symbols-rounded">${esc(s.icon)}</span></span>
-          </div>
-          <div class="solution-body">
-            <h3>${esc(s.title)}</h3>
-            <p>${esc(s.summary || '')}</p>
-            <span class="solution-more">${esc(t('common.more'))} <span class="material-symbols-rounded">arrow_forward</span></span>
-          </div>
-        </a>`).join('')}
+        <div class="solution-wrap">
+          <a class="solution-card" href="${s.href}">
+            <div class="solution-media">
+              ${s.img ? `<img src="${esc(s.img)}" alt="${esc(s.title)}" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()">` : ''}
+              <span class="solution-ico"><span class="material-symbols-rounded">${esc(s.icon)}</span></span>
+            </div>
+            <div class="solution-body">
+              <h3>${esc(s.title)}</h3>
+              <p>${esc(s.summary || '')}</p>
+              <span class="solution-more">${esc(t('common.more'))} <span class="material-symbols-rounded">arrow_forward</span></span>
+            </div>
+            <div class="solution-brands-marquee" id="svcBrands-${esc(s.code)}"></div>
+          </a>
+        </div>`).join('')}
     </div>`;
     bindReveal();
+    cards.forEach(s => loadSolutionBrands(s.code));
   }
 
-  /* ===== Projeler ===== */
-  async function loadProjects() {
-    const grid = $('#projectsGrid'); if (!grid) return;
-    let data = await getJSON('/api/projects?language=' + LANG + '&featured=1&limit=6');
-    let list = (data && data.projects) || [];
-    if (!list.length) { data = await getJSON('/api/projects?language=' + LANG + '&limit=6'); list = (data && data.projects) || []; }
-    if (!list.length) { grid.innerHTML = `<div class="blog-empty">${esc(t('projects.empty'))}</div>`; return; }
-    grid.innerHTML = list.map(p => `
-      <a class="project-card reveal" href="/proje?slug=${encodeURIComponent(p.slug)}">
-        <div class="project-thumb">
-          ${p.cover_image ? `<img src="${esc(p.cover_image)}" alt="${esc(p.title)}" loading="lazy" />` : `<span class="material-symbols-rounded ph-ico">apartment</span>`}
-          ${p.category ? `<span class="project-cat">${esc(p.category)}</span>` : ''}
-        </div>
-        <div class="project-body">
-          <h3>${esc(p.title)}</h3>
-          <div class="project-meta">
-            ${p.client ? `<span><span class="material-symbols-rounded">business</span>${esc(p.client)}</span>` : ''}
-            ${p.location ? `<span><span class="material-symbols-rounded">location_on</span>${esc(p.location)}</span>` : ''}
-            ${p.year ? `<span><span class="material-symbols-rounded">calendar_today</span>${esc(p.year)}</span>` : ''}
-          </div>
-          <p>${esc(p.summary || '')}</p>
-          ${p.capacity ? `<div class="project-cap">${esc(p.capacity)}</div>` : ''}
-        </div>
-      </a>`).join('');
-    bindReveal();
+  async function loadSolutionBrands(code) {
+    const wrap = $(`#svcBrands-${code}`); if (!wrap) return;
+    const data = await getJSON('/api/brands/partner?service=' + encodeURIComponent(code));
+    const list = (data && data.brands) || [];
+    if (!list.length) { wrap.remove(); return; }
+    // İçeriği 3x tekrarla — sonsuz kayma efekti
+    const items = list.map(b =>
+      `<a class="vmarquee-item" href="/marka?slug=${encodeURIComponent(b.slug)}" onclick="event.preventDefault();event.stopPropagation();location.href=this.href" title="${esc(b.name)}">
+        ${b.logo_url ? `<img src="${esc(b.logo_url)}" alt="${esc(b.name)}" loading="lazy" />` : `<span class="vmarquee-text">${esc(b.name)}</span>`}
+      </a>`
+    ).join('');
+    const repeated = items + items + items;
+    wrap.innerHTML = `<div class="vmarquee-track">${repeated}</div>`;
+    // Hover ile durdur
+    const track = wrap.querySelector('.vmarquee-track');
+    wrap.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+    wrap.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
   }
 
-  /* ===== Markalar ===== */
+  /* ===== Markalar — 4 çözüm grubunda dikey kayan slot ===== */
+  const SVC_LABELS = { otomasyon: 'Şebeke Koruma ve Otomasyon', ges: 'Yenilenebilir Enerji (GES)', bess: 'Enerji Depolama (BESS)', emobility: 'E-Mobilite' };
+
   async function loadBrands() {
     const grid = $('#brandsGrid'); if (!grid) return;
-    const data = await getJSON('/api/brands?language=' + LANG);
-    const list = (data && data.brands) || [];
-    if (!list.length) { const sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
+    const groups = SVC_ORDER;
+    const fetches = groups.map(code => getJSON('/api/brands/partner?service=' + encodeURIComponent(code)));
+    const results = await Promise.all(fetches);
+    const slots = groups.map((code, i) => ({ code, brands: (results[i] && results[i].brands) || [] })).filter(s => s.brands.length);
+    if (!slots.length) { const sec = grid.closest('section'); if (sec) sec.style.display = 'none'; return; }
     const sec = grid.closest('section'); if (sec) sec.style.display = '';
-    grid.innerHTML = list.map(b => {
-      // Kart → marka detay sayfası; "Siteyi ziyaret et" → dış site (yeni sekme).
-      // Buton karta gömülü ayrı <a>; iç içe <a> geçersiz olduğu için kart <div>.
-      const detailHref = b.slug ? `/marka?slug=${encodeURIComponent(b.slug)}` : '';
-      const visitBtn = b.url
-        ? `<a class="visit" href="${esc(b.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(t('brands.visit'))} <span class="material-symbols-rounded">north_east</span></a>`
-        : '';
-      return `<div class="brand-card reveal" ${detailHref ? `data-href="${esc(detailHref)}" role="link" tabindex="0" style="cursor:pointer"` : ''}>
-        <div class="brand-logo-box">${b.logo_url ? `<img src="${esc(b.logo_url)}" alt="${esc(b.name)}" />` : `<span class="brand-logo-text">${esc(b.name)}</span>`}</div>
-        <p>${esc(b.description || '')}</p>
-        ${visitBtn}
+    grid.innerHTML = `<div class="brand-slots reveal">${slots.map(s => {
+      const items = s.brands.map(b =>
+        `<a class="bslot-item" href="/marka?slug=${encodeURIComponent(b.slug)}">
+          <div class="bslot-logo">${b.logo_url ? `<img src="${esc(b.logo_url)}" alt="${esc(b.name)}" loading="lazy" />` : `<span class="bslot-name">${esc(b.name)}</span>`}</div>
+          ${b.description ? `<p class="bslot-desc">${esc(b.description)}</p>` : ''}
+        </a>`
+      ).join('');
+      const repeated = items + items + items;
+      return `<div class="bslot">
+        <h3 class="bslot-title">${esc(SVC_LABELS[s.code] || s.code)}</h3>
+        <div class="bslot-viewport">
+          <div class="bslot-track">${repeated}</div>
+        </div>
       </div>`;
-    }).join('');
-    // Kart tıklaması → detay (buton hariç, o stopPropagation ile dış siteye gider)
-    grid.querySelectorAll('.brand-card[data-href]').forEach(card => {
-      const go = () => { location.href = card.dataset.href; };
-      card.addEventListener('click', go);
-      card.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-    });
+    }).join('')}</div>`;
     bindReveal();
+    grid.querySelectorAll('.bslot-viewport').forEach(vp => {
+      const track = vp.querySelector('.bslot-track');
+      vp.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+      vp.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+    });
+  }
+
+  /* ===== Video URL'leri (admin'den yönetilen) ===== */
+  async function loadVideoUrls() {
+    const data = await getJSON('/api/settings/public/videos');
+    if (!data) return;
+    function setVideoSrc(el, url) {
+      if (!el || !url) return;
+      const src = el.querySelector('source');
+      if (src && src.getAttribute('src') !== url) { src.src = url; el.load(); }
+    }
+    setVideoSrc($('#heroVideo'), data.hero_video_url);
+    setVideoSrc($('#introVideo'), data.intro_video_url);
   }
 
   /* ===== Blog ===== */
@@ -734,12 +748,12 @@
   }
 
   /* ===== Referans logoları ===== */
-  function loadRefs() {
+  async function loadRefs() {
     const track = $('#refTrack'); if (!track) return;
-    const logos = ['socar', 'world-bank', 'bedas', 'ayedas', 'baskent-edas', 'dicle-elektrik', 'uedas', 'yedas',
-      'gdz-elektrik', 'aras-elektrik', 'ck-enerji', 'erciyes-anadolu', 'astor', 'sanko', 'dogus',
-      'antalya-buyuksehir', 'ego', 'gaski', 'ilbank', 'karacabey-belediyesi', 'nero-industries', 'siskom-enerji', 'gamador'];
-    const make = (set) => set.map(n => `<img src="/assets/references/${n}.png" alt="${n}" loading="lazy" onerror="this.remove()" />`).join('');
+    const data = await getJSON('/api/references');
+    const logos = (data && data.logos) || [];
+    if (!logos.length) { track.closest('.logos-band').style.display = 'none'; return; }
+    const make = (set) => set.map(l => `<img src="${esc(l.logo_url)}" alt="${esc(l.name)}" loading="lazy" onerror="this.remove()" />`).join('');
     const mid = Math.ceil(logos.length / 2);
     const rowA = logos.slice(0, mid);
     const rowB = logos.slice(mid);
@@ -1148,8 +1162,8 @@
         ? 'I have read and accept the Candidate Applicant Notice and Explicit Consent.'
         : 'Çalışan Adayı Aydınlatma ve Açık Rıza Metni\'ni okudum ve onaylıyorum.',
     });
-    loadServices(); loadProjects(); loadBrands(); loadBlog(); loadAnnouncements();
-    loadPartners(); loadRefs(); loadContact(); initAnnouncementPopup();
+    loadServices(); loadBrands(); loadBlog(); loadAnnouncements(); loadVideoUrls();
+    loadRefs(); loadContact(); initAnnouncementPopup();
     initCookieBanner();
 
     // Cross-page anchor düzeltmesi: async içerik (logo şeridi, projeler) yüklenince

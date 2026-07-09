@@ -24,7 +24,7 @@ const I18N = {
   tr: {
     'navgroup.content': 'İçerik Yönetimi', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
-    'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar',
+    'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
     'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
@@ -32,7 +32,7 @@ const I18N = {
   en: {
     'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
-    'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands',
+    'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
     'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
@@ -1196,6 +1196,7 @@ async function openUserForm(u, onDone) {
     { code: 'services', label: 'Hizmetler' },
     { code: 'projects', label: 'Referans Projeler' },
     { code: 'brands', label: 'Markalar' },
+    { code: 'references', label: 'Referans Logoları' },
     { code: 'appointments', label: 'Randevular' },
     { code: 'careers', label: 'Kariyer / İlanlar' },
     { code: 'job-applications', label: 'Başvurular' },
@@ -1791,6 +1792,7 @@ const _brandsPage = createCrudPage({
     { label: 'Tip', render: r => r.type === 'partner' ? 'Çözüm Ortağı' : 'Çatı Marka' },
     { label: 'Hizmetler', render: r => (r.services && r.services.length) ? escapeHtml(r.services.join(', ')) : '—' },
     { label: 'Dil', render: r => (r.language || 'tr').toUpperCase() },
+    { label: 'Anasayfa', render: r => r.show_on_homepage ? '✓' : '—' },
     { label: 'Aktif', render: r => r.is_active ? '✓' : '—' },
     { label: 'Sıra', render: r => r.sort_order ?? 0 },
   ],
@@ -1816,6 +1818,7 @@ const _brandsPage = createCrudPage({
       <div><span class="field-label">Dil</span><select name="language">${['tr','en'].map(l=>`<option value="${l}" ${(r.language||'tr')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select></div>
       <div><span class="field-label">Sıra</span><input type="number" name="sort_order" value="${r.sort_order ?? 0}"></div>
       <div><label style="display:flex;gap:8px;align-items:center;margin-top:24px"><input type="checkbox" name="is_active" ${r.is_active!==0?'checked':''} style="width:auto"> Aktif</label></div>
+      <div><label style="display:flex;gap:8px;align-items:center;margin-top:24px"><input type="checkbox" name="show_on_homepage" ${r.show_on_homepage?'checked':''} style="width:auto"> Ana sayfada göster</label></div>
     `;
     return wrap;
   },
@@ -1839,6 +1842,39 @@ routes.brands = async (page) => {
   await loadBrandServiceCodes();
   return _brandsPage(page);
 };
+
+// ============================================
+// REFERANS LOGOLARI (Bize Güvenen Kurumlar)
+// ============================================
+routes.references = createCrudPage({
+  title: 'Referans Logoları',
+  newButtonText: 'Yeni Logo',
+  listUrl: '/api/references/admin/all',
+  pluralKey: 'logos',
+  saveUrl: (id) => id ? `/api/references/${id}` : '/api/references',
+  columns: [
+    { label: 'Logo', render: r => r.logo_url ? `<img src="${escapeHtml(r.logo_url)}" style="max-height:32px;max-width:120px;object-fit:contain" alt="">` : '—' },
+    { label: 'Ad', render: r => escapeHtml(r.name) },
+    { label: 'Sıra', render: r => r.sort_order ?? 0 },
+    { label: 'Aktif', render: r => r.is_active ? '✓' : '—' },
+  ],
+  richBody: false,
+  buildForm: (r) => {
+    const el = document.createElement('div');
+    el.className = 'form-grid';
+    el.innerHTML = `
+      <div class="full"><span class="field-label">Kurum Adı</span><input name="name" value="${escapeHtml(r.name || '')}" required></div>
+      ${coverUploaderHtml('logo_url', r.logo_url || '', 'Logo Görseli')}
+      <div class="half"><span class="field-label">Web sitesi (opsiyonel)</span><input name="url" value="${escapeHtml(r.url || '')}" placeholder="https://..."></div>
+      <div class="half"><span class="field-label">Sıra</span><input name="sort_order" type="number" value="${r.sort_order ?? 0}"></div>
+      <div class="half"><label><input type="checkbox" name="is_active" ${r.is_active !== 0 ? 'checked' : ''}> Aktif</label></div>
+    `;
+    return el;
+  },
+  afterForm: (form, r) => {
+    bindCoverUploader(form);
+  },
+});
 
 // ============================================
 // DUYURULAR (announcements) — blog benzeri CRUD
@@ -2076,10 +2112,12 @@ async function renderProjectEditor(page, id) {
   page.innerHTML = '<div class="loader">Yükleniyor...</div>';
   let record = {};
   let images = [];
+  let savedBrandIds = [];
   if (id) {
     const data = await api.get('/api/projects/admin/' + id);
     record = data.project || {};
     images = data.images || [];
+    savedBrandIds = data.brand_ids || [];
   }
 
   page.innerHTML = '';
@@ -2162,6 +2200,10 @@ async function renderProjectEditor(page, id) {
       <div class="field-block">
         <span class="field-label">Sıra</span>
         <input type="number" id="pjSort" value="${record.sort_order ?? 0}">
+      </div>
+      <div class="field-block">
+        <span class="field-label">İlişkili Markalar</span>
+        <div id="pjBrandsList" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px"></div>
       </div>
       ${id ? `
       <div class="field-block" style="margin-top:auto;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-dim)">
@@ -2262,6 +2304,26 @@ async function renderProjectEditor(page, id) {
   page.querySelector('#pjSpecAdd').onclick = () => addSpecRow();
   // Dışarı tıklayınca ikon menülerini kapat
   document.addEventListener('click', () => specsList.querySelectorAll('.spec-icon-menu').forEach(m => m.hidden = true));
+
+  // === İlişkili markalar (checkbox listesi) ===
+  const brandsList = page.querySelector('#pjBrandsList');
+  (async () => {
+    try {
+      const { brands } = await api.get('/api/brands/admin/all');
+      if (!brands || !brands.length) { brandsList.innerHTML = '<span style="font-size:12px;color:var(--text-dim)">Henüz marka yok</span>'; return; }
+      brands.forEach(b => {
+        const lbl = h('label', { style: 'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer' });
+        const cb = h('input', { type: 'checkbox', value: String(b.id), class: 'pj-brand-cb' });
+        if (savedBrandIds.includes(b.id)) cb.checked = true;
+        lbl.appendChild(cb);
+        lbl.appendChild(document.createTextNode(b.name + (b.type === 'partner' ? ' (Çözüm Ortağı)' : '')));
+        brandsList.appendChild(lbl);
+      });
+    } catch { brandsList.innerHTML = '<span style="font-size:12px;color:var(--text-dim)">Markalar yüklenemedi</span>'; }
+  })();
+  function readBrandIds() {
+    return Array.from(page.querySelectorAll('.pj-brand-cb:checked')).map(cb => Number(cb.value));
+  }
 
   // === Kapak görseli yükle / önizle / kaldır ===
   const coverInput = page.querySelector('#pjCover');
@@ -2377,6 +2439,7 @@ async function renderProjectEditor(page, id) {
       sort_order: Number(page.querySelector('#pjSort').value) || 0,
       status: statusSel.value,
       language: langSel.value,
+      brand_ids: readBrandIds(),
     };
     if (!payload.title) { toast('Başlık zorunlu', 'error'); return; }
     saveBtn.disabled = true;
@@ -3425,6 +3488,42 @@ routes.settings = async (page) => {
         </div>
       </div>
 
+      <div class="settings-section-title" style="margin-top:24px">Video Yönetimi
+        <span style="font-weight:400;font-size:12px;color:var(--text-soft);margin-left:6px">(boş = /assets/form.mp4)</span>
+      </div>
+      <div class="settings-cols">
+        <div class="settings-col">
+          <div class="settings-row">
+            <label class="settings-row-label">Hero Video (üstteki blob)</label>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input class="settings-row-input" id="heroVideoUrl" value="${escapeHtml(settings.hero_video_url || '')}" placeholder="/assets/form.mp4" style="flex:1;min-width:200px">
+              <label class="btn btn-ghost" style="cursor:pointer;flex:none;margin:0;font-size:13px;padding:6px 14px">
+                <span class="material-symbols-rounded" style="font-size:18px">upload</span> Yükle
+                <input type="file" accept="video/*" id="heroVideoFile" hidden>
+              </label>
+            </div>
+            <div id="heroVideoPreview" style="margin-top:8px;display:none">
+              <video style="width:100%;max-height:160px;border-radius:8px;background:#000" controls muted></video>
+            </div>
+          </div>
+        </div>
+        <div class="settings-col">
+          <div class="settings-row">
+            <label class="settings-row-label">Tanıtım Videosu</label>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input class="settings-row-input" id="introVideoUrl" value="${escapeHtml(settings.intro_video_url || '')}" placeholder="/assets/form.mp4" style="flex:1;min-width:200px">
+              <label class="btn btn-ghost" style="cursor:pointer;flex:none;margin:0;font-size:13px;padding:6px 14px">
+                <span class="material-symbols-rounded" style="font-size:18px">upload</span> Yükle
+                <input type="file" accept="video/*" id="introVideoFile" hidden>
+              </label>
+            </div>
+            <div id="introVideoPreview" style="margin-top:8px;display:none">
+              <video style="width:100%;max-height:160px;border-radius:8px;background:#000" controls muted></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px">
         <button class="btn btn-primary" id="settingsSaveBtn">
           <span class="material-symbols-rounded">save</span> Kaydet
@@ -3437,6 +3536,32 @@ routes.settings = async (page) => {
     </div>
   `;
   page.appendChild(card);
+
+  // Video upload handler'ları
+  function bindVideoUpload(fileInputId, urlInputId, previewId) {
+    const fileInput = page.querySelector('#' + fileInputId);
+    const urlInput = page.querySelector('#' + urlInputId);
+    const previewWrap = page.querySelector('#' + previewId);
+    if (!fileInput || !urlInput) return;
+    // Mevcut URL varsa preview göster
+    if (urlInput.value) {
+      previewWrap.style.display = '';
+      previewWrap.querySelector('video').src = urlInput.value;
+    }
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0]; if (!file) return;
+      try {
+        toast('Video yükleniyor...', 'info');
+        const url = await uploadFile(file);
+        urlInput.value = url;
+        previewWrap.style.display = '';
+        previewWrap.querySelector('video').src = url;
+        toast('Video yüklendi', 'success');
+      } catch (e) { toast('Video yüklenemedi: ' + e.message, 'error'); }
+    });
+  }
+  bindVideoUpload('heroVideoFile', 'heroVideoUrl', 'heroVideoPreview');
+  bindVideoUpload('introVideoFile', 'introVideoUrl', 'introVideoPreview');
 
   // Leaflet harita seçici — tıkla/sürükle ile konum işaretle
   initMapPicker(page, settings.maps_lat, settings.maps_lng);
@@ -3461,6 +3586,8 @@ routes.settings = async (page) => {
       social_instagram: page.querySelector('#socialInstagram').value.trim(),
       social_youtube: page.querySelector('#socialYoutube').value.trim(),
       social_facebook: page.querySelector('#socialFacebook').value.trim(),
+      hero_video_url: page.querySelector('#heroVideoUrl').value.trim(),
+      intro_video_url: page.querySelector('#introVideoUrl').value.trim(),
     };
     try {
       await api.put('/api/settings', payload);

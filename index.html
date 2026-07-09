@@ -38,7 +38,7 @@
     <nav class="nav-links">
       <a href="#hizmetler" data-i18n="nav.services">Çözümler</a>
       <a href="/hakkimizda" data-i18n="nav.about">Kurumsal</a>
-      <a href="#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
       <a href="#markalar" data-i18n="nav.brands">Markalarımız</a>
       <a href="/blog" data-i18n="nav.blog">Blog</a>
       <a href="#iletisim" data-i18n="nav.contact">İletişim</a>
@@ -60,7 +60,7 @@
 <nav class="mobile-nav" id="mobileNav">
   <a href="#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/hakkimizda" data-i18n="nav.about">Kurumsal<span class="material-symbols-rounded">chevron_right</span></a>
-  <a href="#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/kariyer" data-i18n="nav.careers">Kariyer<span class="material-symbols-rounded">chevron_right</span></a>
@@ -83,8 +83,8 @@
       </div>
       <div class="hero-visual reveal">
         <div class="hero-img hero-video-card">
-          <video class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <source src="/assets/video.mp4" type="video/mp4" />
+          <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <source src="/assets/form.mp4" type="video/mp4" />
           </video>
           <span class="material-symbols-rounded ph hero-video-fallback" style="display:none">electric_bolt</span>
         </div>
@@ -144,33 +144,10 @@
       <h2 class="section-title" data-i18n="video.title" style="margin-top:12px">Form Elektrik'i tanıyın</h2>
     </div>
     <div class="reveal intro-video" id="videoWrap">
-      <video autoplay muted loop playsinline preload="metadata">
+      <video id="introVideo" autoplay muted loop playsinline preload="metadata">
         <source src="/assets/form.mp4" type="video/mp4" />
         Tarayıcınız video etiketini desteklemiyor.
       </video>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PARTNER MARKALAR ===== -->
-<div class="logos-band">
-  <div class="wrap"><p class="band-label" data-i18n="partners.label">Çözüm ortaklarımız</p></div>
-  <div class="marquee"><div class="marquee-track" id="partnerTrack"></div></div>
-</div>
-
-<!-- ===== REFERANS PROJELER ===== -->
-<section id="projeler">
-  <div class="wrap">
-    <div class="section-head center reveal">
-      <span class="eyebrow" data-i18n="projects.eyebrow">Referanslar</span>
-      <h2 class="section-title" data-i18n="projects.title" style="margin-top:12px">Sahada kanıtlanmış işler</h2>
-      <p class="section-lead" data-i18n="projects.lead">Kamu ve özel sektörde tamamladığımız seçili projeler.</p>
-    </div>
-    <div class="projects-grid" id="projectsGrid">
-      <div class="blog-empty" data-i18n="common.loading">Yükleniyor…</div>
-    </div>
-    <div style="text-align:center;margin-top:40px" class="reveal">
-      <a href="/projeler" class="btn btn-outline"><span data-i18n="projects.all">Tüm Projeler</span> <span class="material-symbols-rounded">arrow_forward</span></a>
     </div>
   </div>
 </section>
@@ -179,8 +156,7 @@
 <section class="brands" id="markalar">
   <div class="wrap">
     <div class="section-head center reveal">
-      <span class="eyebrow" data-i18n="brands.eyebrow">Form Elektrik Grubu</span>
-      <h2 class="section-title" data-i18n="brands.title" style="margin-top:12px">Markalarımız</h2>
+      <h2 class="section-title" data-i18n="brands.title">Markalarımız</h2>
       <p class="section-lead" data-i18n="brands.lead">Çatı markamız altında, kendi alanında uzmanlaşmış iş kollarımız.</p>
     </div>
     <div class="brands-grid" id="brandsGrid">
@@ -309,7 +285,7 @@
         <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
         <a href="/kariyer">Kariyer</a>
         <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
-        <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
         <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
       </div>
       <div class="footer-col">
