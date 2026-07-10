@@ -25,7 +25,7 @@ const I18N = {
     'navgroup.content': 'İçerik Yönetimi', 'navgroup.library': 'Teknik Kütüphane', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları', 'nav.milestones': 'Kilometre Taşları',
-    'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
+    'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.appointment-topics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular', 'nav.job-applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
     'nav.library': 'TK Belgeleri', 'nav.libraryUsers': 'TK Başvuruları & Erişim', 'nav.library-users': 'TK Başvuruları & Erişim',
     'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
@@ -34,7 +34,7 @@ const I18N = {
     'navgroup.content': 'Content', 'navgroup.library': 'Technical Library', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos', 'nav.milestones': 'Milestones',
-    'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
+    'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.appointment-topics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications', 'nav.job-applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
     'nav.library': 'TL Documents', 'nav.libraryUsers': 'TL Applications & Access', 'nav.library-users': 'TL Applications & Access',
     'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
@@ -797,13 +797,14 @@ async function renderList(page, cfg, apiPath, listUrl, pluralKey) {
   }
   body.innerHTML = '';
   const t = h('table', { class: 'table' });
-  t.innerHTML = `<thead><tr><th>Başlık</th><th>Dil</th><th>Durum</th><th>Güncellendi</th><th></th></tr></thead>`;
+  t.innerHTML = `<thead><tr><th>Başlık</th><th>Çözüm</th><th>Dil</th><th>Durum</th><th>Güncellendi</th><th></th></tr></thead>`;
   const tbody = h('tbody');
   items.forEach(r => {
     const tr = h('tr', { style: 'cursor:pointer',
       onClick: e => { if (!e.target.closest('.row-actions')) navigateWithParams(currentRoute, { edit: r.id }); } });
     tr.innerHTML = `
       <td><b>${escapeHtml(r.title)}</b><div style="color:var(--text-dim);font-size:11px">${escapeHtml(r.slug)}</div></td>
+      <td>${r.service_title ? escapeHtml(r.service_title) : '—'}</td>
       <td>${(r.language || 'tr').toUpperCase()}</td>
       <td><span class="badge badge-${r.status}">${label(r.status)}</span></td>
       <td>${fmtDate(r.updated_at)}</td>
@@ -929,6 +930,10 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
       <div class="field-block">
         <span class="field-label">Etiketler (virgülle)</span>
         <input id="editTags" value="${escapeHtml(record.tags||'')}" placeholder="ges, otomasyon, ag-og">
+      </div>
+      <div class="field-block">
+        <span class="field-label">İlgili Çözüm</span>
+        <select id="editService"><option value="">— Seçiniz —</option></select>
       </div>
       <div class="field-block">
         <span class="field-label">Teknik Kütüphane Belgeleri</span>
@@ -1083,6 +1088,20 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
 
   titleEl.focus();
 
+  // Blog yazısının ilgili çözüm seçimi
+  const serviceSel = page.querySelector('#editService');
+  if (serviceSel) {
+    try {
+      const sd = await api.get('/api/services/admin/all');
+      (sd.services || []).forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id; o.textContent = s.title;
+        if (record.service_id == s.id) o.selected = true;
+        serviceSel.appendChild(o);
+      });
+    } catch(e) {}
+  }
+
   // TK belge seçici yükle (popup)
   const tkPicker = page.querySelector('#tkDocPicker');
   let tkLinkedIds = [];
@@ -1155,7 +1174,10 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
       status: statusSel.value,
       language: langSel.value,
     };
-    if (cfg.kind === 'post') payload.tags = page.querySelector('#editTags').value.trim() || null;
+    if (cfg.kind === 'post') {
+      payload.tags = page.querySelector('#editTags').value.trim() || null;
+      payload.service_id = page.querySelector('#editService').value || null;
+    }
 
     if (!payload.title || !payload.body || payload.body === '<p></p>') {
       toast('Başlık ve içerik zorunlu', 'error');
@@ -2113,7 +2135,7 @@ routes['job-applications'] = async (page) => {
       tr.innerHTML = `
         <td>${escapeHtml(date)}</td>
         <td>${escapeHtml(a.job_title || 'Genel Başvuru')}</td>
-        <td><b>${escapeHtml(a.first_name)} ${escapeHtml(a.last_name)}</b>${a.message ? `<div style="color:var(--text-dim);font-size:11px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(a.message)}</div>` : ''}</td>
+        <td><b>${escapeHtml(a.first_name)} ${escapeHtml(a.last_name)}</b>${a.message ? `<div class="app-msg" data-msg="${a.id}" title="Tam mesajı görüntüle" style="color:var(--text-dim);font-size:11px;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer">${escapeHtml(a.message)}</div>` : ''}</td>
         <td><a href="mailto:${escapeHtml(a.email)}">${escapeHtml(a.email)}</a></td>
         <td>${escapeHtml(a.phone || '—')}</td>
         <td>${a.cv_url ? `<a class="btn btn-sm btn-ghost" href="${escapeHtml(a.cv_url)}" target="_blank" rel="noopener"><span class="material-symbols-rounded">download</span> CV</a>` : '—'}</td>
@@ -2123,6 +2145,13 @@ routes['job-applications'] = async (page) => {
     });
     t.appendChild(tbody);
     body.appendChild(t);
+
+    body.querySelectorAll('.app-msg').forEach(el => el.addEventListener('click', () => {
+      const a = applications.find(x => String(x.id) === el.dataset.msg);
+      if (!a) return;
+      const c = h('div', { style: 'white-space:pre-wrap;line-height:1.6;color:var(--text)' }, a.message);
+      openModal(`${a.first_name} ${a.last_name} — Mesaj`, c, { width: '560px' });
+    }));
 
     body.querySelectorAll('[data-status]').forEach(sel => sel.addEventListener('change', async () => {
       try { await api.patch(`/api/careers/admin/applications/${sel.dataset.status}`, { status: sel.value }); toast('Durum güncellendi', 'success'); }
