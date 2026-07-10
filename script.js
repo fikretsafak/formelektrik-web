@@ -934,8 +934,24 @@
     if (!topics.length) return; // konu yoksa statik fallback HTML'i kalsın
     wrap.innerHTML = topics.map(tp =>
       `<button type="button" class="chip" data-topic="${esc(tp.title)}">${esc(tp.title)}</button>`
-    ).join('');
-    $$('#serviceChips .chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('active')));
+    ).join('') + '<button type="button" class="chip" data-topic="Diğer">Diğer</button>';
+    bindServiceChips();
+  }
+
+  // "Diğer" seçilince mesaj alanına "Diğer: " ön eki ekle/kaldır
+  const OTHER_PREFIX = 'Diğer: ';
+  function onChipClick(chip) {
+    chip.classList.toggle('active');
+    if (chip.dataset.topic !== 'Diğer') return;
+    const ta = $('#leadForm [name="message"]'); if (!ta) return;
+    if (chip.classList.contains('active')) {
+      if (!ta.value.startsWith(OTHER_PREFIX)) { ta.value = OTHER_PREFIX + ta.value; ta.focus(); }
+    } else if (ta.value.startsWith(OTHER_PREFIX)) {
+      ta.value = ta.value.slice(OTHER_PREFIX.length);
+    }
+  }
+  function bindServiceChips() {
+    $$('#serviceChips .chip').forEach(c => c.addEventListener('click', () => onChipClick(c)));
   }
 
   /* ===== Lead / İletişim formu (modal) ===== */
@@ -944,7 +960,7 @@
     injectKvkkCheckbox(form, 'leadKvkk');
     loadServiceChips();
     // Statik fallback chip'lerini de bağla (topics yüklenemezse)
-    $$('#serviceChips .chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('active')));
+    bindServiceChips();
     const msg = $('#leadMsg');
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); msg.className = 'form-msg'; msg.textContent = '';
