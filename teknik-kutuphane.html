@@ -25,14 +25,15 @@
 /* Sayfaya özel geniş wrap (yan boşlukları azalt) */
 .tk-head .wrap, .tk-wrap { max-width: 1400px; }
 
-/* Header giriş butonu */
-.tk-header-login { display: inline-flex; align-items: center; gap: 6px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: .86rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: .15s; white-space: nowrap; }
+/* Başlık şeridi içi giriş/kullanıcı */
+.tk-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.tk-header-login { display: inline-flex; align-items: center; gap: 6px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 9px 18px; border-radius: 10px; font-size: .88rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: .15s; white-space: nowrap; }
 .tk-header-login:hover { background: #1b8fc0; }
 .tk-header-login .material-symbols-rounded { font-size: 18px; }
-.tk-header-user { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: .86rem; font-weight: 500; }
-.tk-header-user .material-symbols-rounded { font-size: 20px; opacity: .85; }
-.tk-header-user button { background: rgba(255,255,255,.12); color: #fff; border: none; padding: 5px 11px; border-radius: 8px; font-size: .78rem; cursor: pointer; font-family: inherit; }
-.tk-header-user button:hover { background: rgba(255,255,255,.22); }
+.tk-header-user { display: inline-flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 12px; padding: 8px 14px; color: var(--text,#1a1d26); font-size: .86rem; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.tk-header-user .material-symbols-rounded { font-size: 22px; color: var(--cyan,#2aa9e0); }
+.tk-header-user button { background: var(--bg-soft,#f2f4f8); color: var(--text-soft,#4b5167); border: none; padding: 5px 12px; border-radius: 8px; font-size: .78rem; cursor: pointer; font-family: inherit; font-weight: 500; }
+.tk-header-user button:hover { background: #e74c3c; color: #fff; }
 
 /* Başlık şeridi */
 .tk-head { background: var(--bg-soft,#f6f7fa); border-bottom: 1px solid var(--line,#e5e7eb); padding: calc(var(--header-h,72px) + 18px) 0 22px; }
@@ -185,7 +186,6 @@
       <div class="lang-toggle" id="langToggle">
         <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
       </div>
-      <div id="tkHeaderAuth"></div>
       <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
     </div>
   </div>
@@ -203,11 +203,16 @@
 <!-- ===== BAŞLIK ŞERİDİ ===== -->
 <section class="tk-head">
   <div class="wrap">
-    <h1>Teknik Kütüphane</h1>
-    <div class="tk-head-meta">
-      <b><span id="tkStatDocs">0</span> döküman</b>
-      <span class="sep">·</span>
-      <span>Son güncelleme: <b id="tkLastUpdate">—</b></span>
+    <div class="tk-head-top">
+      <div>
+        <h1>Teknik Kütüphane</h1>
+        <div class="tk-head-meta">
+          <b><span id="tkStatDocs">0</span> döküman</b>
+          <span class="sep">·</span>
+          <span>Son güncelleme: <b id="tkLastUpdate">—</b></span>
+        </div>
+      </div>
+      <div id="tkHeadAuth"></div>
     </div>
     <div class="tk-head-search">
       <span class="material-symbols-rounded">search</span>
@@ -376,9 +381,7 @@
   }
 
   function renderUserBar() {
-    const bar = $('#tkUserBar');
-    if (bar) bar.innerHTML = '';
-    const hdr = $('#tkHeaderAuth');
+    const hdr = $('#tkHeadAuth');
     if (!hdr) return;
     if (!currentUser) {
       hdr.innerHTML = `<button class="tk-header-login" id="tkHeaderLogin"><span class="material-symbols-rounded">login</span> Giriş Yap</button>`;
