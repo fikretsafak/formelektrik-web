@@ -56,9 +56,18 @@
 
 /* Tablo listesi */
 .tk-table { border: 1px solid var(--line,#e5e7eb); border-radius: 14px; overflow: hidden; background: #fff; }
-.tk-thead { display: grid; grid-template-columns: 60px 1fr 150px 160px 110px 100px; gap: 16px; padding: 12px 20px; background: var(--bg-soft,#f8f9fb); border-bottom: 1px solid var(--line,#e5e7eb); font-size: .68rem; font-weight: 700; color: var(--text-faint,#98a0b3); text-transform: uppercase; letter-spacing: .07em; }
+.tk-thead { display: grid; grid-template-columns: 60px 1fr 70px 140px 150px 110px 100px; gap: 16px; padding: 12px 20px; background: var(--bg-soft,#f8f9fb); border-bottom: 1px solid var(--line,#e5e7eb); font-size: .68rem; font-weight: 700; color: var(--text-faint,#98a0b3); text-transform: uppercase; letter-spacing: .07em; text-align: center; }
+.tk-thead span:nth-child(2) { text-align: left; }
 .tk-thead span:last-child { text-align: right; }
-.tk-row { display: grid; grid-template-columns: 60px 1fr 150px 160px 110px 100px; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line,#f0f1f4); transition: background .12s; }
+.tk-row { display: grid; grid-template-columns: 60px 1fr 70px 140px 150px 110px 100px; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line,#f0f1f4); transition: background .12s; }
+/* Ortalanan sütunlar */
+.tk-cell-lang, .tk-cell-product, .tk-cell-brand, .tk-cell-date { text-align: center; }
+.tk-cell-lang { display: flex; justify-content: center; }
+.tk-cell-brand { display: flex; justify-content: center; }
+.tk-cell-lang .tk-lang { flex-direction: column; gap: 4px; font-size: .72rem; }
+.tk-cell-lang .tk-flag { width: 24px; height: 16px; }
+.tk-row .tk-type { margin: 0 auto; }
+.tk-row .tk-dl-btn { justify-self: end; }
 .tk-row:last-child { border-bottom: none; }
 .tk-row:hover { background: var(--bg-soft,#f8f9fb); }
 
@@ -75,9 +84,9 @@
 .tk-doc-sub .sep { opacity: .45; }
 .tk-lang { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--text-soft,#6b7180); }
 .tk-flag { width: 18px; height: 12px; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
-.tk-brand-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; color: var(--text,#1a1d26); width: fit-content; max-width: 100%; text-align: center; }
-.tk-brand-pill img { width: 64px; height: 34px; object-fit: contain; display: block; }
-.tk-brand-pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px; }
+.tk-brand-pill { display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+.tk-brand-pill img { width: 100px; height: 44px; object-fit: contain; display: block; }
+.tk-brand-pill .tk-brand-name { font-size: .82rem; font-weight: 600; color: var(--text,#1a1d26); }
 .tk-product { font-size: .82rem; color: var(--text-soft,#4b5167); }
 .tk-product-tag { display: inline-block; font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size: .76rem; font-weight: 600; color: #1b8fc0; background: rgba(42,169,224,.08); padding: 3px 9px; border-radius: 6px; }
 .tk-cell-date { font-size: .82rem; color: var(--text,#1a1d26); font-weight: 500; }
@@ -141,7 +150,7 @@
   .tk-row { grid-template-columns: 48px 1fr auto; grid-template-areas: "type title dl"; gap: 12px; padding: 14px 16px; }
   .tk-row .tk-type { grid-area: type; align-self: center; }
   .tk-row .tk-cell-doc { grid-area: title; }
-  .tk-row .tk-cell-product, .tk-row .tk-cell-brand, .tk-row .tk-cell-date { display: none; }
+  .tk-row .tk-cell-lang, .tk-row .tk-cell-product, .tk-row .tk-cell-brand, .tk-row .tk-cell-date { display: none; }
   .tk-row .tk-dl-btn { grid-area: dl; align-self: center; }
 }
 </style>
@@ -189,8 +198,6 @@
       <b><span id="tkStatDocs">0</span> döküman</b>
       <span class="sep">·</span>
       <span>Son güncelleme: <b id="tkLastUpdate">—</b></span>
-      <span class="sep">·</span>
-      <span>Açık erişim + üyelik</span>
     </div>
     <div class="tk-head-search">
       <span class="material-symbols-rounded">search</span>
@@ -215,6 +222,11 @@
         <label><input type="checkbox" value="certificate" class="tk-type-cb"> Sertifika <span class="cnt" data-cnt="certificate">0</span></label>
         <label><input type="checkbox" value="manual" class="tk-type-cb"> Kullanım Kılavuzu <span class="cnt" data-cnt="manual">0</span></label>
         <label><input type="checkbox" value="software" class="tk-type-cb"> Yazılım / Firmware <span class="cnt" data-cnt="software">0</span></label>
+      </div>
+      <div class="tk-filter-group">
+        <h4>Dil</h4>
+        <label><input type="checkbox" value="tr" class="tk-lang-cb"> Türkçe <span class="cnt" data-langcnt="tr">0</span></label>
+        <label><input type="checkbox" value="en" class="tk-lang-cb"> İngilizce <span class="cnt" data-langcnt="en">0</span></label>
       </div>
     </aside>
 
@@ -409,6 +421,8 @@
       // Client-side çoklu filtre
       if (checkedBrands.length > 1) docs = docs.filter(d => checkedBrands.includes(String(d.brand_id)));
       if (checkedTypes.length > 1) docs = docs.filter(d => checkedTypes.includes(d.document_type));
+      const checkedLangs = [...$$('.tk-lang-cb:checked')].map(cb => cb.value);
+      if (checkedLangs.length) docs = docs.filter(d => checkedLangs.includes((d.language||'tr').toLowerCase()));
 
       // Sıralama
       const sort = $('#tkSort')?.value || 'date';
@@ -438,7 +452,9 @@
         const dateStr = date ? new Date(date).toLocaleDateString('tr-TR',{month:'short',year:'numeric'}) : '';
         const typeLabel = TYPE_ABBR[d.document_type] || 'DOC';
         const brandCell = d.brand_name
-          ? `<span class="tk-brand-pill">${d.brand_logo ? `<img src="${esc(d.brand_logo)}" alt="" onerror="this.style.display='none'">` : ''}<span>${esc(d.brand_name)}</span></span>`
+          ? (d.brand_logo
+              ? `<span class="tk-brand-pill"><img src="${esc(d.brand_logo)}" alt="${esc(d.brand_name)}" title="${esc(d.brand_name)}" onerror="this.parentElement.innerHTML='<span class=\\'tk-brand-name\\'>${esc(d.brand_name)}</span>'"></span>`
+              : `<span class="tk-brand-pill"><span class="tk-brand-name">${esc(d.brand_name)}</span></span>`)
           : '';
         const productCell = d.product_name ? `<span class="tk-product-tag">${esc(d.product_name)}</span>` : '<span style="color:var(--text-faint)">—</span>';
         return `<div class="tk-row">
@@ -447,9 +463,9 @@
             <div class="tk-doc-title">${esc(d.title)}</div>
             <div class="tk-doc-sub">
               ${d.is_public ? '<span style="color:#219653;font-weight:600">Açık Erişim</span>' : `<span>${esc(TYPE_NAMES[d.document_type]||d.document_type)}</span>`}
-              ${d.language ? `<span class="sep">·</span>${langFlag(d.language)}` : ''}
             </div>
           </div>
+          <div class="tk-cell-lang">${d.language ? langFlag(d.language) : ''}</div>
           <div class="tk-cell-product">${productCell}</div>
           <div class="tk-cell-brand">${brandCell}</div>
           <div class="tk-cell-date">${dateStr}${formatSize(d.file_size) ? `<small>${formatSize(d.file_size)}</small>` : ''}</div>
@@ -461,7 +477,7 @@
       }).join('');
 
       grid.innerHTML = `<div class="tk-table">
-        <div class="tk-thead"><span>Tür</span><span>Döküman</span><span>Ürün</span><span>Marka</span><span>Tarih · Boyut</span><span>İndir</span></div>
+        <div class="tk-thead"><span>Tür</span><span>Döküman</span><span>Dil</span><span>Ürün</span><span>Marka</span><span>Tarih · Boyut</span><span>İndir</span></div>
         ${rows}
       </div>`;
 
@@ -478,9 +494,14 @@
   }
 
   function updateTypeCounts(docs) {
-    const counts = {};
-    docs.forEach(d => { counts[d.document_type] = (counts[d.document_type]||0)+1; });
+    const counts = {}, langs = {};
+    docs.forEach(d => {
+      counts[d.document_type] = (counts[d.document_type]||0)+1;
+      const l = (d.language||'tr').toLowerCase();
+      langs[l] = (langs[l]||0)+1;
+    });
     $$('[data-cnt]').forEach(el => { el.textContent = counts[el.dataset.cnt] || 0; });
+    $$('[data-langcnt]').forEach(el => { el.textContent = langs[el.dataset.langcnt] || 0; });
   }
 
   // Load brands filter
@@ -567,8 +588,9 @@
   $('#tkSearch').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadDocs, 300); };
   $('#tkSearch').onkeydown = e => { if (e.key === 'Enter') { clearTimeout(searchTimer); loadDocs(); } };
 
-  // Tür checkbox'ları + sıralama
+  // Tür + dil checkbox'ları + sıralama
   $$('.tk-type-cb').forEach(cb => { cb.onchange = loadDocs; });
+  $$('.tk-lang-cb').forEach(cb => { cb.onchange = loadDocs; });
   const sortSel = $('#tkSort');
   if (sortSel) sortSel.onchange = loadDocs;
 
