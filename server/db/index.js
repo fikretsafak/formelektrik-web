@@ -489,6 +489,10 @@ if (!tableExists('library_documents')) {
   db.exec(`CREATE INDEX idx_libdocs_brand ON library_documents(brand_id)`);
   db.exec(`CREATE INDEX idx_libdocs_slug ON library_documents(slug)`);
 }
+// Ürün adı (opsiyonel): belge hangi ürüne ait
+if (tableExists('library_documents') && !columnExists('library_documents', 'product_name')) {
+  db.exec(`ALTER TABLE library_documents ADD COLUMN product_name TEXT`);
+}
 
 // === Teknik Kütüphane: Kayıt Başvuruları ===
 if (!tableExists('library_registrations')) {

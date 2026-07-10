@@ -27,7 +27,7 @@ const I18N = {
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları', 'nav.milestones': 'Kilometre Taşları',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
-    'nav.library': 'TK Belgeleri', 'nav.libraryUsers': 'TK Başvuruları & Erişim',
+    'nav.library': 'TK Belgeleri', 'nav.libraryUsers': 'TK Başvuruları & Erişim', 'nav.library-users': 'TK Başvuruları & Erişim',
     'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
@@ -36,7 +36,7 @@ const I18N = {
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos', 'nav.milestones': 'Milestones',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
-    'nav.library': 'TL Documents', 'nav.libraryUsers': 'TL Applications & Access',
+    'nav.library': 'TL Documents', 'nav.libraryUsers': 'TL Applications & Access', 'nav.library-users': 'TL Applications & Access',
     'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
   },
 };
@@ -3512,6 +3512,10 @@ routes.settings = async (page) => {
             <label class="settings-row-label" for="contactAddress">Adres</label>
             <textarea class="settings-row-input" id="contactAddress" rows="3" placeholder="Açık adres...">${escapeHtml(settings.contact_address || '')}</textarea>
           </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="contactHours">Çalışma Saatleri</label>
+            <input class="settings-row-input" id="contactHours" value="${escapeHtml(settings.contact_hours || '')}" placeholder="Pzt — Cum · 09:00 – 17:00">
+          </div>
         </div>
       </div>
 
@@ -3654,6 +3658,7 @@ routes.settings = async (page) => {
       contact_phone: page.querySelector('#contactPhone').value.trim(),
       contact_email: page.querySelector('#contactEmail').value.trim(),
       contact_address: page.querySelector('#contactAddress').value.trim(),
+      contact_hours: page.querySelector('#contactHours').value.trim(),
       maps_lat: page.querySelector('#mapsLat').value.trim(),
       maps_lng: page.querySelector('#mapsLng').value.trim(),
       social_linkedin: page.querySelector('#socialLinkedin').value.trim(),
@@ -3956,6 +3961,7 @@ routes.library = createCrudPage({
       <div class="full"><span class="field-label">Başlık *</span><input name="title" value="${escapeHtml(r.title||'')}" required></div>
       <div class="half"><span class="field-label">Slug</span><input name="slug" value="${escapeHtml(r.slug||'')}" placeholder="boş = başlıktan üretilir"></div>
       <div class="half"><span class="field-label">Marka</span><select name="brand_id" id="libBrandSelect"><option value="">— Seçiniz —</option></select></div>
+      <div class="half"><span class="field-label">Ürün Adı (opsiyonel)</span><input name="product_name" value="${escapeHtml(r.product_name||'')}" placeholder="ör. RC-10, BESS-500"></div>
       <div class="half"><span class="field-label">Belge Türü</span><select name="document_type">${DOC_TYPES.map(([v,l])=>`<option value="${v}" ${(r.document_type||'datasheet')===v?'selected':''}>${l}</option>`).join('')}</select></div>
       <div class="half"><span class="field-label">Dil</span><select name="language">${['tr','en'].map(l=>`<option value="${l}" ${(r.language||'tr')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select></div>
       <div class="full"><span class="field-label">Açıklama</span><textarea name="description" rows="3">${escapeHtml(r.description||'')}</textarea></div>
@@ -3976,7 +3982,7 @@ routes.library = createCrudPage({
   afterForm: async (root, r) => {
     // Load brands into select
     try {
-      const data = await apiFetch('/api/brands/admin/all');
+      const data = await api.get('/api/brands/admin/all');
       const sel = root.querySelector('#libBrandSelect');
       if (sel && data.brands) {
         data.brands.forEach(b => {
@@ -3996,11 +4002,12 @@ routes.library = createCrudPage({
       btn.onclick = () => inp.click();
       inp.onchange = async () => {
         if (!inp.files.length) return;
+        const size = inp.files[0].size;
         btn.disabled = true; btn.textContent = 'Yükleniyor...';
         try {
-          const res = await uploadFile(inp.files[0]);
-          urlInp.value = res.url;
-          sizeInp.value = res.size || '';
+          const url = await uploadFile(inp.files[0]);
+          urlInp.value = url;
+          sizeInp.value = size || '';
           toast('Dosya yüklendi');
         } catch(e) { toast(e.message, 'error'); }
         btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded">upload_file</span> Yükle';
@@ -4019,24 +4026,29 @@ routes.library = createCrudPage({
 // ============================================
 routes['library-users'] = function(container) {
   container.innerHTML = `
-    <div class="page-card">
-      <div class="page-card-head">
-        <h2 class="page-card-title">TK Başvuruları & Erişim Yönetimi</h2>
-        <div class="tab-bar" style="margin-top:12px">
-          <button class="tab-btn active" data-tab="regs">Başvurular</button>
-          <button class="tab-btn" data-tab="access">Kullanıcı Erişimi</button>
-        </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="display:flex;gap:4px;background:var(--bg-soft);border-radius:10px;padding:4px">
+        <button class="lu-tab active" data-tab="regs">Başvurular</button>
+        <button class="lu-tab" data-tab="access">Kullanıcı Erişimi</button>
       </div>
-      <div class="page-card-body">
-        <div id="libRegsTab"></div>
-        <div id="libAccessTab" hidden></div>
-      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;cursor:pointer;background:var(--bg-soft);padding:8px 14px;border-radius:10px">
+        <input type="checkbox" id="libAutoApprove"> <span>Otomatik onay <small style="color:var(--text-dim)">(başvurular anında onaylanıp şifre e-posta ile gönderilir)</small></span>
+      </label>
+    </div>
+    <style>
+      .lu-tab { padding:8px 16px; border:none; background:none; border-radius:8px; font-size:.9rem; font-weight:600; cursor:pointer; color:var(--text-dim); font-family:inherit; }
+      .lu-tab.active { background:var(--bg-card,#fff); color:var(--accent,#2aa9e0); box-shadow:0 1px 4px rgba(0,0,0,.1); }
+      .lu-empty { padding:48px 20px; text-align:center; color:var(--text-dim); }
+    </style>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="libRegsTab"></div>
+      <div id="libAccessTab" hidden></div>
     </div>`;
 
   // Tab switching
-  container.querySelectorAll('.tab-btn').forEach(btn => {
+  container.querySelectorAll('.lu-tab').forEach(btn => {
     btn.onclick = () => {
-      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      container.querySelectorAll('.lu-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const t = btn.dataset.tab;
       container.querySelector('#libRegsTab').hidden = t !== 'regs';
@@ -4044,17 +4056,27 @@ routes['library-users'] = function(container) {
     };
   });
 
+  // Otomatik onay toggle
+  (async () => {
+    const cb = container.querySelector('#libAutoApprove');
+    try { const s = await api.get('/api/library/admin/auto-approve'); cb.checked = !!s.enabled; } catch(e) {}
+    cb.onchange = async () => {
+      try { await api.put('/api/library/admin/auto-approve', { enabled: cb.checked }); toast(cb.checked ? 'Otomatik onay açık' : 'Otomatik onay kapalı', 'success'); }
+      catch(e) { toast(e.message, 'error'); cb.checked = !cb.checked; }
+    };
+  })();
+
   // === TAB 1: Başvurular ===
   async function loadRegistrations() {
     const tab = container.querySelector('#libRegsTab');
-    tab.innerHTML = '<p style="padding:16px;color:var(--text-dim)">Yükleniyor...</p>';
+    tab.innerHTML = '<p style="padding:24px;color:var(--text-dim)">Yükleniyor...</p>';
     try {
-      const data = await apiFetch('/api/library/admin/registrations');
+      const data = await api.get('/api/library/admin/registrations');
       if (!data.registrations || !data.registrations.length) {
-        tab.innerHTML = '<p style="padding:16px;color:var(--text-dim)">Henüz başvuru yok.</p>';
+        tab.innerHTML = '<div class="lu-empty"><span class="material-symbols-rounded" style="font-size:40px;opacity:.4;display:block;margin-bottom:8px">how_to_reg</span>Henüz başvuru yok.</div>';
         return;
       }
-      tab.innerHTML = `<table class="crud-table"><thead><tr>
+      tab.innerHTML = `<table class="table"><thead><tr>
         <th>Ad Soyad</th><th>E-posta</th><th>Firma</th><th>Telefon</th><th>Durum</th><th>Tarih</th><th></th>
       </tr></thead><tbody>${data.registrations.map(r => `<tr>
         <td><b>${escapeHtml(r.name)} ${escapeHtml(r.surname)}</b></td>
@@ -4063,7 +4085,7 @@ routes['library-users'] = function(container) {
         <td>${escapeHtml(r.phone||'—')}</td>
         <td>${r.status==='pending'?'<span class="badge badge-draft">Bekliyor</span>':r.status==='approved'?'<span class="badge badge-published">Onaylandı</span>':'<span class="badge" style="background:#c0392b22;color:#e74c3c">Reddedildi</span>'}</td>
         <td>${new Date(r.created_at).toLocaleDateString('tr-TR')}</td>
-        <td>${r.status==='pending'?`<button class="btn btn-sm btn-primary" data-approve="${r.id}">Onayla</button> <button class="btn btn-sm btn-ghost" data-reject="${r.id}">Reddet</button>`:''}</td>
+        <td style="text-align:right;white-space:nowrap">${r.status==='pending'?`<button class="btn btn-sm btn-primary" data-approve="${r.id}">Onayla</button> <button class="btn btn-sm btn-ghost" data-reject="${r.id}">Reddet</button>`:''}</td>
       </tr>`).join('')}</tbody></table>`;
 
       // Approve handler
@@ -4073,35 +4095,42 @@ routes['library-users'] = function(container) {
           // Fetch brands for access selection
           let brandsHtml = '';
           try {
-            const bd = await apiFetch('/api/brands/admin/all');
+            const bd = await api.get('/api/brands/admin/all');
             brandsHtml = (bd.brands||[]).map(b => `<label style="display:flex;gap:8px;align-items:center;padding:4px"><input type="checkbox" value="${b.id}" class="brand-cb" style="width:auto"> ${escapeHtml(b.name)}</label>`).join('');
           } catch(e) {}
           const content = document.createElement('div');
-          content.innerHTML = `<p style="margin-bottom:12px">Bu başvuruyu onaylayarak kullanıcı hesabı oluşturulacak.</p>
+          content.innerHTML = `<p style="margin-bottom:12px">Bu başvuruyu onaylayarak kullanıcı hesabı oluşturulacak. Şifre otomatik üretilip kullanıcıya e-posta ile gönderilir.</p>
             <p style="margin-bottom:8px;font-weight:600">Marka erişimi ver:</p>
-            <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px">${brandsHtml || '<p style="color:var(--text-dim)">Marka bulunamadı</p>'}</div>`;
-          openModal('Başvuru Onayla', content, {
-            confirmText: 'Onayla',
-            onConfirm: async () => {
-              const brandIds = [...content.querySelectorAll('.brand-cb:checked')].map(cb => +cb.value);
-              try {
-                const res = await apiFetch(`/api/library/admin/registrations/${regId}`, {
-                  method: 'PUT', body: JSON.stringify({ action: 'approve', brand_ids: brandIds })
-                });
-                if (res.password) {
-                  toast('Onaylandı! Şifre: ' + res.password, 'success');
-                  openModal('Kullanıcı Oluşturuldu', h('div', {},
-                    h('p', {}, `Otomatik şifre: `),
-                    h('code', { style: 'font-size:1.2em;background:var(--bg-soft);padding:4px 12px;border-radius:6px' }, res.password),
-                    h('p', { style: 'margin-top:12px;color:var(--text-dim)' }, 'Bu şifreyi kullanıcıya iletin. İlk girişte değiştirmesi gerekecek.')
-                  ));
-                } else {
-                  toast('Onaylandı (mevcut kullanıcı)', 'success');
-                }
-                loadRegistrations();
-              } catch(e) { toast(e.message, 'error'); }
-            }
-          });
+            <div style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px">${brandsHtml || '<p style="color:var(--text-dim)">Marka bulunamadı</p>'}</div>`;
+          const actions = h('div', { style: 'display:flex;gap:8px;justify-content:flex-end;margin-top:20px' });
+          const cancelBtn = h('button', { class: 'btn btn-ghost' }, 'Vazgeç');
+          const okBtn = h('button', { class: 'btn btn-primary' }, 'Onayla ve Bilgilendir');
+          actions.appendChild(cancelBtn); actions.appendChild(okBtn);
+          content.appendChild(actions);
+          const modal = openModal('Başvuru Onayla', content, { width: '520px' });
+          cancelBtn.onclick = () => modal.remove();
+          okBtn.onclick = async () => {
+            const brandIds = [...content.querySelectorAll('.brand-cb:checked')].map(cb => +cb.value);
+            okBtn.disabled = true; okBtn.textContent = 'Onaylanıyor...';
+            try {
+              const res = await api.put(`/api/library/admin/registrations/${regId}`, { action: 'approve', brand_ids: brandIds });
+              modal.remove();
+              if (res.password) {
+                const mailNote = res.mail_sent
+                  ? h('p', { style: 'margin-top:12px;color:#1a8a4a' }, '✓ Şifre e-posta ile kullanıcıya gönderildi.')
+                  : h('p', { style: 'margin-top:12px;color:#c0392b' }, '⚠ E-posta gönderilemedi — şifreyi elle iletin.');
+                toast('Onaylandı', 'success');
+                openModal('Kullanıcı Oluşturuldu', h('div', {},
+                  h('p', {}, `Otomatik şifre: `),
+                  h('code', { style: 'font-size:1.2em;background:var(--bg-soft);padding:4px 12px;border-radius:6px' }, res.password),
+                  mailNote
+                ));
+              } else {
+                toast('Onaylandı (mevcut kullanıcı)', 'success');
+              }
+              loadRegistrations();
+            } catch(e) { toast(e.message, 'error'); okBtn.disabled = false; okBtn.textContent = 'Onayla ve Bilgilendir'; }
+          };
         };
       });
       // Reject handler
@@ -4109,9 +4138,7 @@ routes['library-users'] = function(container) {
         btn.onclick = async () => {
           if (!await confirmDialog('Bu başvuruyu reddetmek istediğinize emin misiniz?')) return;
           try {
-            await apiFetch(`/api/library/admin/registrations/${btn.dataset.reject}`, {
-              method: 'PUT', body: JSON.stringify({ action: 'reject' })
-            });
+            await api.put(`/api/library/admin/registrations/${btn.dataset.reject}`, { action: 'reject' });
             toast('Reddedildi');
             loadRegistrations();
           } catch(e) { toast(e.message, 'error'); }
@@ -4124,6 +4151,7 @@ routes['library-users'] = function(container) {
   // === TAB 2: Kullanıcı Erişim Yönetimi ===
   async function initAccessTab() {
     const tab = container.querySelector('#libAccessTab');
+    tab.style.padding = '20px';
     tab.innerHTML = `
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
         <select id="libAccessUserSelect" style="flex:1"><option value="">— Kullanıcı seçin —</option></select>
@@ -4138,7 +4166,7 @@ routes['library-users'] = function(container) {
 
     // Load customers
     try {
-      const cd = await apiFetch('/api/library/admin/customers');
+      const cd = await api.get('/api/library/admin/customers');
       const sel = tab.querySelector('#libAccessUserSelect');
       (cd.users||[]).forEach(u => {
         const o = document.createElement('option');
@@ -4150,11 +4178,11 @@ routes['library-users'] = function(container) {
     // Load brands + docs for checkboxes
     let allBrands = [], allDocs = [];
     try {
-      const bd = await apiFetch('/api/brands/admin/all');
+      const bd = await api.get('/api/brands/admin/all');
       allBrands = bd.brands || [];
     } catch(e) {}
     try {
-      const dd = await apiFetch('/api/library/admin/all');
+      const dd = await api.get('/api/library/admin/all');
       allDocs = dd.documents || [];
     } catch(e) {}
 
@@ -4180,7 +4208,7 @@ routes['library-users'] = function(container) {
 
       // Load current access
       try {
-        const acc = await apiFetch(`/api/library/admin/access/${uid}`);
+        const acc = await api.get(`/api/library/admin/access/${uid}`);
         (acc.brand_ids||[]).forEach(bid => {
           const cb = tab.querySelector(`.ab-cb[value="${bid}"]`);
           if (cb) cb.checked = true;
@@ -4198,9 +4226,7 @@ routes['library-users'] = function(container) {
       const brand_ids = [...tab.querySelectorAll('.ab-cb:checked')].map(cb => +cb.value);
       const document_ids = [...tab.querySelectorAll('.ad-cb:checked')].map(cb => +cb.value);
       try {
-        await apiFetch(`/api/library/admin/access/${uid}`, {
-          method: 'PUT', body: JSON.stringify({ brand_ids, document_ids })
-        });
+        await api.put(`/api/library/admin/access/${uid}`, { brand_ids, document_ids });
         toast('Erişim güncellendi', 'success');
       } catch(e) { toast(e.message, 'error'); }
     };

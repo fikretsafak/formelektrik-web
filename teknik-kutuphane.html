@@ -20,86 +20,87 @@
 <link rel="stylesheet" href="/styles.css" />
 <script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
 <style>
-/* Teknik Kütüphane */
+/* Teknik Kütüphane — sade & profesyonel liste */
 
-/* Hero override */
-.tk-hero { background: linear-gradient(135deg, #0f1640 0%, #162050 50%, #1a3068 100%); padding: 80px 0 48px; position: relative; overflow: hidden; }
-.tk-hero::before { content: ''; position: absolute; top: -60%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(42,169,224,.12) 0%, transparent 70%); pointer-events: none; }
-.tk-hero::after { content: ''; position: absolute; bottom: -40%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(42,169,224,.08) 0%, transparent 70%); pointer-events: none; }
-.tk-hero .wrap { position: relative; z-index: 1; }
-.tk-hero-grid { display: flex; align-items: center; gap: 48px; }
-.tk-hero-copy { flex: 1; }
-.tk-hero-copy .eyebrow { color: rgba(42,169,224,.9); }
-.tk-hero-copy h1 { color: #fff; font-size: 2.2rem; font-family: var(--font-head,Poppins,sans-serif); font-weight: 700; margin: 12px 0 16px; line-height: 1.2; }
-.tk-hero-copy p { color: rgba(255,255,255,.65); font-size: 1.05rem; line-height: 1.6; max-width: 520px; margin: 0; }
-.tk-hero-stats { display: flex; gap: 32px; margin-top: 28px; }
-.tk-hero-stat { text-align: center; }
-.tk-hero-stat b { display: block; font-size: 1.6rem; color: #fff; font-family: var(--font-head,Poppins,sans-serif); }
-.tk-hero-stat span { font-size: .78rem; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .04em; }
-.tk-hero-visual { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tk-hero-icon-card { width: 80px; height: 80px; border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.08); }
-.tk-hero-icon-card .material-symbols-rounded { font-size: 32px; }
-.tk-hic-1 { background: rgba(42,169,224,.15); color: #5cc8f5; }
-.tk-hic-2 { background: rgba(39,174,96,.12); color: #6ddb9e; }
-.tk-hic-3 { background: rgba(241,196,15,.1); color: #f5d565; }
-.tk-hic-4 { background: rgba(155,89,182,.1); color: #c39bdb; }
+/* Sayfaya özel geniş wrap (yan boşlukları azalt) */
+.tk-head .wrap, .tk-wrap { max-width: 1400px; }
+
+/* Başlık şeridi */
+.tk-head { background: var(--bg-soft,#f6f7fa); border-bottom: 1px solid var(--line,#e5e7eb); padding: calc(var(--header-h,72px) + 40px) 0 32px; }
+.tk-head h1 { font-family: var(--font-head,Poppins,sans-serif); font-size: 2rem; font-weight: 700; color: var(--navy-deep,#0f1640); margin: 0 0 10px; }
+.tk-head-meta { display: flex; align-items: center; gap: 10px; font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size: .8rem; color: var(--text-soft,#4b5167); flex-wrap: wrap; }
+.tk-head-meta b { color: var(--text,#1a1d26); font-weight: 600; }
+.tk-head-meta .sep { color: var(--text-faint,#c3c9d6); }
+.tk-head-search { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 12px; padding: 12px 16px; margin-top: 22px; max-width: 620px; transition: border-color .2s, box-shadow .2s; }
+.tk-head-search:focus-within { border-color: var(--cyan,#2aa9e0); box-shadow: 0 0 0 3px rgba(42,169,224,.1); }
+.tk-head-search .material-symbols-rounded { color: var(--text-faint,#9aa2b4); font-size: 21px; }
+.tk-head-search input { flex: 1; border: none; outline: none; background: transparent; font-size: .95rem; font-family: inherit; color: var(--text,#1a1d26); }
 
 /* Shell */
-.tk-shell { display: grid; grid-template-columns: 280px 1fr; gap: 32px; padding: 40px 0 80px; }
-.tk-sidebar { position: sticky; top: calc(var(--header-h,72px) + 16px); align-self: start; }
+.tk-shell { display: grid; grid-template-columns: 240px 1fr; gap: 40px; padding: 36px 0 100px; min-height: 60vh; }
+.tk-shell main { min-height: 480px; }
+.tk-sidebar { position: sticky; top: calc(var(--header-h,84px) + 16px); align-self: start; }
+.tk-filter-group { margin-bottom: 28px; }
+.tk-filter-group h4 { font-size: .72rem; font-weight: 700; color: var(--text-faint,#98a0b3); margin: 0 0 12px; text-transform: uppercase; letter-spacing: .08em; }
+.tk-filter-group label { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: .88rem; color: var(--text-soft,#4b5167); cursor: pointer; transition: color .15s; }
+.tk-filter-group label:hover { color: var(--text,#1a1d26); }
+.tk-filter-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--cyan,#2aa9e0); flex: none; }
+.tk-filter-group label .cnt { margin-left: auto; font-size: .74rem; color: var(--text-faint,#aab0bf); background: var(--bg-soft,#f2f4f8); padding: 1px 7px; border-radius: 6px; font-variant-numeric: tabular-nums; }
 
-/* Search */
-.tk-search { display: flex; align-items: center; gap: 10px; border: 2px solid var(--line,#e5e7eb); border-radius: 14px; padding: 11px 14px; background: #fff; margin-bottom: 16px; transition: border-color .2s, box-shadow .2s; }
-.tk-search:focus-within { border-color: var(--cyan,#2aa9e0); box-shadow: 0 0 0 3px rgba(42,169,224,.1); }
-.tk-search input { border: none; outline: none; flex: 1; font-size: .9rem; font-family: inherit; background: transparent; }
-.tk-search .material-symbols-rounded { color: var(--cyan,#2aa9e0); font-size: 22px; }
+/* Toolbar (sonuç + sıralama) */
+.tk-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.tk-count { font-size: .92rem; color: var(--text-soft,#4b5167); }
+.tk-count b { color: var(--text,#1a1d26); font-weight: 700; }
+.tk-sort { display: flex; align-items: center; gap: 6px; }
+.tk-sort select { border: 1px solid var(--line,#e5e7eb); border-radius: 9px; padding: 7px 30px 7px 12px; font-size: .84rem; font-family: inherit; color: var(--text,#1a1d26); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5167' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center; -webkit-appearance: none; appearance: none; cursor: pointer; }
 
-/* Filter cards */
-.tk-filter-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-.tk-filter-card h4 { display: flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; }
-.tk-filter-card h4 .material-symbols-rounded { font-size: 18px; color: var(--cyan,#2aa9e0); }
-.tk-filter-card label { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: .88rem; color: var(--text-soft,#4b5167); cursor: pointer; transition: color .15s; }
-.tk-filter-card label:hover { color: var(--text,#1a1d26); }
-.tk-filter-card input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cyan,#2aa9e0); border-radius: 4px; }
+/* Tablo listesi */
+.tk-table { border: 1px solid var(--line,#e5e7eb); border-radius: 14px; overflow: hidden; background: #fff; }
+.tk-thead { display: grid; grid-template-columns: 60px 1fr 150px 160px 110px 100px; gap: 16px; padding: 12px 20px; background: var(--bg-soft,#f8f9fb); border-bottom: 1px solid var(--line,#e5e7eb); font-size: .68rem; font-weight: 700; color: var(--text-faint,#98a0b3); text-transform: uppercase; letter-spacing: .07em; }
+.tk-thead span:last-child { text-align: right; }
+.tk-row { display: grid; grid-template-columns: 60px 1fr 150px 160px 110px 100px; gap: 16px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line,#f0f1f4); transition: background .12s; }
+.tk-row:last-child { border-bottom: none; }
+.tk-row:hover { background: var(--bg-soft,#f8f9fb); }
 
-/* List */
-.tk-grid { display: flex; flex-direction: column; gap: 0; }
-.tk-card { display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid var(--line,#e5e7eb); border-bottom: none; padding: 16px 20px; transition: background .15s; }
-.tk-card:first-child { border-radius: 14px 14px 0 0; }
-.tk-card:last-child { border-bottom: 1px solid var(--line,#e5e7eb); border-radius: 0 0 14px 14px; }
-.tk-card:only-child { border-radius: 14px; border-bottom: 1px solid var(--line,#e5e7eb); }
-.tk-card:hover { background: var(--bg-soft,#f8f9fb); }
-.tk-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
-.tk-card-icon .material-symbols-rounded { font-size: 22px; }
-.tk-icon-datasheet { background: rgba(42,169,224,.1); color: #2aa9e0; }
-.tk-icon-manual { background: rgba(155,89,182,.1); color: #9b59b6; }
-.tk-icon-certificate { background: rgba(241,196,15,.12); color: #d4a517; }
-.tk-icon-catalog { background: rgba(39,174,96,.1); color: #27ae60; }
-.tk-icon-software { background: rgba(231,76,60,.1); color: #e74c3c; }
-.tk-card-info { flex: 1; min-width: 0; }
-.tk-card-title { font-size: .92rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tk-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: .78rem; color: var(--text-soft,#4b5167); flex-wrap: wrap; }
-.tk-card-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint,#ccc); flex: none; }
-.tk-badge { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.08); color: var(--cyan,#2aa9e0); padding: 3px 8px; border-radius: 6px; flex: none; }
-.tk-badge.public { background: rgba(39,174,96,.08); color: #27ae60; }
-.tk-card-date { font-size: .75rem; color: var(--text-faint,#aaa); flex: none; min-width: 80px; text-align: right; }
-.tk-dl-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 7px 14px; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; flex: none; }
-.tk-dl-btn:hover { background: #1b8fc0; }
+/* Tür kısaltma rozeti */
+.tk-type { font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size: .7rem; font-weight: 700; letter-spacing: .04em; padding: 6px 0; border-radius: 8px; text-align: center; width: 46px; }
+.tk-type-datasheet { background: rgba(42,169,224,.1); color: #1b8fc0; }
+.tk-type-manual { background: rgba(155,89,182,.1); color: #8e44ad; }
+.tk-type-certificate { background: rgba(241,196,15,.16); color: #a67c05; }
+.tk-type-catalog { background: rgba(39,174,96,.1); color: #219653; }
+.tk-type-software { background: rgba(231,76,60,.1); color: #c0392b; }
+
+.tk-doc-title { font-size: .98rem; font-weight: 600; color: var(--text,#1a1d26); line-height: 1.4; }
+.tk-doc-sub { font-size: .8rem; color: var(--text-soft,#6b7180); margin-top: 5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tk-doc-sub .sep { opacity: .45; }
+.tk-lang { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--text-soft,#6b7180); }
+.tk-flag { width: 18px; height: 12px; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+.tk-brand-pill { display: inline-flex; align-items: center; gap: 7px; font-size: .82rem; font-weight: 600; color: var(--text,#1a1d26); background: var(--bg-soft,#f2f4f8); padding: 5px 12px 5px 6px; border-radius: 999px; width: fit-content; max-width: 100%; }
+.tk-brand-pill img { width: 22px; height: 22px; border-radius: 50%; object-fit: contain; background: #fff; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.06); }
+.tk-brand-pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tk-product { font-size: .82rem; color: var(--text-soft,#4b5167); }
+.tk-product-tag { display: inline-block; font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size: .76rem; font-weight: 600; color: #1b8fc0; background: rgba(42,169,224,.08); padding: 3px 9px; border-radius: 6px; }
+.tk-cell-date { font-size: .82rem; color: var(--text,#1a1d26); font-weight: 500; }
+.tk-cell-date small { display: block; color: var(--text-faint,#aab0bf); margin-top: 3px; font-weight: 400; font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+.tk-dl-btn { display: inline-flex; align-items: center; gap: 5px; background: #fff; color: var(--text,#1a1d26); border: 1px solid var(--line,#dbe0ea); padding: 7px 14px; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; justify-self: end; }
+.tk-dl-btn:hover { border-color: var(--cyan,#2aa9e0); color: var(--cyan,#2aa9e0); }
 .tk-dl-btn .material-symbols-rounded { font-size: 16px; }
-.tk-dl-btn.locked { background: var(--navy-deep,#0f1640); }
-.tk-dl-btn.locked:hover { background: #1a2355; }
+.tk-dl-btn.locked { color: var(--text-faint,#98a0b3); }
+.tk-dl-btn.locked:hover { border-color: var(--navy-deep,#0f1640); color: var(--navy-deep,#0f1640); }
 
 /* Empty state */
-.tk-empty { text-align: center; padding: 80px 20px; color: var(--text-soft,#999); }
-.tk-empty-icon { width: 80px; height: 80px; border-radius: 20px; background: var(--bg-soft,#f6f7fa); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-.tk-empty-icon .material-symbols-rounded { font-size: 36px; color: var(--text-soft,#bbb); }
+.tk-empty { text-align: center; padding: 70px 20px; color: var(--text-soft,#999); }
+.tk-empty-icon { width: 72px; height: 72px; border-radius: 18px; background: var(--bg-soft,#f6f7fa); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+.tk-empty-icon .material-symbols-rounded { font-size: 34px; color: var(--text-faint,#bbb); }
 .tk-empty h3 { font-size: 1rem; color: var(--text,#1a1d26); margin: 0 0 6px; font-weight: 600; }
 .tk-empty p { font-size: .88rem; margin: 0; }
 
-/* Count bar */
-.tk-count-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.tk-count { font-size: .88rem; color: var(--text-soft,#999); font-weight: 500; }
-.tk-count b { color: var(--text,#1a1d26); font-weight: 700; }
+/* User bar */
+.tk-user-bar { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(42,169,224,.06), rgba(42,169,224,.02)); border: 1px solid rgba(42,169,224,.15); border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-size: .88rem; }
+.tk-user-bar .material-symbols-rounded { color: var(--cyan); font-size: 22px; }
+.tk-user-bar b { color: var(--text); }
+.tk-logout-btn { margin-left: auto; background: none; border: 1px solid var(--line,#e5e7eb); color: var(--text-soft); cursor: pointer; font-size: .78rem; font-family: inherit; padding: 4px 12px; border-radius: 8px; transition: .15s; }
+.tk-logout-btn:hover { border-color: #e74c3c; color: #e74c3c; }
 
 /* User bar */
 .tk-user-bar { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(42,169,224,.06), rgba(42,169,224,.02)); border: 1px solid rgba(42,169,224,.15); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px; font-size: .88rem; }
@@ -131,17 +132,17 @@
 .tk-msg.success { color: #1a8a4a; background: rgba(39,174,96,.08); }
 .tk-msg.error { color: #c0392b; background: rgba(231,76,60,.08); }
 
-@media (max-width: 800px) {
+@media (max-width: 860px) {
   .tk-shell { grid-template-columns: 1fr; }
   .tk-sidebar { position: static; }
-  .tk-hero-grid { flex-direction: column; gap: 24px; }
-  .tk-hero-visual { display: none; }
-  .tk-hero-copy h1 { font-size: 1.6rem; }
-  .tk-hero-stats { gap: 20px; }
-  .tk-hero-stats b { font-size: 1.3rem; }
-  .tk-card { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
-  .tk-card-info { width: calc(100% - 56px); }
-  .tk-card-date { order: 5; width: auto; text-align: left; }
+  .tk-head h1 { font-size: 1.6rem; }
+  /* Tabloyu kart-satıra çevir */
+  .tk-thead { display: none; }
+  .tk-row { grid-template-columns: 48px 1fr auto; grid-template-areas: "type title dl"; gap: 12px; padding: 14px 16px; }
+  .tk-row .tk-type { grid-area: type; align-self: center; }
+  .tk-row .tk-cell-doc { grid-area: title; }
+  .tk-row .tk-cell-product, .tk-row .tk-cell-brand, .tk-row .tk-cell-date { display: none; }
+  .tk-row .tk-dl-btn { grid-area: dl; align-self: center; }
 }
 </style>
 </head>
@@ -180,61 +181,56 @@
   <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="tk-hero">
+<!-- ===== BAŞLIK ŞERİDİ ===== -->
+<section class="tk-head">
   <div class="wrap">
-    <div class="tk-hero-grid">
-      <div class="tk-hero-copy">
-        <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:15px">library_books</span> Teknik Kütüphane</span>
-        <h1>Teknik Belgelerinize <span style="color:#2aa9e0">Tek Noktadan</span> Erişin</h1>
-        <p>Datasheet, katalog, sertifika, kullanım kılavuzu ve yazılım dosyalarına güvenli ve hızlı erişim sağlayın.</p>
-        <div class="tk-hero-stats" id="tkHeroStats">
-          <div class="tk-hero-stat"><b id="tkStatDocs">0</b><span>Belge</span></div>
-          <div class="tk-hero-stat"><b id="tkStatBrands">0</b><span>Marka</span></div>
-          <div class="tk-hero-stat"><b id="tkStatTypes">5</b><span>Kategori</span></div>
-        </div>
-      </div>
-      <div class="tk-hero-visual">
-        <div class="tk-hero-icon-card tk-hic-1"><span class="material-symbols-rounded">description</span></div>
-        <div class="tk-hero-icon-card tk-hic-2"><span class="material-symbols-rounded">workspace_premium</span></div>
-        <div class="tk-hero-icon-card tk-hic-3"><span class="material-symbols-rounded">auto_stories</span></div>
-        <div class="tk-hero-icon-card tk-hic-4"><span class="material-symbols-rounded">terminal</span></div>
-      </div>
+    <h1>Teknik Kütüphane</h1>
+    <div class="tk-head-meta">
+      <b><span id="tkStatDocs">0</span> döküman</b>
+      <span class="sep">·</span>
+      <span>Son güncelleme: <b id="tkLastUpdate">—</b></span>
+      <span class="sep">·</span>
+      <span>Açık erişim + üyelik</span>
+    </div>
+    <div class="tk-head-search">
+      <span class="material-symbols-rounded">search</span>
+      <input type="text" id="tkSearch" placeholder="Ürün adı, model no, standart...">
     </div>
   </div>
 </section>
 
-<div class="wrap">
-  <!-- User bar -->
-  <div id="tkUserBar"></div>
-
+<div class="wrap tk-wrap">
   <div class="tk-shell">
     <!-- Sidebar -->
     <aside class="tk-sidebar">
-      <div class="tk-search">
-        <span class="material-symbols-rounded">search</span>
-        <input type="text" id="tkSearch" placeholder="Belge ara...">
+      <div id="tkUserBar"></div>
+      <div class="tk-filter-group" id="tkBrandFilter">
+        <h4>Marka</h4>
+        <div id="tkBrandList"><p style="font-size:.82rem;color:var(--text-faint)">Yükleniyor...</p></div>
       </div>
-      <div class="tk-filter-card" id="tkBrandFilter">
-        <h4><span class="material-symbols-rounded">storefront</span> Marka</h4>
-        <div id="tkBrandList"></div>
-      </div>
-      <div class="tk-filter-card">
-        <h4><span class="material-symbols-rounded">category</span> Belge Türü</h4>
-        <label><input type="checkbox" value="datasheet" class="tk-type-cb"> Datasheet</label>
-        <label><input type="checkbox" value="manual" class="tk-type-cb"> Manual</label>
-        <label><input type="checkbox" value="certificate" class="tk-type-cb"> Sertifika</label>
-        <label><input type="checkbox" value="catalog" class="tk-type-cb"> Katalog</label>
-        <label><input type="checkbox" value="software" class="tk-type-cb"> Yazılım</label>
+      <div class="tk-filter-group">
+        <h4>Döküman Türü</h4>
+        <label><input type="checkbox" value="datasheet" class="tk-type-cb"> Datasheet <span class="cnt" data-cnt="datasheet">0</span></label>
+        <label><input type="checkbox" value="catalog" class="tk-type-cb"> Katalog <span class="cnt" data-cnt="catalog">0</span></label>
+        <label><input type="checkbox" value="certificate" class="tk-type-cb"> Sertifika <span class="cnt" data-cnt="certificate">0</span></label>
+        <label><input type="checkbox" value="manual" class="tk-type-cb"> Kullanım Kılavuzu <span class="cnt" data-cnt="manual">0</span></label>
+        <label><input type="checkbox" value="software" class="tk-type-cb"> Yazılım / Firmware <span class="cnt" data-cnt="software">0</span></label>
       </div>
     </aside>
 
     <!-- Content -->
     <main>
-      <div class="tk-count-bar">
+      <div class="tk-toolbar">
         <div class="tk-count" id="tkCount"></div>
+        <div class="tk-sort">
+          <select id="tkSort">
+            <option value="date">Tarihe göre</option>
+            <option value="name">İsme göre</option>
+            <option value="brand">Markaya göre</option>
+          </select>
+        </div>
       </div>
-      <div class="tk-grid" id="tkGrid"></div>
+      <div id="tkGrid"></div>
     </main>
   </div>
 </div>
@@ -322,7 +318,15 @@
   const TOKEN_KEY = 'tk_token';
   let currentUser = null;
   let myAccess = null;
-  const DOC_ICONS = { datasheet:'description', manual:'menu_book', certificate:'workspace_premium', catalog:'auto_stories', software:'terminal' };
+  const TYPE_ABBR = { datasheet:'DS', manual:'MAN', certificate:'CRT', catalog:'CAT', software:'SW' };
+  const TYPE_NAMES = { datasheet:'Datasheet', manual:'Kullanım Kılavuzu', certificate:'Sertifika', catalog:'Katalog', software:'Yazılım / Firmware' };
+  const FLAG_TR = '<svg viewBox="0 0 60 40" class="tk-flag"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg>';
+  const FLAG_EN = '<svg viewBox="0 0 60 40" class="tk-flag"><clipPath id="tkuk"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#tkuk)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg>';
+  function langFlag(lang) {
+    const l = (lang||'').toLowerCase();
+    const flag = l === 'en' ? FLAG_EN : FLAG_TR;
+    return `<span class="tk-lang" title="${l.toUpperCase()}">${flag}${l.toUpperCase()}</span>`;
+  }
 
   // Auth helpers
   function getToken() { return localStorage.getItem(TOKEN_KEY); }
@@ -402,35 +406,53 @@
       let data = await api('/api/library?' + params.toString());
       let docs = data.documents || [];
 
-      // Client-side multi-filter
+      // Client-side çoklu filtre
       if (checkedBrands.length > 1) docs = docs.filter(d => checkedBrands.includes(String(d.brand_id)));
       if (checkedTypes.length > 1) docs = docs.filter(d => checkedTypes.includes(d.document_type));
 
-      count.innerHTML = '<b>' + docs.length + '</b> belge bulundu';
-      updateHeroStats(docs.length);
+      // Sıralama
+      const sort = $('#tkSort')?.value || 'date';
+      docs.sort((a,b) => {
+        if (sort === 'name') return (a.title||'').localeCompare(b.title||'','tr');
+        if (sort === 'brand') return (a.brand_name||'').localeCompare(b.brand_name||'','tr');
+        return new Date(b.updated_at||b.created_at||0) - new Date(a.updated_at||a.created_at||0);
+      });
+
+      updateTypeCounts(docs);
+      count.innerHTML = '<b>' + docs.length + '</b> sonuç';
+      const statDocs = $('#tkStatDocs'); if (statDocs) statDocs.textContent = docs.length;
+      const lu = $('#tkLastUpdate');
+      if (lu && docs.length) {
+        const newest = docs.reduce((m,d) => { const t = new Date(d.updated_at||d.created_at||0); return t>m?t:m; }, new Date(0));
+        lu.textContent = newest > new Date(0) ? newest.toLocaleDateString('tr-TR',{month:'long',year:'numeric'}) : '—';
+      }
 
       if (!docs.length) {
         grid.innerHTML = '<div class="tk-empty"><div class="tk-empty-icon"><span class="material-symbols-rounded">folder_open</span></div><h3>Belge bulunamadı</h3><p>Filtrelerinizi değiştirmeyi veya arama terimini güncellemeyi deneyin.</p></div>';
         return;
       }
 
-      grid.innerHTML = docs.map(d => {
+      const rows = docs.map(d => {
         const hasAccess = d.is_public || canAccess(d);
-        const icon = DOC_ICONS[d.document_type] || 'description';
         const date = d.updated_at || d.created_at;
-        const dateStr = date ? new Date(date).toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}) : '';
-        return `<div class="tk-card">
-          <div class="tk-card-icon tk-icon-${d.document_type || 'datasheet'}"><span class="material-symbols-rounded">${icon}</span></div>
-          <div class="tk-card-info">
-            <div class="tk-card-title">${esc(d.title)}</div>
-            <div class="tk-card-meta">
-              ${d.brand_name ? `<span>${esc(d.brand_name)}</span>` : ''}
-              ${d.brand_name && d.file_size ? '<span class="dot"></span>' : ''}
-              ${formatSize(d.file_size) ? `<span>${formatSize(d.file_size)}</span>` : ''}
+        const dateStr = date ? new Date(date).toLocaleDateString('tr-TR',{month:'short',year:'numeric'}) : '';
+        const typeLabel = TYPE_ABBR[d.document_type] || 'DOC';
+        const brandCell = d.brand_name
+          ? `<span class="tk-brand-pill">${d.brand_logo ? `<img src="${esc(d.brand_logo)}" alt="" onerror="this.style.display='none'">` : ''}<span>${esc(d.brand_name)}</span></span>`
+          : '';
+        const productCell = d.product_name ? `<span class="tk-product-tag">${esc(d.product_name)}</span>` : '<span style="color:var(--text-faint)">—</span>';
+        return `<div class="tk-row">
+          <span class="tk-type tk-type-${d.document_type||'datasheet'}">${typeLabel}</span>
+          <div class="tk-cell-doc">
+            <div class="tk-doc-title">${esc(d.title)}</div>
+            <div class="tk-doc-sub">
+              ${d.is_public ? '<span style="color:#219653;font-weight:600">Açık Erişim</span>' : `<span>${esc(TYPE_NAMES[d.document_type]||d.document_type)}</span>`}
+              ${d.language ? `<span class="sep">·</span>${langFlag(d.language)}` : ''}
             </div>
           </div>
-          <span class="tk-badge${d.is_public?' public':''}">${d.is_public ? 'Açık Erişim' : esc(d.document_type)}</span>
-          <span class="tk-card-date">${dateStr}</span>
+          <div class="tk-cell-product">${productCell}</div>
+          <div class="tk-cell-brand">${brandCell}</div>
+          <div class="tk-cell-date">${dateStr}${formatSize(d.file_size) ? `<small>${formatSize(d.file_size)}</small>` : ''}</div>
           ${d.is_public || hasAccess
             ? `<button class="tk-dl-btn" data-dl="${d.id}"><span class="material-symbols-rounded">download</span> İndir</button>`
             : `<button class="tk-dl-btn locked" data-need-auth="${d.id}"><span class="material-symbols-rounded">lock</span> Giriş</button>`
@@ -438,20 +460,27 @@
         </div>`;
       }).join('');
 
-      // Download handlers
+      grid.innerHTML = `<div class="tk-table">
+        <div class="tk-thead"><span>Tür</span><span>Döküman</span><span>Ürün</span><span>Marka</span><span>Tarih · Boyut</span><span>İndir</span></div>
+        ${rows}
+      </div>`;
+
+      // İndirme: açık erişim → doğrudan; değilse giriş modalı
       grid.querySelectorAll('[data-dl]').forEach(btn => {
-        btn.onclick = () => {
-          const id = btn.dataset.dl;
-          if (!currentUser) { openModal(); return; }
-          window.open('/api/library/' + id + '/download', '_blank');
-        };
+        btn.onclick = () => window.open('/api/library/' + btn.dataset.dl + '/download', '_blank');
       });
       grid.querySelectorAll('[data-need-auth]').forEach(btn => {
         btn.onclick = () => openModal();
       });
     } catch(e) {
-      grid.innerHTML = `<div class="tk-empty"><span class="material-symbols-rounded">error</span><p>${esc(e.message)}</p></div>`;
+      grid.innerHTML = `<div class="tk-empty"><div class="tk-empty-icon"><span class="material-symbols-rounded">error</span></div><h3>Yüklenemedi</h3><p>${esc(e.message)}</p></div>`;
     }
+  }
+
+  function updateTypeCounts(docs) {
+    const counts = {};
+    docs.forEach(d => { counts[d.document_type] = (counts[d.document_type]||0)+1; });
+    $$('[data-cnt]').forEach(el => { el.textContent = counts[el.dataset.cnt] || 0; });
   }
 
   // Load brands filter
@@ -460,18 +489,14 @@
       const data = await api('/api/library/brands');
       const brands = data.brands || [];
       const list = $('#tkBrandList');
+      if (!brands.length) { list.innerHTML = '<p style="font-size:.82rem;color:var(--text-faint)">Marka yok</p>'; return; }
       list.innerHTML = brands.map(b =>
-        `<label><input type="checkbox" value="${b.id}" class="tk-brand-cb"> ${esc(b.name)} <small style="opacity:.5">(${b.doc_count})</small></label>`
+        `<label><input type="checkbox" value="${b.id}" class="tk-brand-cb"> ${esc(b.name)} <span class="cnt">${b.doc_count}</span></label>`
       ).join('');
       list.querySelectorAll('.tk-brand-cb').forEach(cb => { cb.onchange = loadDocs; });
-      const statBrands = $('#tkStatBrands');
-      if (statBrands) statBrands.textContent = brands.length;
-    } catch(e) {}
-  }
-
-  function updateHeroStats(docCount) {
-    const el = $('#tkStatDocs');
-    if (el) el.textContent = docCount;
+    } catch(e) {
+      $('#tkBrandList').innerHTML = '<p style="font-size:.82rem;color:var(--text-faint)">Yüklenemedi</p>';
+    }
   }
 
   // Modal
@@ -523,11 +548,13 @@
     msg.innerHTML = '';
     const fd = new FormData(e.target);
     try {
-      await api('/api/library/register', { method: 'POST', body: JSON.stringify({
+      const rr = await api('/api/library/register', { method: 'POST', body: JSON.stringify({
         name: fd.get('name'), surname: fd.get('surname'), email: fd.get('email'),
         company: fd.get('company'), phone: fd.get('phone'), message: fd.get('message')
       })});
-      msg.innerHTML = '<p class="tk-msg success">Başvurunuz alındı! Onaylandıktan sonra e-posta ile bilgilendirileceksiniz.</p>';
+      msg.innerHTML = rr.auto_approved
+        ? '<p class="tk-msg success">Başvurunuz onaylandı! Giriş şifreniz e-posta adresinize gönderildi.</p>'
+        : '<p class="tk-msg success">Başvurunuz alındı! Onaylandıktan sonra e-posta ile bilgilendirileceksiniz.</p>';
       e.target.reset();
     } catch(err) {
       const m = err.message === 'already_pending' ? 'Bu e-posta ile zaten bekleyen bir başvuru var.' : err.message;
@@ -535,12 +562,15 @@
     }
   };
 
-  // Search debounce
+  // Arama (debounce)
   let searchTimer;
   $('#tkSearch').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadDocs, 300); };
+  $('#tkSearch').onkeydown = e => { if (e.key === 'Enter') { clearTimeout(searchTimer); loadDocs(); } };
 
-  // Type filter
+  // Tür checkbox'ları + sıralama
   $$('.tk-type-cb').forEach(cb => { cb.onchange = loadDocs; });
+  const sortSel = $('#tkSort');
+  if (sortSel) sortSel.onchange = loadDocs;
 
   // Init
   async function init() {

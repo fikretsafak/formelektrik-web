@@ -786,6 +786,7 @@
       const fe = $('#footerEmail'); if (fe) fe.textContent = data.email;
     }
     if (data.address) { const a = $('#ciAddress'); if (a) a.textContent = data.address; }
+    if (data.hours) { const h = $('#ciHours'); if (h) h.textContent = data.hours; }
     // Harita: src'yi hesapla, modal açılınca yükle (lazy)
     if (data.maps_lat && data.maps_lng && !isNaN(+data.maps_lat) && !isNaN(+data.maps_lng)) {
       const la = +data.maps_lat, lo = +data.maps_lng, d = 0.012;
