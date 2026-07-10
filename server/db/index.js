@@ -418,6 +418,36 @@ if (!tableExists('warranty_queries')) {
   )`);
 }
 
+// === Kilometre Taşları (Timeline) ===
+if (!tableExists('milestones')) {
+  db.exec(`CREATE TABLE IF NOT EXISTS milestones (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    year       TEXT NOT NULL,
+    title      TEXT NOT NULL,
+    description TEXT,
+    icon       TEXT NOT NULL DEFAULT 'flag',
+    language   TEXT NOT NULL DEFAULT 'tr',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_active  INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_milestones_active ON milestones(is_active, sort_order)');
+  // Mevcut hardcoded verileri seed et
+  const ms = db.prepare('INSERT INTO milestones (year, title, description, icon, sort_order) VALUES (?, ?, ?, ?, ?)');
+  [
+    ['2000', 'Şirket Kuruluşu', 'Form Elektrik kuruldu.', 'flag', 0],
+    ['2008', 'Thytronic & Jean Müller', 'Thytronic ve Jean Müller temsilciliği başladı.', 'handshake', 1],
+    ['2010', 'Thyeast (MENA)', 'Thyeast ortak girişimi kuruldu (MENA bölgesi).', 'public', 2],
+    ['2012', 'NOJA Power & Horstmann', 'NOJA Power ve Horstmann temsilciliği alındı.', 'bolt', 3],
+    ['2015', 'Jean Müller Türkiye JV', 'Jean Müller Türkiye ortak girişimi (JV) kuruldu.', 'precision_manufacturing', 4],
+    ['2021', 'Li3 Depolama', 'Li3 enerji depolama departmanı kuruldu.', 'battery_charging_full', 5],
+    ['2022', 'EPSIS Lisansı', 'EPSIS EPDK şarj ağı işletmeci lisansı alındı.', 'verified', 6],
+    ['2023', 'İlk Entegre DC Şarj', 'Türkiye\'nin ilk entegre depolamalı DC şarj istasyonu.', 'ev_station', 7],
+    ['2025', 'Smilics', 'Smilics Türkiye temsilciliği başladı.', 'monitoring', 8],
+  ].forEach(r => ms.run(...r));
+}
+
 // === Referans Logoları (Bize Güvenen Kurumlar) ===
 if (!tableExists('reference_logos')) {
   db.exec(`CREATE TABLE IF NOT EXISTS reference_logos (

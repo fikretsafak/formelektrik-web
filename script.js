@@ -130,7 +130,7 @@
       'doc.calisan-adayi': 'Çalışan Adayı Aydınlatma Metni', 'doc.imha-politikasi': 'İmha Politikası',
       'common.loading': 'Yükleniyor…', 'common.close': 'Kapat', 'common.more': 'Detaylı bilgi',
       'appt.title': 'Görüşme Planla', 'appt.calSub': 'Uygun bir tarih seçin.',
-      'appt.quick': 'Hızlı Randevu', 'appt.quickSub': '30 dakikalık ücretsiz görüşme',
+      'appt.quick': 'Online Toplantı', 'appt.quickSub': '30 dakikalık ücretsiz görüşme',
       'appt.other': 'Diğer', 'appt.topicTitle': 'Görüşmek istediğiniz konu',
       'appt.topicPh': 'Kısaca konuyu yazın…', 'appt.continue': 'Devam', 'appt.topicLabel': 'Konu',
       'appt.topicsTitle': 'Görüşmek istediğiniz konular',
@@ -272,7 +272,7 @@
       'doc.calisan-adayi': 'Candidate Applicant Notice', 'doc.imha-politikasi': 'Retention & Destruction Policy',
       'common.loading': 'Loading…', 'common.close': 'Close', 'common.more': 'Learn more',
       'appt.title': 'Book a Meeting', 'appt.calSub': 'Pick an available date.',
-      'appt.quick': 'Quick Booking', 'appt.quickSub': 'Free 30-minute meeting',
+      'appt.quick': 'Online Meeting', 'appt.quickSub': 'Free 30-minute meeting',
       'appt.other': 'Other', 'appt.topicTitle': 'What would you like to discuss?',
       'appt.topicPh': 'Briefly describe the topic…', 'appt.continue': 'Continue', 'appt.topicLabel': 'Topic',
       'appt.topicsTitle': 'Topics you would like to discuss',
@@ -786,15 +786,12 @@
       const fe = $('#footerEmail'); if (fe) fe.textContent = data.email;
     }
     if (data.address) { const a = $('#ciAddress'); if (a) a.textContent = data.address; }
-    // Harita: koordinat varsa OSM embed üret; yoksa eski embed URL'ye düş
-    const iframe = $('#contactMapIframe');
-    if (iframe) {
-      if (data.maps_lat && data.maps_lng && !isNaN(+data.maps_lat) && !isNaN(+data.maps_lng)) {
-        const la = +data.maps_lat, lo = +data.maps_lng, d = 0.012;
-        iframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik&marker=${la}%2C${lo}`;
-      } else if (data.maps_embed_url) {
-        iframe.src = data.maps_embed_url;
-      }
+    // Harita: src'yi hesapla, modal açılınca yükle (lazy)
+    if (data.maps_lat && data.maps_lng && !isNaN(+data.maps_lat) && !isNaN(+data.maps_lng)) {
+      const la = +data.maps_lat, lo = +data.maps_lng, d = 0.012;
+      window._mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lo - d}%2C${la - d}%2C${lo + d}%2C${la + d}&layer=mapnik&marker=${la}%2C${lo}`;
+    } else if (data.maps_embed_url) {
+      window._mapSrc = data.maps_embed_url;
     }
     // Sosyal linkler — contact + footer (data-social attribute ile). Boşsa gizle.
     ['linkedin', 'instagram', 'youtube', 'facebook'].forEach(net => {
@@ -805,6 +802,28 @@
       });
     });
   }
+
+  /* ===== Harita Modal ===== */
+  (function initMapModal() {
+    const overlay = $('#mapModal');
+    const iframe = $('#contactMapIframe');
+    const openBtn = $('#openMapBtn');
+    const closeBtn = $('#closeMapBtn');
+    if (!overlay) return;
+    function open() {
+      if (iframe && iframe.src === 'about:blank' && window._mapSrc) iframe.src = window._mapSrc;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    if (openBtn) openBtn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) close(); });
+  })();
 
   /* ===== KVKK / belge onay checkbox'ı (popup + sona kaydırma zorunlu) =====
      docSlug ile bağlama göre farklı belge gösterilir:
@@ -1015,7 +1034,7 @@
     }
     function selectSlot(id, time) { sel.slotId = id; sel.time = time; const lbl = (sel.topics && sel.topics.length) ? sel.topics.join(', ') : labelFor(sel.product); $('#apptFormSub').textContent = `${fmtDateLong(sel.date)} · ${time} · ${lbl}`; show('form'); }
 
-    /* ===== Hızlı Randevu kartı (hero CTA) — aynı state/API, kart içi akış ===== */
+    /* ===== Online Toplantı kartı (hero CTA) — aynı state/API, kart içi akış ===== */
     const qaCard = $('.cta-calendar-card');
     if (qaCard) {
       let qaDates = []; let qaYear, qaMonth;

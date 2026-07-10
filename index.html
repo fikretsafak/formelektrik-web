@@ -188,78 +188,98 @@
   </div>
 </section>
 
-<!-- ===== CTA bandı ===== -->
-<section style="padding-top:0">
-  <div class="wrap">
-    <div class="cta-band cta-scheduler reveal">
-      <div class="cta-scheduler-copy">
-        <span class="eyebrow on-navy" data-i18n="contact.eyebrow">İletişim</span>
-        <h2><span data-i18n="cta.schedulerTitlePrefix">Enerji yönetiminizi</span> <span data-i18n="cta.schedulerTitleAccent">geleceğe taşıyın.</span></h2>
-        <p data-i18n="cta.schedulerSub">Uzman ekibimizle ücretsiz keşif görüşmesi planlayın. İhtiyaçlarınıza özel çözüm tasarlayalım.</p>
-        <div class="hero-cta">
-          <button class="btn btn-primary" data-open-contact><span data-i18n="cta.contact">İletişime Geç</span> <span class="material-symbols-rounded">arrow_forward</span></button>
-          <a href="tel:+903123947100" class="btn btn-ghost-light"><span class="material-symbols-rounded">call</span> (0312) 394 71 00</a>
+<!-- ===== İLETİŞİM — 2 kolon: departmanlar | takvim ===== -->
+<section class="contact-full" id="iletisim">
+  <div class="contact-full-inner">
+    <div class="section-head center reveal">
+      <span class="eyebrow on-navy" data-i18n="contact.eyebrow">İletişim</span>
+      <h2 class="section-title" style="margin-top:12px;color:#fff" data-i18n="contact.title">Bize Ulaşın</h2>
+      <p class="section-lead" style="color:rgba(234,240,255,.65)" data-i18n="cta.schedulerSub">Uzman ekibimizle ücretsiz keşif görüşmesi planlayın. İhtiyaçlarınıza özel çözüm tasarlayalım.</p>
+    </div>
+
+    <div class="contact-grid2 reveal">
+      <!-- SOL: 3 departman dikey -->
+      <div class="contact-departments">
+        <div class="dept-block">
+          <div class="dept-icon-wrap"><span class="material-symbols-rounded">build</span></div>
+          <h3>Teknik Destek</h3>
+          <a href="tel:+903123947100" class="dept-link"><span class="material-symbols-rounded">call</span>+90 312 394 71 00</a>
+          <a href="mailto:destek@formelektrik.com" class="dept-link"><span class="material-symbols-rounded">mail</span>destek@formelektrik.com</a>
+        </div>
+        <div class="dept-block">
+          <div class="dept-icon-wrap"><span class="material-symbols-rounded">group</span></div>
+          <h3>İnsan Kaynakları</h3>
+          <a href="tel:+903123947100" class="dept-link"><span class="material-symbols-rounded">call</span>+90 312 394 71 00</a>
+          <a href="mailto:ik@formelektrik.com" class="dept-link"><span class="material-symbols-rounded">mail</span>ik@formelektrik.com</a>
+        </div>
+        <div class="dept-block">
+          <div class="dept-icon-wrap"><span class="material-symbols-rounded">storefront</span></div>
+          <h3>Satış</h3>
+          <a href="tel:+903123947100" class="dept-link"><span class="material-symbols-rounded">call</span>+90 312 394 71 00</a>
+          <a href="mailto:info@formelektrik.com" class="dept-link"><span class="material-symbols-rounded">mail</span>info@formelektrik.com</a>
+        </div>
+        <div class="dept-meta">
+          <span><span class="material-symbols-rounded">schedule</span>Pzt — Cum · 08:30 – 17:30</span>
+          <button type="button" class="dept-map-btn" id="openMapBtn"><span class="material-symbols-rounded">location_on</span><span id="ciAddress">Malıköy Anadolu OSB, 29 Ekim Cd. No:1A, 06909 Sincan/Ankara</span><span class="material-symbols-rounded" style="font-size:16px;margin-left:auto;opacity:.5">open_in_new</span></button>
+        </div>
+        <div class="dept-bottom-row">
+          <button class="contact-form-link" data-open-contact>
+            <span class="material-symbols-rounded">mail</span>
+            <span data-i18n="cta.contact">İletişime Geç</span>
+            <span class="material-symbols-rounded">arrow_forward</span>
+          </button>
+          <div class="contact-social">
+            <a data-social="linkedin" href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+            <a data-social="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
+            <a data-social="youtube" href="#" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
+            <a data-social="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg></a>
+          </div>
         </div>
       </div>
-      <div class="cta-calendar-card">
-        <div class="mini-head"><span class="material-symbols-rounded">calendar_month</span><div><b data-i18n="appt.quick">Hızlı Randevu</b><small data-i18n="appt.quickSub">30 dakikalık ücretsiz görüşme</small></div></div>
-        <!-- Adım 1: Takvim -->
-        <div class="qa-step" id="qaCalStep">
-          <div class="cta-cal-title"><button type="button" id="qaPrev" aria-label="Önceki">‹</button><b id="qaCalLabel"></b><button type="button" id="qaNext" aria-label="Sonraki">›</button></div>
-          <div class="cta-cal-grid" id="qaCalGrid"></div>
-        </div>
-        <!-- Adım 2: Konular (çoklu seçim) -->
-        <div class="qa-step hidden" id="qaProductStep">
-          <button type="button" class="qa-back" data-qa-back="cal"><span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> <span data-i18n="appt.back">Geri</span></button>
-          <p class="qa-sub" data-i18n="appt.topicsTitle">Görüşmek istediğiniz konular</p>
-          <small class="qa-subnote" id="qaProductSub"></small>
-          <div class="qa-options qa-topics" id="qaProducts"></div>
-        </div>
-        <!-- Adım 3: Saat -->
-        <div class="qa-step hidden" id="qaSlotStep">
-          <button type="button" class="qa-back" data-qa-back="product"><span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> <span data-i18n="appt.back">Geri</span></button>
-          <p class="qa-sub" id="qaSlotSub"></p>
-          <div class="qa-slots" id="qaSlots"></div>
+
+      <!-- SAĞ: Takvim -->
+      <div class="contact-right">
+        <div class="cta-calendar-card">
+          <div class="mini-head"><span class="material-symbols-rounded">calendar_month</span><div><b data-i18n="appt.quick">Online Toplantı</b><small data-i18n="appt.quickSub">30 dakikalık ücretsiz görüşme</small></div></div>
+          <div class="qa-step" id="qaCalStep">
+            <div class="cta-cal-title"><button type="button" id="qaPrev" aria-label="Önceki">‹</button><b id="qaCalLabel"></b><button type="button" id="qaNext" aria-label="Sonraki">›</button></div>
+            <div class="cta-cal-grid" id="qaCalGrid"></div>
+          </div>
+          <div class="qa-step hidden" id="qaProductStep">
+            <button type="button" class="qa-back" data-qa-back="cal"><span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> <span data-i18n="appt.back">Geri</span></button>
+            <p class="qa-sub" data-i18n="appt.topicsTitle">Görüşmek istediğiniz konular</p>
+            <small class="qa-subnote" id="qaProductSub"></small>
+            <div class="qa-options qa-topics" id="qaProducts"></div>
+          </div>
+          <div class="qa-step hidden" id="qaSlotStep">
+            <button type="button" class="qa-back" data-qa-back="product"><span class="material-symbols-rounded" style="font-size:18px">arrow_back</span> <span data-i18n="appt.back">Geri</span></button>
+            <p class="qa-sub" id="qaSlotSub"></p>
+            <div class="qa-slots" id="qaSlots"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== İLETİŞİM / TEKLİF ===== -->
-<section class="contact" id="iletisim">
-  <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-info reveal">
-        <span class="eyebrow" data-i18n="contact.eyebrow">İletişim</span>
-        <h2 class="section-title" data-i18n="contact.title" style="margin:12px 0 16px">Bize ulaşın</h2>
-        <p class="section-lead" data-i18n="contact.lead" style="margin-bottom:32px">İhtiyacınız olan her an profesyonel destek için ekibimize ulaşabilirsiniz.</p>
-        <div class="ci-item">
-          <div class="ci-ico"><span class="material-symbols-rounded">call</span></div>
-          <div><h4 data-i18n="contact.phone">Telefon</h4><p id="ciPhone">+90 312 394 7100</p></div>
-        </div>
-        <div class="ci-item">
-          <div class="ci-ico"><span class="material-symbols-rounded">mail</span></div>
-          <div><h4 data-i18n="contact.email">E-posta</h4><p id="ciEmail">info@formelektrik.com</p></div>
-        </div>
-        <div class="ci-item">
-          <div class="ci-ico"><span class="material-symbols-rounded">location_on</span></div>
-          <div><h4 data-i18n="contact.address">Adres</h4><p id="ciAddress">Malıköy Anadolu OSB, 29 Ekim Cd. No:1A, 06909 Sincan/Ankara</p></div>
-        </div>
-        <div class="contact-social">
-          <a data-social="linkedin" href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
-          <a data-social="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
-          <a data-social="youtube" href="#" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
-          <a data-social="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12Z"/></svg></a>
-        </div>
-      </div>
-
-      <div class="contact-map-large reveal">
-        <iframe id="contactMapIframe" title="Form Elektrik konum" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Mal%C4%B1k%C3%B6y%20Anadolu%20OSB%2C%2029%20Ekim%20Cd.%20No%3A1A%2C%2006909%20Sincan%2FAnkara&output=embed"></iframe>
-      </div>
+<!-- Harita Modal -->
+<div class="map-modal-overlay" id="mapModal">
+  <div class="map-modal">
+    <div class="map-modal-head">
+      <span class="material-symbols-rounded">location_on</span>
+      <span>Form Elektrik — Konum</span>
+      <button type="button" class="map-modal-close" id="closeMapBtn"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="map-modal-body">
+      <iframe id="contactMapIframe" title="Form Elektrik konum" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
+    </div>
+    <div class="map-modal-foot">
+      <a href="https://maps.google.com/?q=Malıköy+Anadolu+OSB,+29+Ekim+Cd.+No:1A,+06909+Sincan/Ankara" target="_blank" rel="noopener" class="map-modal-link">
+        <span class="material-symbols-rounded">open_in_new</span> Google Maps'te Aç
+      </a>
     </div>
   </div>
-</section>
+</div>
 
 
 <!-- ===== FOOTER ===== -->

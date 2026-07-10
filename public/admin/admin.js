@@ -24,7 +24,7 @@ const I18N = {
   tr: {
     'navgroup.content': 'İçerik Yönetimi', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
-    'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları',
+    'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları', 'nav.milestones': 'Kilometre Taşları',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
     'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
@@ -32,7 +32,7 @@ const I18N = {
   en: {
     'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
-    'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos',
+    'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos', 'nav.milestones': 'Milestones',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
     'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
@@ -1197,6 +1197,7 @@ async function openUserForm(u, onDone) {
     { code: 'projects', label: 'Referans Projeler' },
     { code: 'brands', label: 'Markalar' },
     { code: 'references', label: 'Referans Logoları' },
+    { code: 'milestones', label: 'Kilometre Taşları' },
     { code: 'appointments', label: 'Randevular' },
     { code: 'careers', label: 'Kariyer / İlanlar' },
     { code: 'job-applications', label: 'Başvurular' },
@@ -1874,6 +1875,40 @@ routes.references = createCrudPage({
   },
   afterForm: (form, r) => {
     bindCoverUploader(form);
+  },
+});
+
+// ============================================
+// KİLOMETRE TAŞLARI (milestones) — timeline CRUD
+// ============================================
+routes.milestones = createCrudPage({
+  title: 'Kilometre Taşları',
+  newButtonText: 'Yeni Kilometre Taşı',
+  listUrl: '/api/milestones/admin/all',
+  pluralKey: 'milestones',
+  saveUrl: (id) => id ? `/api/milestones/${id}` : '/api/milestones',
+  richBody: false,
+  columns: [
+    { label: 'Yıl', render: r => `<b>${escapeHtml(r.year)}</b>` },
+    { label: 'Başlık', render: r => escapeHtml(r.title) },
+    { label: 'İkon', render: r => `<span class="material-symbols-rounded" style="font-size:20px">${escapeHtml(r.icon||'flag')}</span>` },
+    { label: 'Dil', render: r => (r.language || 'tr').toUpperCase() },
+    { label: 'Sıra', render: r => r.sort_order ?? 0 },
+    { label: 'Aktif', render: r => r.is_active ? '✓' : '—' },
+  ],
+  buildForm: (r) => {
+    const el = document.createElement('div');
+    el.className = 'form-grid';
+    el.innerHTML = `
+      <div class="half"><span class="field-label">Yıl *</span><input name="year" value="${escapeHtml(r.year||'')}" placeholder="ör. 2025" required></div>
+      <div class="half"><span class="field-label">Başlık *</span><input name="title" value="${escapeHtml(r.title||'')}" placeholder="ör. Smilics Temsilciliği" required></div>
+      <div class="full"><span class="field-label">Açıklama</span><input name="description" value="${escapeHtml(r.description||'')}" placeholder="Kısa açıklama"></div>
+      <div class="half"><span class="field-label">Material Icon</span><input name="icon" value="${escapeHtml(r.icon||'flag')}" placeholder="flag, bolt, handshake..."><small style="color:var(--text-dim)"><a href="https://fonts.google.com/icons" target="_blank" rel="noopener">İkon listesi</a></small></div>
+      <div class="half"><span class="field-label">Dil</span><select name="language">${['tr','en'].map(l=>`<option value="${l}" ${(r.language||'tr')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select></div>
+      <div class="half"><span class="field-label">Sıra</span><input name="sort_order" type="number" value="${r.sort_order ?? 0}"></div>
+      <div class="half"><label style="display:flex;gap:8px;align-items:center;margin-top:24px"><input type="checkbox" name="is_active" ${r.is_active!==0?'checked':''} style="width:auto"> Aktif</label></div>
+    `;
+    return el;
   },
 });
 

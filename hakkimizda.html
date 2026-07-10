@@ -27,7 +27,7 @@
     <nav class="nav-links">
       <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
       <a href="/hakkimizda" data-i18n="nav.about">Kurumsal</a>
-      <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
       <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
       <a href="/blog" data-i18n="nav.blog">Blog</a>
       <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
@@ -48,7 +48,7 @@
 <nav class="mobile-nav" id="mobileNav">
   <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/hakkimizda" data-i18n="nav.about">Kurumsal<span class="material-symbols-rounded">chevron_right</span></a>
-  <a href="/#projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
   <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
@@ -206,16 +206,8 @@
         <span class="eyebrow" data-i18n="about.statsEyebrow">Tarihçe</span>
         <h2 class="section-title" data-i18n="about.tlTitle" style="margin-top:12px">Kilometre Taşları</h2>
       </div>
-      <div class="timeline-v reveal">
-        <div class="tlv-item"><span class="tlv-year">2000</span><span class="tlv-dot"><span class="material-symbols-rounded">flag</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2000">Şirket Kuruluşu</h4><p data-i18n="tl.2000">Form Elektrik kuruldu.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2008</span><span class="tlv-dot"><span class="material-symbols-rounded">handshake</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2008">Thytronic & Jean Müller</h4><p data-i18n="tl.2008">Thytronic ve Jean Müller temsilciliği başladı.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2010</span><span class="tlv-dot"><span class="material-symbols-rounded">public</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2010">Thyeast (MENA)</h4><p data-i18n="tl.2010">Thyeast ortak girişimi kuruldu (MENA bölgesi).</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2012</span><span class="tlv-dot"><span class="material-symbols-rounded">bolt</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2012">NOJA Power & Horstmann</h4><p data-i18n="tl.2012">NOJA Power ve Horstmann temsilciliği alındı.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2015</span><span class="tlv-dot"><span class="material-symbols-rounded">precision_manufacturing</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2015">Jean Müller Türkiye JV</h4><p data-i18n="tl.2015">Jean Müller Türkiye ortak girişimi (JV) kuruldu.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2021</span><span class="tlv-dot"><span class="material-symbols-rounded">battery_charging_full</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2021">Li3 Depolama</h4><p data-i18n="tl.2021">Li3 enerji depolama departmanı kuruldu.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2022</span><span class="tlv-dot"><span class="material-symbols-rounded">verified</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2022">EPSIS Lisansı</h4><p data-i18n="tl.2022">EPSIS EPDK şarj ağı işletmeci lisansı alındı.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2023</span><span class="tlv-dot"><span class="material-symbols-rounded">ev_station</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2023">İlk Entegre DC Şarj</h4><p data-i18n="tl.2023">Türkiye'nin ilk entegre depolamalı DC şarj istasyonu.</p></div></div>
-        <div class="tlv-item"><span class="tlv-year">2025</span><span class="tlv-dot"><span class="material-symbols-rounded">monitoring</span></span><div class="tlv-body"><h4 data-i18n="about.tlt2025">Smilics</h4><p data-i18n="tl.2025">Smilics Türkiye temsilciliği başladı.</p></div></div>
+      <div class="timeline-v reveal" id="timelineContainer">
+        <div style="text-align:center;color:var(--text-soft);padding:40px">Yükleniyor…</div>
       </div>
     </div>
   </section>
@@ -292,7 +284,7 @@
         <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
         <a href="/kariyer">Kariyer</a>
         <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
-        <a href="/#projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
         <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
       </div>
       <div class="footer-col">
@@ -340,6 +332,25 @@
       }).join('');
     })
     .catch(function(){ grid.innerHTML = ''; });
+})();
+(function(){
+  var el = document.getElementById('timelineContainer');
+  if (!el) return;
+  var esc = function(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  fetch('/api/milestones')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var items = (data && data.milestones) || [];
+      if (!items.length){ el.innerHTML = ''; return; }
+      el.innerHTML = items.map(function(m){
+        return '<div class="tlv-item"><span class="tlv-year">' + esc(m.year) + '</span>'
+          + '<span class="tlv-dot"><span class="material-symbols-rounded">' + esc(m.icon||'flag') + '</span></span>'
+          + '<div class="tlv-body"><h4>' + esc(m.title) + '</h4>'
+          + (m.description ? '<p>' + esc(m.description) + '</p>' : '')
+          + '</div></div>';
+      }).join('');
+    })
+    .catch(function(){ el.innerHTML = ''; });
 })();
 </script>
 </body>
