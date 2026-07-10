@@ -128,6 +128,7 @@ r.get('/:id/download', optionalAuth, (req, res) => {
   }
   const filePath = path.resolve(__dirname, '../../', doc.file_url.replace(/^\//, ''));
   if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'file_missing' });
+  db.prepare('UPDATE library_documents SET download_count = COALESCE(download_count,0) + 1 WHERE id=?').run(doc.id);
   const ext = path.extname(doc.file_url);
   res.setHeader('Content-Disposition', `attachment; filename="${slugify(doc.title)}${ext}"`);
   fs.createReadStream(filePath).pipe(res);

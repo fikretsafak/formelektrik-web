@@ -274,7 +274,16 @@
       <div class="tk-form-group"><label>E-posta</label><input type="email" name="email" required></div>
       <div class="tk-form-group"><label>Şifre</label><input type="password" name="password" required></div>
       <button type="submit" class="tk-submit">Giriş Yap</button>
+      <div style="text-align:center;margin-top:12px"><a href="#" id="tkForgotLink" style="font-size:.84rem;color:var(--cyan,#2aa9e0);text-decoration:none">Şifremi unuttum</a></div>
       <div id="tkLoginMsg"></div>
+    </form>
+    <!-- Şifremi unuttum -->
+    <form id="tkForgotForm" hidden>
+      <p style="font-size:.88rem;color:var(--text-soft);margin:0 0 16px">E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim.</p>
+      <div class="tk-form-group"><label>E-posta</label><input type="email" name="email" required></div>
+      <button type="submit" class="tk-submit">Sıfırlama Bağlantısı Gönder</button>
+      <div style="text-align:center;margin-top:12px"><a href="#" id="tkBackToLogin" style="font-size:.84rem;color:var(--text-soft);text-decoration:none">← Girişe dön</a></div>
+      <div id="tkForgotMsg"></div>
     </form>
     <!-- Register -->
     <form id="tkRegisterForm" hidden>
@@ -559,8 +568,27 @@
       tab.classList.add('active');
       $('#tkLoginForm').hidden = tab.dataset.tkTab !== 'login';
       $('#tkRegisterForm').hidden = tab.dataset.tkTab !== 'register';
+      $('#tkForgotForm').hidden = true;
     };
   });
+
+  // Şifremi unuttum geçişleri
+  $('#tkForgotLink').onclick = e => { e.preventDefault(); $('#tkLoginForm').hidden = true; $('#tkForgotForm').hidden = false; };
+  $('#tkBackToLogin').onclick = e => { e.preventDefault(); $('#tkForgotForm').hidden = true; $('#tkLoginForm').hidden = false; };
+
+  // Şifremi unuttum gönder
+  $('#tkForgotForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const msg = $('#tkForgotMsg'); msg.innerHTML = '';
+    const email = new FormData(e.target).get('email');
+    try {
+      await api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+      msg.innerHTML = '<p class="tk-msg success">Eğer bu e-posta kayıtlıysa, sıfırlama bağlantısı gönderildi. Gelen kutunuzu kontrol edin.</p>';
+      e.target.reset();
+    } catch(err) {
+      msg.innerHTML = `<p class="tk-msg error">${esc(err.message)}</p>`;
+    }
+  };
 
   // Login
   $('#tkLoginForm').onsubmit = async (e) => {

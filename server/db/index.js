@@ -493,6 +493,9 @@ if (!tableExists('library_documents')) {
 if (tableExists('library_documents') && !columnExists('library_documents', 'product_name')) {
   db.exec(`ALTER TABLE library_documents ADD COLUMN product_name TEXT`);
 }
+if (tableExists('library_documents') && !columnExists('library_documents', 'download_count')) {
+  db.exec(`ALTER TABLE library_documents ADD COLUMN download_count INTEGER NOT NULL DEFAULT 0`);
+}
 
 // === Teknik Kütüphane: Kayıt Başvuruları ===
 if (!tableExists('library_registrations')) {

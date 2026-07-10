@@ -932,7 +932,10 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
       </div>
       <div class="field-block">
         <span class="field-label">Teknik Kütüphane Belgeleri</span>
-        <div id="tkDocPicker" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px">Yükleniyor...</div>
+        <div id="tkDocPicker" style="display:flex;flex-direction:column;gap:8px">
+          <button type="button" class="btn btn-ghost btn-sm" id="tkDocPickBtn" style="justify-content:center"><span class="material-symbols-rounded">library_books</span> Belge Seç</button>
+          <div id="tkDocSelected" style="display:flex;flex-direction:column;gap:6px;color:var(--text-dim);font-size:12px">Yükleniyor...</div>
+        </div>
       </div>` : ''}
       ${id ? `
       <div class="field-block" style="margin-top:auto;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-dim)">
@@ -1080,9 +1083,51 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
 
   titleEl.focus();
 
-  // TK belge seçici yükle
+  // TK belge seçici yükle (popup)
   const tkPicker = page.querySelector('#tkDocPicker');
   let tkLinkedIds = [];
+  let tkAllDocs = [];
+  function renderTkSelected() {
+    const box = page.querySelector('#tkDocSelected');
+    if (!box) return;
+    const selected = tkAllDocs.filter(d => tkLinkedIds.includes(d.id));
+    if (!selected.length) { box.textContent = 'Belge seçilmedi'; return; }
+    box.innerHTML = selected.map(d => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;padding:7px 9px">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>${escapeHtml(d.title)}</b>${d.brand_name ? ` <small style="color:var(--text-dim)">(${escapeHtml(d.brand_name)})</small>` : ''}</span>
+      <button type="button" data-remove-tk="${d.id}" class="btn btn-ghost btn-sm" style="padding:2px 6px">×</button>
+    </div>`).join('');
+    box.querySelectorAll('[data-remove-tk]').forEach(btn => {
+      btn.onclick = () => { tkLinkedIds = tkLinkedIds.filter(x => x !== Number(btn.dataset.removeTk)); renderTkSelected(); markDirty(); };
+    });
+  }
+  function openTkDocPicker() {
+    const content = document.createElement('div');
+    content.innerHTML = `<input id="tkDocSearch" placeholder="Belge ara..." style="width:100%;margin-bottom:12px">
+      <div id="tkDocModalList" style="max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:10px;padding:8px"></div>`;
+    const actions = h('div', { style:'display:flex;gap:8px;justify-content:flex-end;margin-top:16px' });
+    const cancel = h('button', { class:'btn btn-ghost' }, 'Vazgeç');
+    const save = h('button', { class:'btn btn-primary' }, 'Seçimi Kaydet');
+    actions.appendChild(cancel); actions.appendChild(save); content.appendChild(actions);
+    const modal = openModal('Teknik Kütüphane Belgeleri', content, { width:'720px' });
+    const list = content.querySelector('#tkDocModalList');
+    const search = content.querySelector('#tkDocSearch');
+    let tempIds = [...tkLinkedIds];
+    const renderList = () => {
+      const q = search.value.trim().toLowerCase();
+      const docs = q ? tkAllDocs.filter(d => (d.title||'').toLowerCase().includes(q) || (d.brand_name||'').toLowerCase().includes(q)) : tkAllDocs;
+      list.innerHTML = docs.map(d => `<label style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border-bottom:1px solid var(--border);cursor:pointer">
+        <input type="checkbox" value="${d.id}" ${tempIds.includes(d.id)?'checked':''}>
+        <span><b>${escapeHtml(d.title)}</b><br><small style="color:var(--text-dim)">${escapeHtml(d.document_type||'')} ${d.brand_name ? '· '+escapeHtml(d.brand_name) : ''}</small></span>
+        <span class="badge badge-published">${(d.language||'tr').toUpperCase()}</span>
+      </label>`).join('') || '<p style="padding:12px;color:var(--text-dim)">Belge bulunamadı</p>';
+      list.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.onchange = () => { const n = Number(cb.value); tempIds = cb.checked ? [...new Set([...tempIds,n])] : tempIds.filter(x => x !== n); };
+      });
+    };
+    search.oninput = renderList; renderList();
+    cancel.onclick = () => modal.remove();
+    save.onclick = () => { tkLinkedIds = tempIds; renderTkSelected(); markDirty(); modal.remove(); };
+  }
   if (tkPicker) {
     try {
       const [allDocs, linked] = await Promise.all([
@@ -1090,19 +1135,11 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
         id ? api.get(`/api/posts/admin/${id}/library-docs`) : { document_ids: [] }
       ]);
       tkLinkedIds = linked.document_ids || [];
-      const docs = (allDocs.documents || []).filter(d => d.status === 'published');
-      if (!docs.length) { tkPicker.textContent = 'Yayınlı belge yok'; }
-      else {
-        tkPicker.innerHTML = '';
-        docs.forEach(d => {
-          const lbl = h('label', { style: 'display:flex;gap:6px;align-items:center;padding:2px 0;cursor:pointer' });
-          const cb = h('input', { type: 'checkbox', value: d.id, ...(tkLinkedIds.includes(d.id) ? { checked: '' } : {}) });
-          lbl.appendChild(cb);
-          lbl.appendChild(document.createTextNode(d.title + (d.brand_name ? ` (${d.brand_name})` : '')));
-          tkPicker.appendChild(lbl);
-        });
-      }
-    } catch { tkPicker.textContent = 'Yüklenemedi'; }
+      tkAllDocs = (allDocs.documents || []).filter(d => d.status === 'published');
+      renderTkSelected();
+      const pickBtn = page.querySelector('#tkDocPickBtn');
+      if (pickBtn) pickBtn.onclick = openTkDocPicker;
+    } catch { const s = page.querySelector('#tkDocSelected'); if (s) s.textContent = 'Yüklenemedi'; }
   }
 
   saveBtn.onclick = async () => {
@@ -1126,7 +1163,7 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
     }
 
     // TK belge bağlantıları
-    const tkDocIds = tkPicker ? [...tkPicker.querySelectorAll('input[type=checkbox]:checked')].map(c => Number(c.value)) : [];
+    const tkDocIds = tkPicker ? tkLinkedIds : [];
 
     saveBtn.disabled = true;
     try {
@@ -3950,6 +3987,7 @@ routes.library = createCrudPage({
     { label: 'Başlık', render: r => `<b>${escapeHtml(r.title)}</b><br><small style="color:var(--text-dim)">${escapeHtml(r.brand_name||'—')}</small>` },
     { label: 'Tür', render: r => escapeHtml(r.document_type) },
     { label: 'Dil', render: r => (r.language||'tr').toUpperCase() },
+    { label: 'İndirme', render: r => Number(r.download_count || 0).toLocaleString('tr-TR') },
     { label: 'Herkese Açık', render: r => r.is_public ? '✓' : '—' },
     { label: 'Durum', render: r => r.status==='published' ? '<span class="badge badge-published">Yayında</span>' : '<span class="badge badge-draft">Taslak</span>' },
     { label: 'Tarih', render: r => r.created_at ? new Date(r.created_at).toLocaleDateString('tr-TR') : '—' },
@@ -3975,7 +4013,20 @@ routes.library = createCrudPage({
         <input type="hidden" name="file_size" id="libFileSize" value="${r.file_size||''}">
       </div>
       <div class="half"><span class="field-label">Durum</span><select name="status">${[['draft','Taslak'],['published','Yayında']].map(([v,l])=>`<option value="${v}" ${(r.status||'draft')===v?'selected':''}>${l}</option>`).join('')}</select></div>
-      <div class="half"><label style="display:flex;gap:8px;align-items:center;margin-top:24px"><input type="checkbox" name="is_public" ${r.is_public?'checked':''} style="width:auto"> Herkese Açık (giriş gerektirmez)</label></div>
+      <div class="half">
+        <style>
+          .lib-switch-input{position:absolute;opacity:0;width:0;height:0}
+          .lib-switch{position:relative;width:44px;height:24px;background:var(--border,#3a4256);border-radius:999px;transition:.2s;flex:none}
+          .lib-switch:after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+          .lib-switch-input:checked + .lib-switch{background:var(--accent,#2aa9e0)}
+          .lib-switch-input:checked + .lib-switch:after{transform:translateX(20px)}
+        </style>
+        <label style="display:flex;gap:10px;align-items:center;margin-top:24px;cursor:pointer">
+          <input type="checkbox" name="is_public" class="lib-switch-input" ${r.is_public?'checked':''}>
+          <span class="lib-switch"></span>
+          <span>Herkese Açık <small style="color:var(--text-dim)">(giriş gerektirmez)</small></span>
+        </label>
+      </div>
     `;
     return el;
   },
@@ -4031,14 +4082,21 @@ routes['library-users'] = function(container) {
         <button class="lu-tab active" data-tab="regs">Başvurular</button>
         <button class="lu-tab" data-tab="access">Kullanıcı Erişimi</button>
       </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;cursor:pointer;background:var(--bg-soft);padding:8px 14px;border-radius:10px">
-        <input type="checkbox" id="libAutoApprove"> <span>Otomatik onay <small style="color:var(--text-dim)">(başvurular anında onaylanıp şifre e-posta ile gönderilir)</small></span>
+      <label style="display:flex;align-items:center;gap:12px;font-size:.88rem;cursor:pointer;background:var(--bg-soft);padding:10px 16px;border-radius:10px">
+        <input type="checkbox" id="libAutoApprove" class="lu-switch-input">
+        <span class="lu-switch"></span>
+        <span>Otomatik onay <small style="color:var(--text-dim)">(başvurular anında onaylanıp şifre e-posta ile gönderilir)</small></span>
       </label>
     </div>
     <style>
       .lu-tab { padding:8px 16px; border:none; background:none; border-radius:8px; font-size:.9rem; font-weight:600; cursor:pointer; color:var(--text-dim); font-family:inherit; }
       .lu-tab.active { background:var(--bg-card,#fff); color:var(--accent,#2aa9e0); box-shadow:0 1px 4px rgba(0,0,0,.1); }
       .lu-empty { padding:48px 20px; text-align:center; color:var(--text-dim); }
+      .lu-switch-input { position:absolute; opacity:0; width:0; height:0; }
+      .lu-switch { position:relative; width:40px; height:22px; background:var(--border,#3a4256); border-radius:999px; transition:.2s; flex:none; }
+      .lu-switch::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:.2s; }
+      .lu-switch-input:checked + .lu-switch { background:var(--accent,#2aa9e0); }
+      .lu-switch-input:checked + .lu-switch::after { transform:translateX(18px); }
     </style>
     <div class="card" style="padding:0;overflow:hidden">
       <div id="libRegsTab"></div>
