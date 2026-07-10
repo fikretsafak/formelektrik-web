@@ -333,10 +333,9 @@
           ? '<img src="' + esc(b.logo_url) + '" alt="' + esc(b.name) + '" loading="lazy" />'
           : '<span style="font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--navy)">' + esc(b.name) + '</span>';
         return '<a class="br-card" href="/marka?slug=' + encodeURIComponent(b.slug) + '">'
-          + '<div class="br-top"><span class="br-logo-box">' + logo + '</span>'
-          + (b.country ? '<span class="br-country">' + esc(b.country) + '</span>' : '')
-          + '</div>'
+          + '<span class="br-logo-box">' + logo + '</span>'
           + (b.description ? '<p>' + esc(b.description) + '</p>' : '')
+          + (b.country ? '<span class="br-country">' + esc(b.country) + '</span>' : '')
           + '</a>';
       }).join('');
     })

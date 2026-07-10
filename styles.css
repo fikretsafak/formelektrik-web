@@ -376,13 +376,12 @@ section { padding: clamp(60px, 8vw, 100px) 0; position: relative; }
 
 /* ===== Kurumsal: Markalar ===== */
 .about-brands { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
-.br-card { display: block; text-decoration: none; color: inherit; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 16px; padding: 24px 28px; box-shadow: var(--shadow-sm); transition: .18s; }
+.br-card { position: relative; display: block; text-decoration: none; color: inherit; background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 16px; padding: 24px 28px; box-shadow: var(--shadow-sm); transition: .18s; }
 .br-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.br-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-.br-logo-box { flex: 1; min-width: 0; height: 88px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 22px; }
+.br-logo-box { width: 100%; height: 88px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 22px; margin-bottom: 16px; }
 .br-logo-box img { max-height: 52px; max-width: 100%; width: auto; height: auto; object-fit: contain; display: block; }
-.br-country { flex: none; background: var(--cyan-soft); color: var(--navy); font-size: .78rem; font-weight: 700; padding: 6px 15px; border-radius: 100px; }
-.br-card p { color: var(--text-soft); font-size: .92rem; line-height: 1.55; }
+.br-country { position: absolute; right: 16px; bottom: 16px; background: var(--cyan-soft); color: var(--navy); font-size: .75rem; font-weight: 700; padding: 5px 13px; border-radius: 100px; }
+.br-card p { color: var(--text-soft); font-size: .92rem; line-height: 1.55; padding-bottom: 12px; }
 
 /* ===== Kurumsal: Neden Form Elektrik (6 kart) ===== */
 .about-why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
