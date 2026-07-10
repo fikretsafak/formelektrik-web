@@ -28,13 +28,13 @@ router.get('/partner', (req, res) => {
   const { service } = req.query;
   const rows = service
     ? db.prepare(`
-        SELECT b.id, b.name, b.slug, b.description, b.logo_url, b.url, b.sort_order
+        SELECT b.id, b.name, b.slug, b.description, b.logo_url, b.url, b.country, b.sort_order
         FROM brands b JOIN brand_services bs ON bs.brand_id = b.id
         WHERE b.is_active = 1 AND bs.service_code = ?
         ORDER BY bs.sort_order, b.sort_order, b.id
       `).all(service)
     : db.prepare(`
-        SELECT id, name, slug, description, logo_url, url, sort_order
+        SELECT id, name, slug, description, logo_url, url, country, sort_order
         FROM brands WHERE is_active = 1 AND type = 'partner'
         ORDER BY sort_order, id
       `).all();
@@ -73,16 +73,17 @@ function setBrandServices(brandId, codes) {
 }
 
 router.post('/', authRequired, requireRole('admin'), requirePermission('brands'), (req, res) => {
-  const { name, description, body, cover_image, logo_url, url, type, language = 'tr', sort_order = 0, is_active, show_on_homepage, slug, service_codes } = req.body || {};
+  const { name, description, body, cover_image, logo_url, url, type, language = 'tr', sort_order = 0, is_active, show_on_homepage, slug, service_codes, country } = req.body || {};
   if (!isNonEmptyString(name, 120)) return res.status(400).json({ error: 'invalid_input' });
   const finalType = type === 'partner' ? 'partner' : 'umbrella';
   const info = db.prepare(`
-    INSERT INTO brands (name, slug, description, body, cover_image, logo_url, url, type, language, sort_order, is_active, show_on_homepage)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO brands (name, slug, description, body, cover_image, logo_url, url, type, language, sort_order, is_active, show_on_homepage, country)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(name, (slug && slugify(slug)) || slugify(name), description || null, body || '', cover_image || null,
     logo_url || null, url || null, finalType,
     language, Number(sort_order) || 0, is_active === undefined ? 1 : (is_active ? 1 : 0),
-    show_on_homepage !== undefined ? (show_on_homepage ? 1 : 0) : (finalType === 'umbrella' ? 1 : 0));
+    show_on_homepage !== undefined ? (show_on_homepage ? 1 : 0) : (finalType === 'umbrella' ? 1 : 0),
+    country || null);
   setBrandServices(info.lastInsertRowid, service_codes);
   res.status(201).json({ ok: true, id: info.lastInsertRowid });
 });
@@ -104,11 +105,12 @@ router.put('/:id', authRequired, requireRole('admin'), requirePermission('brands
     sort_order: b.sort_order === undefined ? existing.sort_order : Number(b.sort_order) || 0,
     is_active: b.is_active === undefined ? existing.is_active : (b.is_active ? 1 : 0),
     show_on_homepage: b.show_on_homepage === undefined ? existing.show_on_homepage : (b.show_on_homepage ? 1 : 0),
+    country: b.country !== undefined ? (b.country || null) : (existing.country || null),
   };
   db.prepare(`UPDATE brands SET
-    name=?, slug=?, description=?, body=?, cover_image=?, logo_url=?, url=?, type=?, language=?, sort_order=?, is_active=?, show_on_homepage=?, updated_at=CURRENT_TIMESTAMP
+    name=?, slug=?, description=?, body=?, cover_image=?, logo_url=?, url=?, type=?, language=?, sort_order=?, is_active=?, show_on_homepage=?, country=?, updated_at=CURRENT_TIMESTAMP
     WHERE id=?`).run(next.name, next.slug, next.description, next.body, next.cover_image, next.logo_url, next.url,
-    next.type, next.language, next.sort_order, next.is_active, next.show_on_homepage, req.params.id);
+    next.type, next.language, next.sort_order, next.is_active, next.show_on_homepage, next.country, req.params.id);
   if (b.service_codes !== undefined) setBrandServices(Number(req.params.id), b.service_codes);
   res.json({ ok: true });
 });

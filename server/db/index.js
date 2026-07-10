@@ -194,6 +194,11 @@ if (tableExists('brands') && !columnExists('brands', 'type')) {
   db.exec("ALTER TABLE brands ADD COLUMN type TEXT NOT NULL DEFAULT 'umbrella'");
 }
 
+// country: markanın menşe ülkesi (kurumsal sayfada gösterilir)
+if (tableExists('brands') && !columnExists('brands', 'country')) {
+  db.exec("ALTER TABLE brands ADD COLUMN country TEXT");
+}
+
 // show_on_homepage: partner markalar da anasayfada gösterilebilsin
 if (tableExists('brands') && !columnExists('brands', 'show_on_homepage')) {
   db.exec("ALTER TABLE brands ADD COLUMN show_on_homepage INTEGER NOT NULL DEFAULT 0");

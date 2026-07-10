@@ -522,19 +522,31 @@
           ${b.description ? `<p class="bslot-desc">${esc(b.description)}</p>` : ''}
         </a>`
       ).join('');
-      const repeated = items + items + items;
       return `<div class="bslot">
         <h3 class="bslot-title">${esc(SVC_LABELS[s.code] || s.code)}</h3>
         <div class="bslot-viewport">
-          <div class="bslot-track">${repeated}</div>
+          <button type="button" class="bslot-nav bslot-nav-up" aria-label="Yukarı"><span class="material-symbols-rounded">keyboard_arrow_up</span></button>
+          <div class="bslot-track">${items}</div>
+          <button type="button" class="bslot-nav bslot-nav-down" aria-label="Aşağı"><span class="material-symbols-rounded">keyboard_arrow_down</span></button>
         </div>
       </div>`;
     }).join('')}</div>`;
     bindReveal();
     grid.querySelectorAll('.bslot-viewport').forEach(vp => {
       const track = vp.querySelector('.bslot-track');
-      vp.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
-      vp.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+      const items = track.querySelectorAll('.bslot-item');
+      const count = items.length;
+      if (count < 2) { vp.querySelectorAll('.bslot-nav').forEach(b => b.style.display = 'none'); return; }
+      let idx = 0, autoTimer;
+      const itemH = () => items[0].offsetHeight + 16;
+      const go = (i) => { idx = ((i % count) + count) % count; track.style.transform = `translateY(-${idx * itemH()}px)`; };
+      vp.querySelector('.bslot-nav-up').onclick = () => { go(idx - 1); resetAuto(); };
+      vp.querySelector('.bslot-nav-down').onclick = () => { go(idx + 1); resetAuto(); };
+      const startAuto = () => { autoTimer = setInterval(() => go(idx + 1), 4000); };
+      const resetAuto = () => { clearInterval(autoTimer); startAuto(); };
+      vp.addEventListener('mouseenter', () => clearInterval(autoTimer));
+      vp.addEventListener('mouseleave', () => startAuto());
+      startAuto();
     });
   }
 

@@ -193,27 +193,8 @@
         <h2 class="section-title" data-i18n="about.brTitle" style="margin-top:12px">Temsil Ettiğimiz Markalar</h2>
         <p class="section-lead" data-i18n="about.brLead">Şebeke tarafında yetkili Türkiye temsilcisi olduğumuz üreticiler</p>
       </div>
-      <div class="about-brands reveal">
-        <div class="br-card">
-          <div class="br-top"><span class="br-logo-box"><img src="/assets/brands/noja-power.avif" alt="NOJA Power" loading="lazy" /></span><span class="br-country" data-i18n="about.br1c">Avustralya</span></div>
-          <div class="br-coop"><span data-i18n="about.brCoop">İş birliği</span>: 2012</div>
-          <p data-i18n="about.br1d">Orta gerilim otomatik kesici ve recloser sistemleri ile şalt ekipmanları.</p>
-        </div>
-        <div class="br-card">
-          <div class="br-top"><span class="br-logo-box"><img src="/assets/brands/thytronic.avif" alt="Thytronic" loading="lazy" /></span><span class="br-country" data-i18n="about.br2c">İtalya</span></div>
-          <div class="br-coop"><span data-i18n="about.brCoop">İş birliği</span>: 2008</div>
-          <p data-i18n="about.br2d">Hat, trafo, motor ve jeneratör koruma röleleri; şebeke otomasyonu.</p>
-        </div>
-        <div class="br-card">
-          <div class="br-top"><span class="br-logo-box"><img src="/assets/brands/horstmann.avif" alt="Horstmann" loading="lazy" /></span><span class="br-country" data-i18n="about.br3c">Almanya</span></div>
-          <div class="br-coop"><span data-i18n="about.brCoop">İş birliği</span>: 2012</div>
-          <p data-i18n="about.br3d">Orta gerilim kısa devre ve toprak arıza göstergeleri, gerilim algılama.</p>
-        </div>
-        <div class="br-card">
-          <div class="br-top"><span class="br-logo-box"><img src="/assets/brands/smilics.avif" alt="Smilics" loading="lazy" /></span><span class="br-country" data-i18n="about.br4c">İspanya</span></div>
-          <div class="br-coop"><span data-i18n="about.brCoop">İş birliği</span>: 2025</div>
-          <p data-i18n="about.br4d">Enerji izleme ve ölçüm; alçak gerilim şebeke dijitalleşmesi (Wibeee).</p>
-        </div>
+      <div class="about-brands reveal" id="aboutBrandsGrid">
+        <div style="text-align:center;color:var(--text-soft);padding:40px">Yükleniyor…</div>
       </div>
     </div>
   </section>
@@ -337,5 +318,30 @@
   </div>
 </footer>
 <script src="/script.js"></script>
+<script>
+(function(){
+  var grid = document.getElementById('aboutBrandsGrid');
+  if (!grid) return;
+  var esc = function(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  fetch('/api/brands/partner')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var brands = (data && data.brands) || [];
+      if (!brands.length){ grid.innerHTML = ''; return; }
+      grid.innerHTML = brands.map(function(b){
+        var logo = b.logo_url
+          ? '<img src="' + esc(b.logo_url) + '" alt="' + esc(b.name) + '" loading="lazy" />'
+          : '<span style="font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--navy)">' + esc(b.name) + '</span>';
+        return '<a class="br-card" href="/marka?slug=' + encodeURIComponent(b.slug) + '">'
+          + '<div class="br-top"><span class="br-logo-box">' + logo + '</span>'
+          + (b.country ? '<span class="br-country">' + esc(b.country) + '</span>' : '')
+          + '</div>'
+          + (b.description ? '<p>' + esc(b.description) + '</p>' : '')
+          + '</a>';
+      }).join('');
+    })
+    .catch(function(){ grid.innerHTML = ''; });
+})();
+</script>
 </body>
 </html>

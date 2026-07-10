@@ -1808,6 +1808,7 @@ const _brandsPage = createCrudPage({
       <div class="full"><span class="field-label">İsim *</span><input name="name" value="${escapeHtml(r.name||'')}" required></div>
       <div><span class="field-label">Tip</span><select name="type">${[['umbrella','Çatı Marka (ana sayfa)'],['partner','Çözüm Ortağı (hizmet altı)']].map(([v,l])=>`<option value="${v}" ${(r.type||'umbrella')===v?'selected':''}>${l}</option>`).join('')}</select></div>
       <div><span class="field-label">Dış Site Linki</span><input name="url" value="${escapeHtml(r.url||'')}" placeholder="https://..."></div>
+      <div><span class="field-label">Ülke</span><input name="country" value="${escapeHtml(r.country||'')}" placeholder="ör. Avustralya"></div>
       <div class="full"><span class="field-label">Kısa Açıklama (kart)</span><textarea name="description" rows="2">${escapeHtml(r.description||'')}</textarea></div>
       <div class="full"><span class="field-label">İlişkili Hizmetler (çözüm ortağı olarak görüneceği hizmetler)</span>
         <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:6px">${svcChecks}</div>
