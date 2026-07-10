@@ -62,29 +62,32 @@
 .tk-filter-card label:hover { color: var(--text,#1a1d26); }
 .tk-filter-card input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cyan,#2aa9e0); border-radius: 4px; }
 
-/* Grid */
-.tk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
-.tk-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 22px; transition: box-shadow .25s, transform .25s, border-color .25s; display: flex; flex-direction: column; }
-.tk-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,.08); transform: translateY(-3px); border-color: rgba(42,169,224,.2); }
-.tk-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
-.tk-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
-.tk-card-icon .material-symbols-rounded { font-size: 24px; }
+/* List */
+.tk-grid { display: flex; flex-direction: column; gap: 0; }
+.tk-card { display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid var(--line,#e5e7eb); border-bottom: none; padding: 16px 20px; transition: background .15s; }
+.tk-card:first-child { border-radius: 14px 14px 0 0; }
+.tk-card:last-child { border-bottom: 1px solid var(--line,#e5e7eb); border-radius: 0 0 14px 14px; }
+.tk-card:only-child { border-radius: 14px; border-bottom: 1px solid var(--line,#e5e7eb); }
+.tk-card:hover { background: var(--bg-soft,#f8f9fb); }
+.tk-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
+.tk-card-icon .material-symbols-rounded { font-size: 22px; }
 .tk-icon-datasheet { background: rgba(42,169,224,.1); color: #2aa9e0; }
 .tk-icon-manual { background: rgba(155,89,182,.1); color: #9b59b6; }
 .tk-icon-certificate { background: rgba(241,196,15,.12); color: #d4a517; }
 .tk-icon-catalog { background: rgba(39,174,96,.1); color: #27ae60; }
 .tk-icon-software { background: rgba(231,76,60,.1); color: #e74c3c; }
-.tk-card-title { font-size: .95rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.35; }
-.tk-card-brand { font-size: .78rem; color: var(--text-soft,#4b5167); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
-.tk-card-desc { font-size: .85rem; color: var(--text-soft,#4b5167); line-height: 1.55; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
-.tk-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line,#f0f1f4); }
-.tk-badge { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.08); color: var(--cyan,#2aa9e0); padding: 4px 10px; border-radius: 8px; }
+.tk-card-info { flex: 1; min-width: 0; }
+.tk-card-title { font-size: .92rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; font-size: .78rem; color: var(--text-soft,#4b5167); flex-wrap: wrap; }
+.tk-card-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint,#ccc); flex: none; }
+.tk-badge { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.08); color: var(--cyan,#2aa9e0); padding: 3px 8px; border-radius: 6px; flex: none; }
 .tk-badge.public { background: rgba(39,174,96,.08); color: #27ae60; }
-.tk-dl-btn { display: inline-flex; align-items: center; gap: 5px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .2s; }
-.tk-dl-btn:hover { background: #1b8fc0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(42,169,224,.3); }
-.tk-dl-btn .material-symbols-rounded { font-size: 17px; }
+.tk-card-date { font-size: .75rem; color: var(--text-faint,#aaa); flex: none; min-width: 80px; text-align: right; }
+.tk-dl-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 7px 14px; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; flex: none; }
+.tk-dl-btn:hover { background: #1b8fc0; }
+.tk-dl-btn .material-symbols-rounded { font-size: 16px; }
 .tk-dl-btn.locked { background: var(--navy-deep,#0f1640); }
-.tk-dl-btn.locked:hover { background: #1a2355; box-shadow: 0 4px 12px rgba(15,22,64,.3); }
+.tk-dl-btn.locked:hover { background: #1a2355; }
 
 /* Empty state */
 .tk-empty { text-align: center; padding: 80px 20px; color: var(--text-soft,#999); }
@@ -136,6 +139,9 @@
   .tk-hero-copy h1 { font-size: 1.6rem; }
   .tk-hero-stats { gap: 20px; }
   .tk-hero-stats b { font-size: 1.3rem; }
+  .tk-card { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
+  .tk-card-info { width: calc(100% - 56px); }
+  .tk-card-date { order: 5; width: auto; text-align: left; }
 }
 </style>
 </head>
@@ -411,22 +417,24 @@
       grid.innerHTML = docs.map(d => {
         const hasAccess = d.is_public || canAccess(d);
         const icon = DOC_ICONS[d.document_type] || 'description';
+        const date = d.updated_at || d.created_at;
+        const dateStr = date ? new Date(date).toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'}) : '';
         return `<div class="tk-card">
-          <div class="tk-card-head">
-            <div class="tk-card-icon tk-icon-${d.document_type || 'datasheet'}"><span class="material-symbols-rounded">${icon}</span></div>
-            <div>
-              <div class="tk-card-title">${esc(d.title)}</div>
-              <div class="tk-card-brand">${esc(d.brand_name || '')} ${formatSize(d.file_size) ? '· '+formatSize(d.file_size) : ''}</div>
+          <div class="tk-card-icon tk-icon-${d.document_type || 'datasheet'}"><span class="material-symbols-rounded">${icon}</span></div>
+          <div class="tk-card-info">
+            <div class="tk-card-title">${esc(d.title)}</div>
+            <div class="tk-card-meta">
+              ${d.brand_name ? `<span>${esc(d.brand_name)}</span>` : ''}
+              ${d.brand_name && d.file_size ? '<span class="dot"></span>' : ''}
+              ${formatSize(d.file_size) ? `<span>${formatSize(d.file_size)}</span>` : ''}
             </div>
           </div>
-          ${d.description ? `<div class="tk-card-desc">${esc(d.description)}</div>` : ''}
-          <div class="tk-card-foot">
-            <span class="tk-badge${d.is_public?' public':''}">${d.is_public ? 'Açık Erişim' : esc(d.document_type)}</span>
-            ${d.is_public || hasAccess
-              ? `<button class="tk-dl-btn" data-dl="${d.id}"><span class="material-symbols-rounded">download</span> İndir</button>`
-              : `<button class="tk-dl-btn locked" data-need-auth="${d.id}"><span class="material-symbols-rounded">lock</span> Giriş Gerekli</button>`
-            }
-          </div>
+          <span class="tk-badge${d.is_public?' public':''}">${d.is_public ? 'Açık Erişim' : esc(d.document_type)}</span>
+          <span class="tk-card-date">${dateStr}</span>
+          ${d.is_public || hasAccess
+            ? `<button class="tk-dl-btn" data-dl="${d.id}"><span class="material-symbols-rounded">download</span> İndir</button>`
+            : `<button class="tk-dl-btn locked" data-need-auth="${d.id}"><span class="material-symbols-rounded">lock</span> Giriş</button>`
+          }
         </div>`;
       }).join('');
 

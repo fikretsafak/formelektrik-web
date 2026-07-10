@@ -4008,7 +4008,7 @@ routes.library = createCrudPage({
     }
   },
   beforeSave: (p) => {
-    p.is_public = p.is_public === 'on' || p.is_public === true ? 1 : 0;
+    p.is_public = p.is_public ? 1 : 0;
     if (!p.brand_id) p.brand_id = null;
     return p;
   },
