@@ -927,6 +927,10 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
       <div class="field-block">
         <span class="field-label">Etiketler (virgülle)</span>
         <input id="editTags" value="${escapeHtml(record.tags||'')}" placeholder="ges, otomasyon, ag-og">
+      </div>
+      <div class="field-block">
+        <span class="field-label">Teknik Kütüphane Belgeleri</span>
+        <div id="tkDocPicker" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px">Yükleniyor...</div>
       </div>` : ''}
       ${id ? `
       <div class="field-block" style="margin-top:auto;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-dim)">
@@ -1074,6 +1078,31 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
 
   titleEl.focus();
 
+  // TK belge seçici yükle
+  const tkPicker = page.querySelector('#tkDocPicker');
+  let tkLinkedIds = [];
+  if (tkPicker) {
+    try {
+      const [allDocs, linked] = await Promise.all([
+        api.get('/api/library/admin/all'),
+        id ? api.get(`/api/posts/admin/${id}/library-docs`) : { document_ids: [] }
+      ]);
+      tkLinkedIds = linked.document_ids || [];
+      const docs = (allDocs.documents || []).filter(d => d.status === 'published');
+      if (!docs.length) { tkPicker.textContent = 'Yayınlı belge yok'; }
+      else {
+        tkPicker.innerHTML = '';
+        docs.forEach(d => {
+          const lbl = h('label', { style: 'display:flex;gap:6px;align-items:center;padding:2px 0;cursor:pointer' });
+          const cb = h('input', { type: 'checkbox', value: d.id, ...(tkLinkedIds.includes(d.id) ? { checked: '' } : {}) });
+          lbl.appendChild(cb);
+          lbl.appendChild(document.createTextNode(d.title + (d.brand_name ? ` (${d.brand_name})` : '')));
+          tkPicker.appendChild(lbl);
+        });
+      }
+    } catch { tkPicker.textContent = 'Yüklenemedi'; }
+  }
+
   saveBtn.onclick = async () => {
     const body = getEditorContent('#editBody');
     const showCoverEl = page.querySelector('#editShowCover');
@@ -1094,14 +1123,19 @@ async function renderEditor(page, cfg, apiPath, pluralKey, id) {
       return;
     }
 
+    // TK belge bağlantıları
+    const tkDocIds = tkPicker ? [...tkPicker.querySelectorAll('input[type=checkbox]:checked')].map(c => Number(c.value)) : [];
+
     saveBtn.disabled = true;
     try {
       if (id) {
         await api.put(`${apiPath}/${id}`, payload);
+        await api.put(`/api/posts/admin/${id}/library-docs`, { document_ids: tkDocIds });
         dirty = false;
         toast('Kaydedildi', 'success');
       } else {
         const res = await api.post(apiPath, payload);
+        if (tkDocIds.length) await api.put(`/api/posts/admin/${res.id}/library-docs`, { document_ids: tkDocIds });
         toast('Oluşturuldu', 'success');
         leavingViaSave = true;
         dirty = false;
@@ -1211,6 +1245,8 @@ async function openUserForm(u, onDone) {
     { code: 'warranty', label: 'Garanti Ayarları' },
     { code: 'warranty-logs', label: 'Garanti Sorguları' },
     { code: 'settings', label: 'Ayarlar' },
+    { code: 'library', label: 'TK Belgeleri' },
+    { code: 'library-users', label: 'TK Başvuruları & Erişim' },
   ];
   // Mevcut yetkiler: null = tam yetki; array = kısıtlı
   const curPerms = u && Array.isArray(u.permissions) ? u.permissions : null;
@@ -3888,5 +3924,286 @@ function renderWhoBlock(u) {
   `;
   el.classList.add('has-avatar');
 }
+
+// ============================================
+// TEKNİK KÜTÜPHANE BELGELERİ — library CRUD
+// ============================================
+const DOC_TYPES = [
+  ['datasheet','Datasheet'],['manual','Manual'],['certificate','Sertifika'],['catalog','Katalog'],['software','Yazılım']
+];
+
+routes.library = createCrudPage({
+  title: 'TK Belgeleri',
+  newButtonText: 'Yeni Belge',
+  listUrl: '/api/library/admin/all',
+  pluralKey: 'documents',
+  saveUrl: id => id ? `/api/library/${id}` : '/api/library',
+  richBody: false,
+  columns: [
+    { label: 'Başlık', render: r => `<b>${escapeHtml(r.title)}</b><br><small style="color:var(--text-dim)">${escapeHtml(r.brand_name||'—')}</small>` },
+    { label: 'Tür', render: r => escapeHtml(r.document_type) },
+    { label: 'Dil', render: r => (r.language||'tr').toUpperCase() },
+    { label: 'Herkese Açık', render: r => r.is_public ? '✓' : '—' },
+    { label: 'Durum', render: r => r.status==='published' ? '<span class="badge badge-published">Yayında</span>' : '<span class="badge badge-draft">Taslak</span>' },
+    { label: 'Tarih', render: r => r.created_at ? new Date(r.created_at).toLocaleDateString('tr-TR') : '—' },
+  ],
+  buildForm: (r = {}) => {
+    const el = document.createElement('div');
+    el.className = 'form-grid';
+    el.innerHTML = `
+      <div class="full"><span class="field-label">Başlık *</span><input name="title" value="${escapeHtml(r.title||'')}" required></div>
+      <div class="half"><span class="field-label">Slug</span><input name="slug" value="${escapeHtml(r.slug||'')}" placeholder="boş = başlıktan üretilir"></div>
+      <div class="half"><span class="field-label">Marka</span><select name="brand_id" id="libBrandSelect"><option value="">— Seçiniz —</option></select></div>
+      <div class="half"><span class="field-label">Belge Türü</span><select name="document_type">${DOC_TYPES.map(([v,l])=>`<option value="${v}" ${(r.document_type||'datasheet')===v?'selected':''}>${l}</option>`).join('')}</select></div>
+      <div class="half"><span class="field-label">Dil</span><select name="language">${['tr','en'].map(l=>`<option value="${l}" ${(r.language||'tr')===l?'selected':''}>${l.toUpperCase()}</option>`).join('')}</select></div>
+      <div class="full"><span class="field-label">Açıklama</span><textarea name="description" rows="3">${escapeHtml(r.description||'')}</textarea></div>
+      <div class="full">
+        <span class="field-label">Dosya *</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input name="file_url" id="libFileUrl" value="${escapeHtml(r.file_url||'')}" placeholder="/uploads/..." style="flex:1" required>
+          <button type="button" class="btn btn-ghost btn-sm" id="libFileUploadBtn"><span class="material-symbols-rounded">upload_file</span> Yükle</button>
+          <input type="file" id="libFileInput" accept=".pdf,.zip,.doc,.docx,.xls,.xlsx,.dwg,.rar,.7z" hidden>
+        </div>
+        <input type="hidden" name="file_size" id="libFileSize" value="${r.file_size||''}">
+      </div>
+      <div class="half"><span class="field-label">Durum</span><select name="status">${[['draft','Taslak'],['published','Yayında']].map(([v,l])=>`<option value="${v}" ${(r.status||'draft')===v?'selected':''}>${l}</option>`).join('')}</select></div>
+      <div class="half"><label style="display:flex;gap:8px;align-items:center;margin-top:24px"><input type="checkbox" name="is_public" ${r.is_public?'checked':''} style="width:auto"> Herkese Açık (giriş gerektirmez)</label></div>
+    `;
+    return el;
+  },
+  afterForm: async (root, r) => {
+    // Load brands into select
+    try {
+      const data = await apiFetch('/api/brands/admin/all');
+      const sel = root.querySelector('#libBrandSelect');
+      if (sel && data.brands) {
+        data.brands.forEach(b => {
+          const o = document.createElement('option');
+          o.value = b.id; o.textContent = b.name;
+          if (r && r.brand_id == b.id) o.selected = true;
+          sel.appendChild(o);
+        });
+      }
+    } catch(e) { console.warn('brands load failed', e); }
+    // Wire file upload
+    const btn = root.querySelector('#libFileUploadBtn');
+    const inp = root.querySelector('#libFileInput');
+    const urlInp = root.querySelector('#libFileUrl');
+    const sizeInp = root.querySelector('#libFileSize');
+    if (btn && inp) {
+      btn.onclick = () => inp.click();
+      inp.onchange = async () => {
+        if (!inp.files.length) return;
+        btn.disabled = true; btn.textContent = 'Yükleniyor...';
+        try {
+          const res = await uploadFile(inp.files[0]);
+          urlInp.value = res.url;
+          sizeInp.value = res.size || '';
+          toast('Dosya yüklendi');
+        } catch(e) { toast(e.message, 'error'); }
+        btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded">upload_file</span> Yükle';
+      };
+    }
+  },
+  beforeSave: (p) => {
+    p.is_public = p.is_public === 'on' || p.is_public === true ? 1 : 0;
+    if (!p.brand_id) p.brand_id = null;
+    return p;
+  },
+});
+
+// ============================================
+// TEKNİK KÜTÜPHANE BAŞVURULARI & ERİŞİM YÖNETİMİ
+// ============================================
+routes['library-users'] = function(container) {
+  container.innerHTML = `
+    <div class="page-card">
+      <div class="page-card-head">
+        <h2 class="page-card-title">TK Başvuruları & Erişim Yönetimi</h2>
+        <div class="tab-bar" style="margin-top:12px">
+          <button class="tab-btn active" data-tab="regs">Başvurular</button>
+          <button class="tab-btn" data-tab="access">Kullanıcı Erişimi</button>
+        </div>
+      </div>
+      <div class="page-card-body">
+        <div id="libRegsTab"></div>
+        <div id="libAccessTab" hidden></div>
+      </div>
+    </div>`;
+
+  // Tab switching
+  container.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const t = btn.dataset.tab;
+      container.querySelector('#libRegsTab').hidden = t !== 'regs';
+      container.querySelector('#libAccessTab').hidden = t !== 'access';
+    };
+  });
+
+  // === TAB 1: Başvurular ===
+  async function loadRegistrations() {
+    const tab = container.querySelector('#libRegsTab');
+    tab.innerHTML = '<p style="padding:16px;color:var(--text-dim)">Yükleniyor...</p>';
+    try {
+      const data = await apiFetch('/api/library/admin/registrations');
+      if (!data.registrations || !data.registrations.length) {
+        tab.innerHTML = '<p style="padding:16px;color:var(--text-dim)">Henüz başvuru yok.</p>';
+        return;
+      }
+      tab.innerHTML = `<table class="crud-table"><thead><tr>
+        <th>Ad Soyad</th><th>E-posta</th><th>Firma</th><th>Telefon</th><th>Durum</th><th>Tarih</th><th></th>
+      </tr></thead><tbody>${data.registrations.map(r => `<tr>
+        <td><b>${escapeHtml(r.name)} ${escapeHtml(r.surname)}</b></td>
+        <td>${escapeHtml(r.email)}</td>
+        <td>${escapeHtml(r.company||'—')}</td>
+        <td>${escapeHtml(r.phone||'—')}</td>
+        <td>${r.status==='pending'?'<span class="badge badge-draft">Bekliyor</span>':r.status==='approved'?'<span class="badge badge-published">Onaylandı</span>':'<span class="badge" style="background:#c0392b22;color:#e74c3c">Reddedildi</span>'}</td>
+        <td>${new Date(r.created_at).toLocaleDateString('tr-TR')}</td>
+        <td>${r.status==='pending'?`<button class="btn btn-sm btn-primary" data-approve="${r.id}">Onayla</button> <button class="btn btn-sm btn-ghost" data-reject="${r.id}">Reddet</button>`:''}</td>
+      </tr>`).join('')}</tbody></table>`;
+
+      // Approve handler
+      tab.querySelectorAll('[data-approve]').forEach(btn => {
+        btn.onclick = async () => {
+          const regId = btn.dataset.approve;
+          // Fetch brands for access selection
+          let brandsHtml = '';
+          try {
+            const bd = await apiFetch('/api/brands/admin/all');
+            brandsHtml = (bd.brands||[]).map(b => `<label style="display:flex;gap:8px;align-items:center;padding:4px"><input type="checkbox" value="${b.id}" class="brand-cb" style="width:auto"> ${escapeHtml(b.name)}</label>`).join('');
+          } catch(e) {}
+          const content = document.createElement('div');
+          content.innerHTML = `<p style="margin-bottom:12px">Bu başvuruyu onaylayarak kullanıcı hesabı oluşturulacak.</p>
+            <p style="margin-bottom:8px;font-weight:600">Marka erişimi ver:</p>
+            <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px">${brandsHtml || '<p style="color:var(--text-dim)">Marka bulunamadı</p>'}</div>`;
+          openModal('Başvuru Onayla', content, {
+            confirmText: 'Onayla',
+            onConfirm: async () => {
+              const brandIds = [...content.querySelectorAll('.brand-cb:checked')].map(cb => +cb.value);
+              try {
+                const res = await apiFetch(`/api/library/admin/registrations/${regId}`, {
+                  method: 'PUT', body: JSON.stringify({ action: 'approve', brand_ids: brandIds })
+                });
+                if (res.password) {
+                  toast('Onaylandı! Şifre: ' + res.password, 'success');
+                  openModal('Kullanıcı Oluşturuldu', h('div', {},
+                    h('p', {}, `Otomatik şifre: `),
+                    h('code', { style: 'font-size:1.2em;background:var(--bg-soft);padding:4px 12px;border-radius:6px' }, res.password),
+                    h('p', { style: 'margin-top:12px;color:var(--text-dim)' }, 'Bu şifreyi kullanıcıya iletin. İlk girişte değiştirmesi gerekecek.')
+                  ));
+                } else {
+                  toast('Onaylandı (mevcut kullanıcı)', 'success');
+                }
+                loadRegistrations();
+              } catch(e) { toast(e.message, 'error'); }
+            }
+          });
+        };
+      });
+      // Reject handler
+      tab.querySelectorAll('[data-reject]').forEach(btn => {
+        btn.onclick = async () => {
+          if (!await confirmDialog('Bu başvuruyu reddetmek istediğinize emin misiniz?')) return;
+          try {
+            await apiFetch(`/api/library/admin/registrations/${btn.dataset.reject}`, {
+              method: 'PUT', body: JSON.stringify({ action: 'reject' })
+            });
+            toast('Reddedildi');
+            loadRegistrations();
+          } catch(e) { toast(e.message, 'error'); }
+        };
+      });
+    } catch(e) { tab.innerHTML = `<p style="padding:16px;color:#e74c3c">${escapeHtml(e.message)}</p>`; }
+  }
+  loadRegistrations();
+
+  // === TAB 2: Kullanıcı Erişim Yönetimi ===
+  async function initAccessTab() {
+    const tab = container.querySelector('#libAccessTab');
+    tab.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <select id="libAccessUserSelect" style="flex:1"><option value="">— Kullanıcı seçin —</option></select>
+        <button class="btn btn-primary btn-sm" id="libAccessSaveBtn" disabled>Kaydet</button>
+      </div>
+      <div id="libAccessBody" style="display:none">
+        <h4 style="margin:0 0 8px">Marka Erişimi</h4>
+        <div id="libAccessBrands" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:16px"></div>
+        <h4 style="margin:0 0 8px">Tekil Belge Erişimi</h4>
+        <div id="libAccessDocs" style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px"></div>
+      </div>`;
+
+    // Load customers
+    try {
+      const cd = await apiFetch('/api/library/admin/customers');
+      const sel = tab.querySelector('#libAccessUserSelect');
+      (cd.users||[]).forEach(u => {
+        const o = document.createElement('option');
+        o.value = u.id; o.textContent = `${u.name} (${u.email})`;
+        sel.appendChild(o);
+      });
+    } catch(e) {}
+
+    // Load brands + docs for checkboxes
+    let allBrands = [], allDocs = [];
+    try {
+      const bd = await apiFetch('/api/brands/admin/all');
+      allBrands = bd.brands || [];
+    } catch(e) {}
+    try {
+      const dd = await apiFetch('/api/library/admin/all');
+      allDocs = dd.documents || [];
+    } catch(e) {}
+
+    const sel = tab.querySelector('#libAccessUserSelect');
+    const saveBtn = tab.querySelector('#libAccessSaveBtn');
+    const body = tab.querySelector('#libAccessBody');
+
+    sel.onchange = async () => {
+      const uid = sel.value;
+      if (!uid) { body.style.display = 'none'; saveBtn.disabled = true; return; }
+      body.style.display = '';
+      saveBtn.disabled = false;
+
+      // Render brand checkboxes
+      tab.querySelector('#libAccessBrands').innerHTML = allBrands.map(b =>
+        `<label style="display:flex;gap:6px;align-items:center;padding:4px"><input type="checkbox" class="ab-cb" value="${b.id}" style="width:auto"> ${escapeHtml(b.name)}</label>`
+      ).join('');
+
+      // Render doc checkboxes
+      tab.querySelector('#libAccessDocs').innerHTML = allDocs.map(d =>
+        `<label style="display:flex;gap:6px;align-items:center;padding:3px"><input type="checkbox" class="ad-cb" value="${d.id}" style="width:auto"> ${escapeHtml(d.title)} <small style="color:var(--text-dim)">(${escapeHtml(d.document_type)})</small></label>`
+      ).join('') || '<p style="color:var(--text-dim)">Henüz belge yok</p>';
+
+      // Load current access
+      try {
+        const acc = await apiFetch(`/api/library/admin/access/${uid}`);
+        (acc.brand_ids||[]).forEach(bid => {
+          const cb = tab.querySelector(`.ab-cb[value="${bid}"]`);
+          if (cb) cb.checked = true;
+        });
+        (acc.document_ids||[]).forEach(did => {
+          const cb = tab.querySelector(`.ad-cb[value="${did}"]`);
+          if (cb) cb.checked = true;
+        });
+      } catch(e) {}
+    };
+
+    saveBtn.onclick = async () => {
+      const uid = sel.value;
+      if (!uid) return;
+      const brand_ids = [...tab.querySelectorAll('.ab-cb:checked')].map(cb => +cb.value);
+      const document_ids = [...tab.querySelectorAll('.ad-cb:checked')].map(cb => +cb.value);
+      try {
+        await apiFetch(`/api/library/admin/access/${uid}`, {
+          method: 'PUT', body: JSON.stringify({ brand_ids, document_ids })
+        });
+        toast('Erişim güncellendi', 'success');
+      } catch(e) { toast(e.message, 'error'); }
+    };
+  }
+  initAccessTab();
+};
 
 init();

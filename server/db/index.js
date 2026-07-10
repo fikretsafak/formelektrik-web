@@ -467,4 +467,75 @@ if (!tableExists('reference_logos')) {
    'bogazici-elektrik'].forEach((n, i) => seed.run(n, `/assets/references/${n}.png`, i));
 }
 
+// === Teknik Kütüphane: Belgeler ===
+if (!tableExists('library_documents')) {
+  db.exec(`CREATE TABLE library_documents (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    title         TEXT NOT NULL,
+    slug          TEXT NOT NULL,
+    description   TEXT,
+    brand_id      INTEGER REFERENCES brands(id) ON DELETE SET NULL,
+    document_type TEXT NOT NULL DEFAULT 'datasheet'
+                  CHECK (document_type IN ('datasheet','manual','certificate','catalog','software')),
+    file_url      TEXT NOT NULL,
+    file_size     INTEGER,
+    is_public     INTEGER NOT NULL DEFAULT 0,
+    language      TEXT NOT NULL DEFAULT 'tr',
+    status        TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),
+    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+  db.exec(`CREATE INDEX idx_libdocs_status ON library_documents(status)`);
+  db.exec(`CREATE INDEX idx_libdocs_brand ON library_documents(brand_id)`);
+  db.exec(`CREATE INDEX idx_libdocs_slug ON library_documents(slug)`);
+}
+
+// === Teknik Kütüphane: Kayıt Başvuruları ===
+if (!tableExists('library_registrations')) {
+  db.exec(`CREATE TABLE library_registrations (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    surname    TEXT NOT NULL,
+    email      TEXT NOT NULL,
+    company    TEXT,
+    phone      TEXT,
+    message    TEXT,
+    status     TEXT NOT NULL DEFAULT 'pending'
+               CHECK (status IN ('pending','approved','rejected')),
+    user_id    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`);
+  db.exec(`CREATE INDEX idx_libreg_status ON library_registrations(status, created_at DESC)`);
+  db.exec(`CREATE INDEX idx_libreg_email ON library_registrations(email)`);
+}
+
+// === Teknik Kütüphane: Kullanıcı ↔ Belge Erişimi ===
+if (!tableExists('library_user_documents')) {
+  db.exec(`CREATE TABLE library_user_documents (
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    document_id INTEGER NOT NULL REFERENCES library_documents(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, document_id)
+  )`);
+}
+
+// === Teknik Kütüphane: Kullanıcı ↔ Marka Erişimi ===
+if (!tableExists('library_user_brands')) {
+  db.exec(`CREATE TABLE library_user_brands (
+    user_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    brand_id INTEGER NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, brand_id)
+  )`);
+}
+
+// === Blog ↔ Kütüphane Belge İlişkisi ===
+if (!tableExists('post_library_documents')) {
+  db.exec(`CREATE TABLE post_library_documents (
+    post_id     INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    document_id INTEGER NOT NULL REFERENCES library_documents(id) ON DELETE CASCADE,
+    sort_order  INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (post_id, document_id)
+  )`);
+}
+
 module.exports = db;

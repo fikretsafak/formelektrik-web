@@ -44,7 +44,7 @@ function requireRole(...roles) {
 
 // Admin paneli bölüm kodları (nav data-route ile aynı).
 // 'dashboard' ve 'profile' her admin kullanıcısına açık (yetki gerektirmez).
-const ADMIN_SECTIONS = ['leads', 'posts', 'announcements', 'services', 'projects', 'brands', 'appointments', 'careers', 'users', 'kvkk', 'kvkk-politikasi', 'basvuru-formu', 'calisan-adayi', 'imha-politikasi', 'cerez', 'warranty', 'warranty-logs', 'settings'];
+const ADMIN_SECTIONS = ['leads', 'posts', 'announcements', 'services', 'projects', 'brands', 'appointments', 'careers', 'users', 'kvkk', 'kvkk-politikasi', 'basvuru-formu', 'calisan-adayi', 'imha-politikasi', 'cerez', 'warranty', 'warranty-logs', 'settings', 'library', 'library-users'];
 
 function getUserPermissions(user) {
   // NULL/yoksa = tam yetki (süper admin). Aksi halde JSON array.

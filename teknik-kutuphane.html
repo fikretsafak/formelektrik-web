@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Teknik Kütüphane — Form Elektrik</title>
+<meta name="description" content="Form Elektrik teknik kütüphanesi: datasheet, katalog, sertifika ve teknik belgelere erişim." />
+<link rel="canonical" href="https://formelektrik.com/teknik-kutuphane" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Form Elektrik" />
+<meta property="og:title" content="Teknik Kütüphane — Form Elektrik" />
+<meta property="og:description" content="Datasheet, katalog, sertifika ve teknik belgelere erişim." />
+<meta property="og:url" content="https://formelektrik.com/teknik-kutuphane" />
+<link rel="icon" type="image/png" href="/assets/main/favicon.png" />
+<link rel="apple-touch-icon" href="/assets/main/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+<script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
+<style>
+/* Teknik Kütüphane */
+.tk-shell { display: grid; grid-template-columns: 260px 1fr; gap: 32px; padding: 40px 0 80px; }
+.tk-sidebar { position: sticky; top: calc(var(--header-h,72px) + 16px); align-self: start; }
+.tk-filter-card { background: var(--bg-soft,#f6f7fa); border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.tk-filter-card h4 { font-size: .85rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0 0 10px; text-transform: uppercase; letter-spacing: .03em; }
+.tk-filter-card label { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: .9rem; color: var(--text-soft,#4b5167); cursor: pointer; }
+.tk-filter-card input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cyan,#2aa9e0); }
+.tk-search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line,#e5e7eb); border-radius: 10px; padding: 8px 12px; background: #fff; margin-bottom: 16px; }
+.tk-search input { border: none; outline: none; flex: 1; font-size: .9rem; font-family: inherit; background: transparent; }
+.tk-search .material-symbols-rounded { color: var(--text-soft,#999); font-size: 20px; }
+
+.tk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.tk-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 14px; padding: 20px; transition: box-shadow .2s, transform .2s; }
+.tk-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); transform: translateY(-2px); }
+.tk-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.tk-card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(42,169,224,.1); display: flex; align-items: center; justify-content: center; flex: none; }
+.tk-card-icon .material-symbols-rounded { color: var(--cyan,#2aa9e0); font-size: 22px; }
+.tk-card-title { font-size: .95rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.3; }
+.tk-card-brand { font-size: .78rem; color: var(--text-soft,#4b5167); margin-top: 2px; }
+.tk-card-desc { font-size: .85rem; color: var(--text-soft,#4b5167); line-height: 1.5; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tk-card-foot { display: flex; align-items: center; justify-content: space-between; }
+.tk-badge { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.1); color: var(--cyan,#2aa9e0); padding: 3px 8px; border-radius: 6px; }
+.tk-badge.public { background: rgba(39,174,96,.1); color: #27ae60; }
+.tk-dl-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; }
+.tk-dl-btn:hover { background: #1b8fc0; }
+.tk-dl-btn .material-symbols-rounded { font-size: 17px; }
+.tk-dl-btn.locked { background: var(--text-soft,#4b5167); }
+.tk-empty { text-align: center; padding: 60px 20px; color: var(--text-soft,#999); }
+.tk-empty .material-symbols-rounded { font-size: 48px; display: block; margin: 0 auto 12px; opacity: .4; }
+.tk-count { font-size: .85rem; color: var(--text-soft,#999); margin-bottom: 16px; }
+
+/* Login/Register Modal */
+.tk-modal-overlay { display: none; position: fixed; inset: 0; z-index: 1100; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+.tk-modal-overlay.open { display: flex; }
+.tk-modal { background: #fff; border-radius: 20px; width: 90vw; max-width: 440px; padding: 32px; box-shadow: 0 24px 60px rgba(0,0,0,.2); animation: tkIn .2s ease; }
+@keyframes tkIn { from { opacity: 0; transform: scale(.95) translateY(10px); } }
+.tk-modal-close { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-soft); }
+.tk-modal h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.tk-modal p { margin: 0 0 16px; font-size: .88rem; color: var(--text-soft); }
+.tk-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--line,#e5e7eb); }
+.tk-tab { flex: 1; padding: 10px; text-align: center; background: none; border: none; font-size: .9rem; font-weight: 600; cursor: pointer; color: var(--text-soft); border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; }
+.tk-tab.active { color: var(--cyan,#2aa9e0); border-bottom-color: var(--cyan,#2aa9e0); }
+.tk-form-group { margin-bottom: 12px; }
+.tk-form-group label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+.tk-form-group input, .tk-form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--line,#e5e7eb); border-radius: 8px; font-size: .9rem; font-family: inherit; box-sizing: border-box; }
+.tk-form-group textarea { resize: vertical; }
+.tk-submit { width: 100%; padding: 10px; background: var(--cyan,#2aa9e0); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 8px; }
+.tk-submit:hover { background: #1b8fc0; }
+.tk-msg { text-align: center; padding: 20px; font-size: .9rem; }
+.tk-msg.success { color: #27ae60; }
+.tk-msg.error { color: #e74c3c; }
+.tk-user-bar { display: flex; align-items: center; gap: 10px; background: rgba(42,169,224,.06); border: 1px solid rgba(42,169,224,.15); border-radius: 12px; padding: 10px 16px; margin-bottom: 16px; font-size: .88rem; }
+.tk-user-bar .material-symbols-rounded { color: var(--cyan); }
+.tk-user-bar b { color: var(--text); }
+.tk-logout-btn { margin-left: auto; background: none; border: none; color: var(--text-soft); cursor: pointer; font-size: .8rem; text-decoration: underline; font-family: inherit; }
+@media (max-width: 800px) {
+  .tk-shell { grid-template-columns: 1fr; }
+  .tk-sidebar { position: static; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Form Elektrik">
+      <img src="/assets/main/logo-white.png" alt="Form Elektrik" onerror="this.onerror=null;this.src='/assets/main/logo.png'" />
+      <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#hizmetler" data-i18n="nav.services">Çözümler</a>
+      <a href="/#hakkimizda" data-i18n="nav.about">Kurumsal</a>
+      <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
+      <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      <a href="/blog" data-i18n="nav.blog">Blog</a>
+      <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
+      </div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="/#hizmetler" data-i18n="nav.services">Çözümler<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#hakkimizda" data-i18n="nav.about">Kurumsal<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/projeler" data-i18n="nav.projects">Referanslar<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#markalar" data-i18n="nav.brands">Markalarımız<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/blog" data-i18n="nav.blog">Blog<span class="material-symbols-rounded">chevron_right</span></a>
+  <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
+</nav>
+
+<!-- ===== SAYFA ===== -->
+<section class="subpage-hero">
+  <div class="wrap">
+    <div class="section-head reveal" style="margin-bottom:0">
+      <span class="eyebrow">Teknik Kütüphane</span>
+      <h1 class="section-title" style="margin-top:14px">Teknik Belgeler</h1>
+      <p class="section-lead">Datasheet, katalog, sertifika ve teknik belgelere erişim.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <!-- User bar -->
+  <div id="tkUserBar"></div>
+
+  <div class="tk-shell">
+    <!-- Sidebar -->
+    <aside class="tk-sidebar">
+      <div class="tk-search">
+        <span class="material-symbols-rounded">search</span>
+        <input type="text" id="tkSearch" placeholder="Belge ara...">
+      </div>
+      <div class="tk-filter-card" id="tkBrandFilter">
+        <h4>Marka</h4>
+        <div id="tkBrandList"></div>
+      </div>
+      <div class="tk-filter-card">
+        <h4>Belge Türü</h4>
+        <label><input type="checkbox" value="datasheet" class="tk-type-cb"> Datasheet</label>
+        <label><input type="checkbox" value="manual" class="tk-type-cb"> Manual</label>
+        <label><input type="checkbox" value="certificate" class="tk-type-cb"> Sertifika</label>
+        <label><input type="checkbox" value="catalog" class="tk-type-cb"> Katalog</label>
+        <label><input type="checkbox" value="software" class="tk-type-cb"> Yazılım</label>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main>
+      <div class="tk-count" id="tkCount"></div>
+      <div class="tk-grid" id="tkGrid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Login / Register Modal -->
+<div class="tk-modal-overlay" id="tkModal">
+  <div class="tk-modal" style="position:relative">
+    <button class="tk-modal-close" id="tkModalClose"><span class="material-symbols-rounded">close</span></button>
+    <div class="tk-tabs">
+      <button class="tk-tab active" data-tk-tab="login">Giriş Yap</button>
+      <button class="tk-tab" data-tk-tab="register">Kayıt Ol</button>
+    </div>
+    <!-- Login -->
+    <form id="tkLoginForm">
+      <div class="tk-form-group"><label>E-posta</label><input type="email" name="email" required></div>
+      <div class="tk-form-group"><label>Şifre</label><input type="password" name="password" required></div>
+      <button type="submit" class="tk-submit">Giriş Yap</button>
+      <div id="tkLoginMsg"></div>
+    </form>
+    <!-- Register -->
+    <form id="tkRegisterForm" hidden>
+      <div class="tk-form-group"><label>Ad *</label><input type="text" name="name" required></div>
+      <div class="tk-form-group"><label>Soyad *</label><input type="text" name="surname" required></div>
+      <div class="tk-form-group"><label>E-posta *</label><input type="email" name="email" required></div>
+      <div class="tk-form-group"><label>Firma</label><input type="text" name="company"></div>
+      <div class="tk-form-group"><label>Telefon</label><input type="tel" name="phone"></div>
+      <div class="tk-form-group"><label>Mesaj</label><textarea name="message" rows="2" placeholder="Erişim talep ettiğiniz belgeler hakkında bilgi..."></textarea></div>
+      <button type="submit" class="tk-submit">Başvuru Gönder</button>
+      <div id="tkRegisterMsg"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/assets/main/logo.png" alt="Form Elektrik" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'" />
+        <span class="brand-fallback" style="display:none"><b>form</b><i>elektrik</i></span>
+        <p data-i18n="footer.about">Enerji altyapıları ve güç sistemleri alanında mühendislik odaklı, uçtan uca çözüm sağlayıcısı. 2000'den bu yana güvenilir çözüm ortağınız.</p>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">call</span> +90 312 394 7100</div>
+        <div class="footer-contact-line"><span class="material-symbols-rounded">mail</span> info@formelektrik.com</div>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.solutions">Çözümlerimiz</h4>
+        <a href="/hizmet?slug=ges" data-i18n="svc.ges">Yenilenebilir Enerji</a>
+        <a href="/hizmet?slug=otomasyon" data-i18n="svc.otomasyon">Şebeke Koruma ve Otomasyon</a>
+        <a href="/hizmet?slug=bess" data-i18n="svc.bess">Enerji Depolama</a>
+        <a href="/hizmet?slug=emobility" data-i18n="svc.emobility">E-Mobility</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footer.corporate">Kurumsal</h4>
+        <a href="/hakkimizda" data-i18n="nav.about">Hakkımızda</a>
+        <a href="/kariyer">Kariyer</a>
+        <a href="/#iletisim" data-i18n="nav.contact">İletişim</a>
+        <a href="/projeler" data-i18n="nav.projects">Referanslar</a>
+        <a href="/#markalar" data-i18n="nav.brands">Markalarımız</a>
+      </div>
+      <div class="footer-col">
+        <h4>Diğer</h4>
+        <a href="/blog" data-i18n="nav.blog">Blog</a>
+        <a href="/teknik-kutuphane">Teknik Kütüphane</a>
+        <a href="/kvkk" data-i18n="footer.kvkk">KVKK Aydınlatması</a>
+        <a href="/cerez-politikasi" data-i18n="footer.cookie">Çerez Politikası</a>
+        <div class="footer-social" style="margin-top:16px">
+          <a href="https://tr.linkedin.com/company/form-elektrik-insaat-muh-a-s-" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+          <a href="https://www.instagram.com/form_elektrik/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg></a>
+          <a href="https://www.youtube.com/channel/UCOF1W02fEyOTseZ2o2CLCcA" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">© <span id="year">2026</span> Form Elektrik İnş.Müh.A.Ş — Tüm hakları saklıdır.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(function() {
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+
+  const TOKEN_KEY = 'tk_token';
+  let currentUser = null;
+  let myAccess = null;
+  const DOC_ICONS = { datasheet:'description', manual:'menu_book', certificate:'workspace_premium', catalog:'auto_stories', software:'terminal' };
+
+  // Auth helpers
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+  function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+  async function api(url, opts = {}) {
+    const token = getToken();
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const res = await fetch(url, { ...opts, headers });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Hata');
+    return data;
+  }
+
+  // Check auth state
+  async function checkAuth() {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await api('/api/auth/me');
+      currentUser = data.user || data;
+      myAccess = await api('/api/library/my-access');
+    } catch(e) { clearToken(); }
+  }
+
+  function renderUserBar() {
+    const bar = $('#tkUserBar');
+    if (!currentUser) { bar.innerHTML = ''; return; }
+    bar.innerHTML = `<div class="tk-user-bar">
+      <span class="material-symbols-rounded">person</span>
+      <b>${esc(currentUser.name || currentUser.email)}</b>
+      <button class="tk-logout-btn" id="tkLogout">Çıkış</button>
+    </div>`;
+    $('#tkLogout').onclick = () => { clearToken(); currentUser = null; myAccess = null; renderUserBar(); loadDocs(); };
+  }
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  function canAccess(doc) {
+    if (!currentUser || !myAccess) return false;
+    if (currentUser.role === 'admin') return true;
+    if (doc.is_public) return true;
+    if (myAccess.document_ids.includes(doc.id)) return true;
+    if (doc.brand_id && myAccess.brand_ids.includes(doc.brand_id)) return true;
+    return false;
+  }
+
+  function formatSize(bytes) {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(0) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+  }
+
+  // Load docs
+  async function loadDocs() {
+    const grid = $('#tkGrid');
+    const count = $('#tkCount');
+    grid.innerHTML = '<p style="padding:20px;color:var(--text-soft)">Yükleniyor...</p>';
+
+    const params = new URLSearchParams();
+    params.set('language', 'all');
+    params.set('limit', '200');
+
+    const q = $('#tkSearch').value.trim();
+    if (q) params.set('q', q);
+
+    const checkedBrands = [...$$('.tk-brand-cb:checked')].map(cb => cb.value);
+    if (checkedBrands.length === 1) params.set('brand_id', checkedBrands[0]);
+
+    const checkedTypes = [...$$('.tk-type-cb:checked')].map(cb => cb.value);
+    if (checkedTypes.length === 1) params.set('type', checkedTypes[0]);
+
+    try {
+      let data = await api('/api/library?' + params.toString());
+      let docs = data.documents || [];
+
+      // Client-side multi-filter
+      if (checkedBrands.length > 1) docs = docs.filter(d => checkedBrands.includes(String(d.brand_id)));
+      if (checkedTypes.length > 1) docs = docs.filter(d => checkedTypes.includes(d.document_type));
+
+      count.textContent = docs.length + ' belge bulundu';
+
+      if (!docs.length) {
+        grid.innerHTML = '<div class="tk-empty"><span class="material-symbols-rounded">folder_open</span><p>Belge bulunamadı.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = docs.map(d => {
+        const hasAccess = d.is_public || canAccess(d);
+        const icon = DOC_ICONS[d.document_type] || 'description';
+        return `<div class="tk-card">
+          <div class="tk-card-head">
+            <div class="tk-card-icon"><span class="material-symbols-rounded">${icon}</span></div>
+            <div>
+              <div class="tk-card-title">${esc(d.title)}</div>
+              <div class="tk-card-brand">${esc(d.brand_name || '')} ${formatSize(d.file_size) ? '· '+formatSize(d.file_size) : ''}</div>
+            </div>
+          </div>
+          ${d.description ? `<div class="tk-card-desc">${esc(d.description)}</div>` : ''}
+          <div class="tk-card-foot">
+            <span class="tk-badge${d.is_public?' public':''}">${d.is_public ? 'Açık Erişim' : esc(d.document_type)}</span>
+            ${d.is_public || hasAccess
+              ? `<button class="tk-dl-btn" data-dl="${d.id}"><span class="material-symbols-rounded">download</span> İndir</button>`
+              : `<button class="tk-dl-btn locked" data-need-auth="${d.id}"><span class="material-symbols-rounded">lock</span> Giriş Gerekli</button>`
+            }
+          </div>
+        </div>`;
+      }).join('');
+
+      // Download handlers
+      grid.querySelectorAll('[data-dl]').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.dataset.dl;
+          if (!currentUser) { openModal(); return; }
+          window.open('/api/library/' + id + '/download', '_blank');
+        };
+      });
+      grid.querySelectorAll('[data-need-auth]').forEach(btn => {
+        btn.onclick = () => openModal();
+      });
+    } catch(e) {
+      grid.innerHTML = `<div class="tk-empty"><span class="material-symbols-rounded">error</span><p>${esc(e.message)}</p></div>`;
+    }
+  }
+
+  // Load brands filter
+  async function loadBrands() {
+    try {
+      const data = await api('/api/library/brands');
+      const list = $('#tkBrandList');
+      list.innerHTML = (data.brands || []).map(b =>
+        `<label><input type="checkbox" value="${b.id}" class="tk-brand-cb"> ${esc(b.name)} <small style="opacity:.5">(${b.doc_count})</small></label>`
+      ).join('');
+      list.querySelectorAll('.tk-brand-cb').forEach(cb => { cb.onchange = loadDocs; });
+    } catch(e) {}
+  }
+
+  // Modal
+  function openModal() {
+    $('#tkModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    $('#tkModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  $('#tkModalClose').onclick = closeModal;
+  $('#tkModal').onclick = e => { if (e.target === $('#tkModal')) closeModal(); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Tabs
+  $$('[data-tk-tab]').forEach(tab => {
+    tab.onclick = () => {
+      $$('[data-tk-tab]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      $('#tkLoginForm').hidden = tab.dataset.tkTab !== 'login';
+      $('#tkRegisterForm').hidden = tab.dataset.tkTab !== 'register';
+    };
+  });
+
+  // Login
+  $('#tkLoginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const msg = $('#tkLoginMsg');
+    msg.innerHTML = '';
+    const fd = new FormData(e.target);
+    try {
+      const data = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: fd.get('email'), password: fd.get('password') }) });
+      setToken(data.token);
+      currentUser = data.user;
+      myAccess = await api('/api/library/my-access');
+      closeModal();
+      renderUserBar();
+      loadDocs();
+    } catch(err) {
+      msg.innerHTML = `<p class="tk-msg error">${esc(err.message)}</p>`;
+    }
+  };
+
+  // Register
+  $('#tkRegisterForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const msg = $('#tkRegisterMsg');
+    msg.innerHTML = '';
+    const fd = new FormData(e.target);
+    try {
+      await api('/api/library/register', { method: 'POST', body: JSON.stringify({
+        name: fd.get('name'), surname: fd.get('surname'), email: fd.get('email'),
+        company: fd.get('company'), phone: fd.get('phone'), message: fd.get('message')
+      })});
+      msg.innerHTML = '<p class="tk-msg success">Başvurunuz alındı! Onaylandıktan sonra e-posta ile bilgilendirileceksiniz.</p>';
+      e.target.reset();
+    } catch(err) {
+      const m = err.message === 'already_pending' ? 'Bu e-posta ile zaten bekleyen bir başvuru var.' : err.message;
+      msg.innerHTML = `<p class="tk-msg error">${esc(m)}</p>`;
+    }
+  };
+
+  // Search debounce
+  let searchTimer;
+  $('#tkSearch').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(loadDocs, 300); };
+
+  // Type filter
+  $$('.tk-type-cb').forEach(cb => { cb.onchange = loadDocs; });
+
+  // Init
+  async function init() {
+    await checkAuth();
+    renderUserBar();
+    loadBrands();
+    loadDocs();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

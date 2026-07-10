@@ -217,4 +217,33 @@ router.post('/admin/import', authRequired, requireRole('admin'), requirePermissi
   res.json({ ok: true, imported, updated, skipped });
 });
 
+// --- Blog ↔ Teknik Kütüphane belge linkleri ---
+// Public: slug ile bağlı yayınlı belgeleri getir
+router.get('/:slug/library-docs', (req, res) => {
+  const post = db.prepare("SELECT id FROM posts WHERE slug=? AND status='published'").get(req.params.slug);
+  if (!post) return res.json({ documents: [] });
+  const docs = db.prepare(`SELECT ld.id, ld.title, ld.slug, ld.document_type, ld.is_public, ld.brand_id, b.name as brand_name
+    FROM post_library_documents pld
+    JOIN library_documents ld ON ld.id=pld.document_id AND ld.status='published'
+    LEFT JOIN brands b ON b.id=ld.brand_id
+    WHERE pld.post_id=? ORDER BY pld.sort_order`).all(post.id);
+  res.json({ documents: docs });
+});
+
+// Admin: get/set bağlı belgeler
+router.get('/admin/:id/library-docs', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
+  const docs = db.prepare('SELECT document_id FROM post_library_documents WHERE post_id=? ORDER BY sort_order').all(req.params.id);
+  res.json({ document_ids: docs.map(d => d.document_id) });
+});
+router.put('/admin/:id/library-docs', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
+  const { document_ids = [] } = req.body;
+  const tx = db.transaction(() => {
+    db.prepare('DELETE FROM post_library_documents WHERE post_id=?').run(req.params.id);
+    const ins = db.prepare('INSERT INTO post_library_documents (post_id, document_id, sort_order) VALUES (?,?,?)');
+    document_ids.forEach((did, i) => ins.run(req.params.id, did, i));
+  });
+  tx();
+  res.json({ ok: true });
+});
+
 module.exports = router;
