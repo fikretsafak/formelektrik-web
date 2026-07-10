@@ -25,9 +25,18 @@
 /* Sayfaya özel geniş wrap (yan boşlukları azalt) */
 .tk-head .wrap, .tk-wrap { max-width: 1400px; }
 
+/* Header giriş butonu */
+.tk-header-login { display: inline-flex; align-items: center; gap: 6px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: .86rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: .15s; white-space: nowrap; }
+.tk-header-login:hover { background: #1b8fc0; }
+.tk-header-login .material-symbols-rounded { font-size: 18px; }
+.tk-header-user { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: .86rem; font-weight: 500; }
+.tk-header-user .material-symbols-rounded { font-size: 20px; opacity: .85; }
+.tk-header-user button { background: rgba(255,255,255,.12); color: #fff; border: none; padding: 5px 11px; border-radius: 8px; font-size: .78rem; cursor: pointer; font-family: inherit; }
+.tk-header-user button:hover { background: rgba(255,255,255,.22); }
+
 /* Başlık şeridi */
-.tk-head { background: var(--bg-soft,#f6f7fa); border-bottom: 1px solid var(--line,#e5e7eb); padding: calc(var(--header-h,72px) + 40px) 0 32px; }
-.tk-head h1 { font-family: var(--font-head,Poppins,sans-serif); font-size: 2rem; font-weight: 700; color: var(--navy-deep,#0f1640); margin: 0 0 10px; }
+.tk-head { background: var(--bg-soft,#f6f7fa); border-bottom: 1px solid var(--line,#e5e7eb); padding: calc(var(--header-h,72px) + 18px) 0 22px; }
+.tk-head h1 { font-family: var(--font-head,Poppins,sans-serif); font-size: 1.7rem; font-weight: 700; color: var(--navy-deep,#0f1640); margin: 0 0 8px; }
 .tk-head-meta { display: flex; align-items: center; gap: 10px; font-family: ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size: .8rem; color: var(--text-soft,#4b5167); flex-wrap: wrap; }
 .tk-head-meta b { color: var(--text,#1a1d26); font-weight: 600; }
 .tk-head-meta .sep { color: var(--text-faint,#c3c9d6); }
@@ -37,7 +46,7 @@
 .tk-head-search input { flex: 1; border: none; outline: none; background: transparent; font-size: .95rem; font-family: inherit; color: var(--text,#1a1d26); }
 
 /* Shell */
-.tk-shell { display: grid; grid-template-columns: 240px 1fr; gap: 40px; padding: 36px 0 100px; min-height: 60vh; }
+.tk-shell { display: grid; grid-template-columns: 240px 1fr; gap: 40px; padding: 28px 0 100px; min-height: 60vh; }
 .tk-shell main { min-height: 480px; }
 .tk-sidebar { position: sticky; top: calc(var(--header-h,84px) + 16px); align-self: start; }
 .tk-filter-group { margin-bottom: 28px; }
@@ -176,6 +185,7 @@
       <div class="lang-toggle" id="langToggle">
         <button data-lang="tr" class="active" title="Türkçe" aria-label="Türkçe"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><rect width="60" height="40" fill="#E30A17"/><circle cx="26" cy="20" r="9" fill="#fff"/><circle cx="29" cy="20" r="7.2" fill="#E30A17"/><polygon points="40,20 33,22.3 37.3,16.4 37.3,23.6 33,17.7" fill="#fff"/></svg></button><button data-lang="en" title="English" aria-label="English"><svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice"><clipPath id="uk-h"><rect width="60" height="40"/></clipPath><rect width="60" height="40" fill="#012169"/><g clip-path="url(#uk-h)"><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="7"/></g></svg></button>
       </div>
+      <div id="tkHeaderAuth"></div>
       <button class="menu-toggle" id="menuToggle" aria-label="Menü"><span class="material-symbols-rounded">menu</span></button>
     </div>
   </div>
@@ -210,7 +220,6 @@
   <div class="tk-shell">
     <!-- Sidebar -->
     <aside class="tk-sidebar">
-      <div id="tkUserBar"></div>
       <div class="tk-filter-group" id="tkBrandFilter">
         <h4>Marka</h4>
         <div id="tkBrandList"><p style="font-size:.82rem;color:var(--text-faint)">Yükleniyor...</p></div>
@@ -368,12 +377,19 @@
 
   function renderUserBar() {
     const bar = $('#tkUserBar');
-    if (!currentUser) { bar.innerHTML = ''; return; }
-    bar.innerHTML = `<div class="tk-user-bar">
-      <span class="material-symbols-rounded">person</span>
+    if (bar) bar.innerHTML = '';
+    const hdr = $('#tkHeaderAuth');
+    if (!hdr) return;
+    if (!currentUser) {
+      hdr.innerHTML = `<button class="tk-header-login" id="tkHeaderLogin"><span class="material-symbols-rounded">login</span> Giriş Yap</button>`;
+      $('#tkHeaderLogin').onclick = openModal;
+      return;
+    }
+    hdr.innerHTML = `<span class="tk-header-user">
+      <span class="material-symbols-rounded">account_circle</span>
       <b>${esc(currentUser.name || currentUser.email)}</b>
-      <button class="tk-logout-btn" id="tkLogout">Çıkış</button>
-    </div>`;
+      <button id="tkLogout">Çıkış</button>
+    </span>`;
     $('#tkLogout').onclick = () => { clearToken(); currentUser = null; myAccess = null; renderUserBar(); loadDocs(); };
   }
 
