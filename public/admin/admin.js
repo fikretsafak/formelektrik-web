@@ -22,19 +22,21 @@ function setupTheme() {
 // ===== i18n (panel arayüzü) =====
 const I18N = {
   tr: {
-    'navgroup.content': 'İçerik Yönetimi', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
+    'navgroup.content': 'İçerik Yönetimi', 'navgroup.library': 'Teknik Kütüphane', 'navgroup.requests': 'Talepler & Randevu', 'navgroup.hr': 'İnsan Kaynakları', 'navgroup.legal': 'Yasal & Uyumluluk', 'navgroup.system': 'Sistem',
     'nav.dashboard': 'Genel Bakış', 'nav.leads': 'İletişim Talepleri', 'nav.posts': 'Blog Yazıları', 'nav.announcements': 'Duyurular',
     'nav.services': 'Hizmetler', 'nav.projects': 'Referans Projeler', 'nav.brands': 'Markalar', 'nav.references': 'Referans Logoları', 'nav.milestones': 'Kilometre Taşları',
     'nav.users': 'Kullanıcılar', 'nav.appointments': 'Randevular', 'nav.apptTopics': 'Randevu Konuları', 'nav.careers': 'Kariyer / İlanlar', 'nav.applications': 'Başvurular',
     'nav.kvkk': 'KVKK Aydınlatma Metni', 'nav.kvkk-politikasi': 'Genel KVKK Politikası', 'nav.basvuru-formu': 'Başvuru Formu', 'nav.calisan-adayi': 'Çalışan Adayı Metni', 'nav.imha-politikasi': 'İmha Politikası',
+    'nav.library': 'TK Belgeleri', 'nav.libraryUsers': 'TK Başvuruları & Erişim',
     'nav.cerez': 'Çerez Politikası', 'nav.warranty': 'Garanti Ayarları', 'nav.warranty-logs': 'Garanti Sorguları', 'nav.settings': 'Ayarlar', 'nav.profile': 'Profilim', 'nav.logout': 'Çıkış',
   },
   en: {
-    'navgroup.content': 'Content', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
+    'navgroup.content': 'Content', 'navgroup.library': 'Technical Library', 'navgroup.requests': 'Requests & Appointments', 'navgroup.hr': 'Human Resources', 'navgroup.legal': 'Legal & Compliance', 'navgroup.system': 'System',
     'nav.dashboard': 'Overview', 'nav.leads': 'Contact Requests', 'nav.posts': 'Blog Posts', 'nav.announcements': 'Announcements',
     'nav.services': 'Services', 'nav.projects': 'References', 'nav.brands': 'Brands', 'nav.references': 'Reference Logos', 'nav.milestones': 'Milestones',
     'nav.users': 'Users', 'nav.appointments': 'Appointments', 'nav.apptTopics': 'Appointment Topics', 'nav.careers': 'Careers / Jobs', 'nav.applications': 'Applications',
     'nav.kvkk': 'Privacy Notice', 'nav.kvkk-politikasi': 'General PDPL Policy', 'nav.basvuru-formu': 'Application Form', 'nav.calisan-adayi': 'Candidate Notice', 'nav.imha-politikasi': 'Retention & Destruction',
+    'nav.library': 'TL Documents', 'nav.libraryUsers': 'TL Applications & Access',
     'nav.cerez': 'Cookie Policy', 'nav.warranty': 'Warranty Settings', 'nav.warranty-logs': 'Warranty Queries', 'nav.settings': 'Settings', 'nav.profile': 'My Profile', 'nav.logout': 'Log Out',
   },
 };

@@ -21,63 +21,121 @@
 <script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
 <style>
 /* Teknik Kütüphane */
-.tk-shell { display: grid; grid-template-columns: 260px 1fr; gap: 32px; padding: 40px 0 80px; }
-.tk-sidebar { position: sticky; top: calc(var(--header-h,72px) + 16px); align-self: start; }
-.tk-filter-card { background: var(--bg-soft,#f6f7fa); border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-.tk-filter-card h4 { font-size: .85rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0 0 10px; text-transform: uppercase; letter-spacing: .03em; }
-.tk-filter-card label { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: .9rem; color: var(--text-soft,#4b5167); cursor: pointer; }
-.tk-filter-card input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cyan,#2aa9e0); }
-.tk-search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line,#e5e7eb); border-radius: 10px; padding: 8px 12px; background: #fff; margin-bottom: 16px; }
-.tk-search input { border: none; outline: none; flex: 1; font-size: .9rem; font-family: inherit; background: transparent; }
-.tk-search .material-symbols-rounded { color: var(--text-soft,#999); font-size: 20px; }
 
-.tk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.tk-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 14px; padding: 20px; transition: box-shadow .2s, transform .2s; }
-.tk-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.08); transform: translateY(-2px); }
-.tk-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
-.tk-card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(42,169,224,.1); display: flex; align-items: center; justify-content: center; flex: none; }
-.tk-card-icon .material-symbols-rounded { color: var(--cyan,#2aa9e0); font-size: 22px; }
-.tk-card-title { font-size: .95rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.3; }
-.tk-card-brand { font-size: .78rem; color: var(--text-soft,#4b5167); margin-top: 2px; }
-.tk-card-desc { font-size: .85rem; color: var(--text-soft,#4b5167); line-height: 1.5; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.tk-card-foot { display: flex; align-items: center; justify-content: space-between; }
-.tk-badge { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.1); color: var(--cyan,#2aa9e0); padding: 3px 8px; border-radius: 6px; }
-.tk-badge.public { background: rgba(39,174,96,.1); color: #27ae60; }
-.tk-dl-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .15s; }
-.tk-dl-btn:hover { background: #1b8fc0; }
+/* Hero override */
+.tk-hero { background: linear-gradient(135deg, #0f1640 0%, #162050 50%, #1a3068 100%); padding: 80px 0 48px; position: relative; overflow: hidden; }
+.tk-hero::before { content: ''; position: absolute; top: -60%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(42,169,224,.12) 0%, transparent 70%); pointer-events: none; }
+.tk-hero::after { content: ''; position: absolute; bottom: -40%; left: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(42,169,224,.08) 0%, transparent 70%); pointer-events: none; }
+.tk-hero .wrap { position: relative; z-index: 1; }
+.tk-hero-grid { display: flex; align-items: center; gap: 48px; }
+.tk-hero-copy { flex: 1; }
+.tk-hero-copy .eyebrow { color: rgba(42,169,224,.9); }
+.tk-hero-copy h1 { color: #fff; font-size: 2.2rem; font-family: var(--font-head,Poppins,sans-serif); font-weight: 700; margin: 12px 0 16px; line-height: 1.2; }
+.tk-hero-copy p { color: rgba(255,255,255,.65); font-size: 1.05rem; line-height: 1.6; max-width: 520px; margin: 0; }
+.tk-hero-stats { display: flex; gap: 32px; margin-top: 28px; }
+.tk-hero-stat { text-align: center; }
+.tk-hero-stat b { display: block; font-size: 1.6rem; color: #fff; font-family: var(--font-head,Poppins,sans-serif); }
+.tk-hero-stat span { font-size: .78rem; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .04em; }
+.tk-hero-visual { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tk-hero-icon-card { width: 80px; height: 80px; border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.08); }
+.tk-hero-icon-card .material-symbols-rounded { font-size: 32px; }
+.tk-hic-1 { background: rgba(42,169,224,.15); color: #5cc8f5; }
+.tk-hic-2 { background: rgba(39,174,96,.12); color: #6ddb9e; }
+.tk-hic-3 { background: rgba(241,196,15,.1); color: #f5d565; }
+.tk-hic-4 { background: rgba(155,89,182,.1); color: #c39bdb; }
+
+/* Shell */
+.tk-shell { display: grid; grid-template-columns: 280px 1fr; gap: 32px; padding: 40px 0 80px; }
+.tk-sidebar { position: sticky; top: calc(var(--header-h,72px) + 16px); align-self: start; }
+
+/* Search */
+.tk-search { display: flex; align-items: center; gap: 10px; border: 2px solid var(--line,#e5e7eb); border-radius: 14px; padding: 11px 14px; background: #fff; margin-bottom: 16px; transition: border-color .2s, box-shadow .2s; }
+.tk-search:focus-within { border-color: var(--cyan,#2aa9e0); box-shadow: 0 0 0 3px rgba(42,169,224,.1); }
+.tk-search input { border: none; outline: none; flex: 1; font-size: .9rem; font-family: inherit; background: transparent; }
+.tk-search .material-symbols-rounded { color: var(--cyan,#2aa9e0); font-size: 22px; }
+
+/* Filter cards */
+.tk-filter-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.tk-filter-card h4 { display: flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; }
+.tk-filter-card h4 .material-symbols-rounded { font-size: 18px; color: var(--cyan,#2aa9e0); }
+.tk-filter-card label { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: .88rem; color: var(--text-soft,#4b5167); cursor: pointer; transition: color .15s; }
+.tk-filter-card label:hover { color: var(--text,#1a1d26); }
+.tk-filter-card input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cyan,#2aa9e0); border-radius: 4px; }
+
+/* Grid */
+.tk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+.tk-card { background: #fff; border: 1px solid var(--line,#e5e7eb); border-radius: 16px; padding: 22px; transition: box-shadow .25s, transform .25s, border-color .25s; display: flex; flex-direction: column; }
+.tk-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,.08); transform: translateY(-3px); border-color: rgba(42,169,224,.2); }
+.tk-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.tk-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
+.tk-card-icon .material-symbols-rounded { font-size: 24px; }
+.tk-icon-datasheet { background: rgba(42,169,224,.1); color: #2aa9e0; }
+.tk-icon-manual { background: rgba(155,89,182,.1); color: #9b59b6; }
+.tk-icon-certificate { background: rgba(241,196,15,.12); color: #d4a517; }
+.tk-icon-catalog { background: rgba(39,174,96,.1); color: #27ae60; }
+.tk-icon-software { background: rgba(231,76,60,.1); color: #e74c3c; }
+.tk-card-title { font-size: .95rem; font-weight: 700; color: var(--text,#1a1d26); margin: 0; line-height: 1.35; }
+.tk-card-brand { font-size: .78rem; color: var(--text-soft,#4b5167); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+.tk-card-desc { font-size: .85rem; color: var(--text-soft,#4b5167); line-height: 1.55; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+.tk-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line,#f0f1f4); }
+.tk-badge { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; background: rgba(42,169,224,.08); color: var(--cyan,#2aa9e0); padding: 4px 10px; border-radius: 8px; }
+.tk-badge.public { background: rgba(39,174,96,.08); color: #27ae60; }
+.tk-dl-btn { display: inline-flex; align-items: center; gap: 5px; background: var(--cyan,#2aa9e0); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: .2s; }
+.tk-dl-btn:hover { background: #1b8fc0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(42,169,224,.3); }
 .tk-dl-btn .material-symbols-rounded { font-size: 17px; }
-.tk-dl-btn.locked { background: var(--text-soft,#4b5167); }
-.tk-empty { text-align: center; padding: 60px 20px; color: var(--text-soft,#999); }
-.tk-empty .material-symbols-rounded { font-size: 48px; display: block; margin: 0 auto 12px; opacity: .4; }
-.tk-count { font-size: .85rem; color: var(--text-soft,#999); margin-bottom: 16px; }
+.tk-dl-btn.locked { background: var(--navy-deep,#0f1640); }
+.tk-dl-btn.locked:hover { background: #1a2355; box-shadow: 0 4px 12px rgba(15,22,64,.3); }
+
+/* Empty state */
+.tk-empty { text-align: center; padding: 80px 20px; color: var(--text-soft,#999); }
+.tk-empty-icon { width: 80px; height: 80px; border-radius: 20px; background: var(--bg-soft,#f6f7fa); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+.tk-empty-icon .material-symbols-rounded { font-size: 36px; color: var(--text-soft,#bbb); }
+.tk-empty h3 { font-size: 1rem; color: var(--text,#1a1d26); margin: 0 0 6px; font-weight: 600; }
+.tk-empty p { font-size: .88rem; margin: 0; }
+
+/* Count bar */
+.tk-count-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.tk-count { font-size: .88rem; color: var(--text-soft,#999); font-weight: 500; }
+.tk-count b { color: var(--text,#1a1d26); font-weight: 700; }
+
+/* User bar */
+.tk-user-bar { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(42,169,224,.06), rgba(42,169,224,.02)); border: 1px solid rgba(42,169,224,.15); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px; font-size: .88rem; }
+.tk-user-bar .material-symbols-rounded { color: var(--cyan); font-size: 22px; }
+.tk-user-bar b { color: var(--text); }
+.tk-logout-btn { margin-left: auto; background: none; border: 1px solid var(--line,#e5e7eb); color: var(--text-soft); cursor: pointer; font-size: .78rem; font-family: inherit; padding: 4px 12px; border-radius: 8px; transition: .15s; }
+.tk-logout-btn:hover { border-color: #e74c3c; color: #e74c3c; }
 
 /* Login/Register Modal */
-.tk-modal-overlay { display: none; position: fixed; inset: 0; z-index: 1100; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+.tk-modal-overlay { display: none; position: fixed; inset: 0; z-index: 1100; background: rgba(15,22,64,.6); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
 .tk-modal-overlay.open { display: flex; }
-.tk-modal { background: #fff; border-radius: 20px; width: 90vw; max-width: 440px; padding: 32px; box-shadow: 0 24px 60px rgba(0,0,0,.2); animation: tkIn .2s ease; }
-@keyframes tkIn { from { opacity: 0; transform: scale(.95) translateY(10px); } }
-.tk-modal-close { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; color: var(--text-soft); }
+.tk-modal { background: #fff; border-radius: 24px; width: 90vw; max-width: 440px; padding: 36px; box-shadow: 0 24px 60px rgba(0,0,0,.25); animation: tkIn .25s ease; }
+@keyframes tkIn { from { opacity: 0; transform: scale(.96) translateY(12px); } }
+.tk-modal-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 8px; background: var(--bg-soft,#f6f7fa); border: none; cursor: pointer; color: var(--text-soft); display: flex; align-items: center; justify-content: center; transition: .15s; }
+.tk-modal-close:hover { background: #eee; }
 .tk-modal h3 { margin: 0 0 8px; font-size: 1.1rem; }
 .tk-modal p { margin: 0 0 16px; font-size: .88rem; color: var(--text-soft); }
-.tk-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--line,#e5e7eb); }
-.tk-tab { flex: 1; padding: 10px; text-align: center; background: none; border: none; font-size: .9rem; font-weight: 600; cursor: pointer; color: var(--text-soft); border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; }
-.tk-tab.active { color: var(--cyan,#2aa9e0); border-bottom-color: var(--cyan,#2aa9e0); }
-.tk-form-group { margin-bottom: 12px; }
-.tk-form-group label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
-.tk-form-group input, .tk-form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--line,#e5e7eb); border-radius: 8px; font-size: .9rem; font-family: inherit; box-sizing: border-box; }
+.tk-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg-soft,#f6f7fa); border-radius: 12px; padding: 4px; }
+.tk-tab { flex: 1; padding: 10px; text-align: center; background: none; border: none; font-size: .88rem; font-weight: 600; cursor: pointer; color: var(--text-soft); border-radius: 8px; font-family: inherit; transition: .2s; }
+.tk-tab.active { color: var(--cyan,#2aa9e0); background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.tk-form-group { margin-bottom: 14px; }
+.tk-form-group label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: 5px; color: var(--text); text-transform: uppercase; letter-spacing: .02em; }
+.tk-form-group input, .tk-form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--line,#e5e7eb); border-radius: 10px; font-size: .9rem; font-family: inherit; box-sizing: border-box; transition: border-color .2s; }
+.tk-form-group input:focus, .tk-form-group textarea:focus { outline: none; border-color: var(--cyan,#2aa9e0); }
 .tk-form-group textarea { resize: vertical; }
-.tk-submit { width: 100%; padding: 10px; background: var(--cyan,#2aa9e0); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 8px; }
-.tk-submit:hover { background: #1b8fc0; }
-.tk-msg { text-align: center; padding: 20px; font-size: .9rem; }
-.tk-msg.success { color: #27ae60; }
-.tk-msg.error { color: #e74c3c; }
-.tk-user-bar { display: flex; align-items: center; gap: 10px; background: rgba(42,169,224,.06); border: 1px solid rgba(42,169,224,.15); border-radius: 12px; padding: 10px 16px; margin-bottom: 16px; font-size: .88rem; }
-.tk-user-bar .material-symbols-rounded { color: var(--cyan); }
-.tk-user-bar b { color: var(--text); }
-.tk-logout-btn { margin-left: auto; background: none; border: none; color: var(--text-soft); cursor: pointer; font-size: .8rem; text-decoration: underline; font-family: inherit; }
+.tk-submit { width: 100%; padding: 12px; background: var(--cyan,#2aa9e0); color: #fff; border: none; border-radius: 12px; font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 10px; transition: .2s; }
+.tk-submit:hover { background: #1b8fc0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(42,169,224,.3); }
+.tk-msg { text-align: center; padding: 16px; font-size: .88rem; border-radius: 10px; margin-top: 12px; }
+.tk-msg.success { color: #1a8a4a; background: rgba(39,174,96,.08); }
+.tk-msg.error { color: #c0392b; background: rgba(231,76,60,.08); }
+
 @media (max-width: 800px) {
   .tk-shell { grid-template-columns: 1fr; }
   .tk-sidebar { position: static; }
+  .tk-hero-grid { flex-direction: column; gap: 24px; }
+  .tk-hero-visual { display: none; }
+  .tk-hero-copy h1 { font-size: 1.6rem; }
+  .tk-hero-stats { gap: 20px; }
+  .tk-hero-stats b { font-size: 1.3rem; }
 }
 </style>
 </head>
@@ -116,13 +174,26 @@
   <a href="/#iletisim" data-i18n="nav.contact">İletişim<span class="material-symbols-rounded">chevron_right</span></a>
 </nav>
 
-<!-- ===== SAYFA ===== -->
-<section class="subpage-hero">
+<!-- ===== HERO ===== -->
+<section class="tk-hero">
   <div class="wrap">
-    <div class="section-head reveal" style="margin-bottom:0">
-      <span class="eyebrow">Teknik Kütüphane</span>
-      <h1 class="section-title" style="margin-top:14px">Teknik Belgeler</h1>
-      <p class="section-lead">Datasheet, katalog, sertifika ve teknik belgelere erişim.</p>
+    <div class="tk-hero-grid">
+      <div class="tk-hero-copy">
+        <span class="eyebrow"><span class="material-symbols-rounded" style="font-size:15px">library_books</span> Teknik Kütüphane</span>
+        <h1>Teknik Belgelerinize <span style="color:#2aa9e0">Tek Noktadan</span> Erişin</h1>
+        <p>Datasheet, katalog, sertifika, kullanım kılavuzu ve yazılım dosyalarına güvenli ve hızlı erişim sağlayın.</p>
+        <div class="tk-hero-stats" id="tkHeroStats">
+          <div class="tk-hero-stat"><b id="tkStatDocs">0</b><span>Belge</span></div>
+          <div class="tk-hero-stat"><b id="tkStatBrands">0</b><span>Marka</span></div>
+          <div class="tk-hero-stat"><b id="tkStatTypes">5</b><span>Kategori</span></div>
+        </div>
+      </div>
+      <div class="tk-hero-visual">
+        <div class="tk-hero-icon-card tk-hic-1"><span class="material-symbols-rounded">description</span></div>
+        <div class="tk-hero-icon-card tk-hic-2"><span class="material-symbols-rounded">workspace_premium</span></div>
+        <div class="tk-hero-icon-card tk-hic-3"><span class="material-symbols-rounded">auto_stories</span></div>
+        <div class="tk-hero-icon-card tk-hic-4"><span class="material-symbols-rounded">terminal</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -139,11 +210,11 @@
         <input type="text" id="tkSearch" placeholder="Belge ara...">
       </div>
       <div class="tk-filter-card" id="tkBrandFilter">
-        <h4>Marka</h4>
+        <h4><span class="material-symbols-rounded">storefront</span> Marka</h4>
         <div id="tkBrandList"></div>
       </div>
       <div class="tk-filter-card">
-        <h4>Belge Türü</h4>
+        <h4><span class="material-symbols-rounded">category</span> Belge Türü</h4>
         <label><input type="checkbox" value="datasheet" class="tk-type-cb"> Datasheet</label>
         <label><input type="checkbox" value="manual" class="tk-type-cb"> Manual</label>
         <label><input type="checkbox" value="certificate" class="tk-type-cb"> Sertifika</label>
@@ -154,7 +225,9 @@
 
     <!-- Content -->
     <main>
-      <div class="tk-count" id="tkCount"></div>
+      <div class="tk-count-bar">
+        <div class="tk-count" id="tkCount"></div>
+      </div>
       <div class="tk-grid" id="tkGrid"></div>
     </main>
   </div>
@@ -327,10 +400,11 @@
       if (checkedBrands.length > 1) docs = docs.filter(d => checkedBrands.includes(String(d.brand_id)));
       if (checkedTypes.length > 1) docs = docs.filter(d => checkedTypes.includes(d.document_type));
 
-      count.textContent = docs.length + ' belge bulundu';
+      count.innerHTML = '<b>' + docs.length + '</b> belge bulundu';
+      updateHeroStats(docs.length);
 
       if (!docs.length) {
-        grid.innerHTML = '<div class="tk-empty"><span class="material-symbols-rounded">folder_open</span><p>Belge bulunamadı.</p></div>';
+        grid.innerHTML = '<div class="tk-empty"><div class="tk-empty-icon"><span class="material-symbols-rounded">folder_open</span></div><h3>Belge bulunamadı</h3><p>Filtrelerinizi değiştirmeyi veya arama terimini güncellemeyi deneyin.</p></div>';
         return;
       }
 
@@ -339,7 +413,7 @@
         const icon = DOC_ICONS[d.document_type] || 'description';
         return `<div class="tk-card">
           <div class="tk-card-head">
-            <div class="tk-card-icon"><span class="material-symbols-rounded">${icon}</span></div>
+            <div class="tk-card-icon tk-icon-${d.document_type || 'datasheet'}"><span class="material-symbols-rounded">${icon}</span></div>
             <div>
               <div class="tk-card-title">${esc(d.title)}</div>
               <div class="tk-card-brand">${esc(d.brand_name || '')} ${formatSize(d.file_size) ? '· '+formatSize(d.file_size) : ''}</div>
@@ -376,12 +450,20 @@
   async function loadBrands() {
     try {
       const data = await api('/api/library/brands');
+      const brands = data.brands || [];
       const list = $('#tkBrandList');
-      list.innerHTML = (data.brands || []).map(b =>
+      list.innerHTML = brands.map(b =>
         `<label><input type="checkbox" value="${b.id}" class="tk-brand-cb"> ${esc(b.name)} <small style="opacity:.5">(${b.doc_count})</small></label>`
       ).join('');
       list.querySelectorAll('.tk-brand-cb').forEach(cb => { cb.onchange = loadDocs; });
+      const statBrands = $('#tkStatBrands');
+      if (statBrands) statBrands.textContent = brands.length;
     } catch(e) {}
+  }
+
+  function updateHeroStats(docCount) {
+    const el = $('#tkStatDocs');
+    if (el) el.textContent = docCount;
   }
 
   // Modal
