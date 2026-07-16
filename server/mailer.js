@@ -6,7 +6,7 @@ let configured = false;
 
 const APP_BASE_URL = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 // Not: logo-light.png projede yok; gerçek logo logo.png (beyaz zeminde iyi durur).
-const MAIL_LOGO_URL = `${APP_BASE_URL}/assets/main/logo.png`;
+const MAIL_LOGO_URL = 'https://formelektrik.com/assets/main/logo.png';
 
 // Ortak e-posta şablonu — logo başlık + içerik + "cevaplamayın" alt bilgisi.
 // Tüm bildirim mailleri (lead/randevu/kariyer) bunu kullanır.
