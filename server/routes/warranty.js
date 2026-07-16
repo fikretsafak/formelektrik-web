@@ -130,12 +130,14 @@ function mapRecord(rec) {
     for (const f of fallbacks) { if (rec[f] != null) return rec[f]; }
     return '';
   };
+  // Fallback'ler ERP'nin gerçek alan adlarına göre (OData: serialNo, invoiceNo, invoiceDate,
+  // warrantyStartDate, warrantyEndDate, customerName, taxNo).
   return {
-    serialNo:       pick('navision_field_serial', 'serial', 'serialNo', 'SerialNo', 'seri_no'),
+    serialNo:       pick('navision_field_serial', 'serialNo', 'serial', 'SerialNo', 'seri_no'),
     invoiceDate:    pick('navision_field_invoice_date', 'invoiceDate', 'InvoiceDate', 'fatura_tarihi'),
     invoiceNo:      pick('navision_field_invoice_no', 'invoiceNo', 'InvoiceNo', 'fatura_no'),
-    warrantyStart:  pick('navision_field_warranty_start', 'warrantyStart', 'WarrantyStart', 'garanti_baslangic'),
-    warrantyEnd:    pick('navision_field_warranty_end', 'warrantyEnd', 'WarrantyEnd', 'garanti_bitis'),
+    warrantyStart:  pick('navision_field_warranty_start', 'warrantyStartDate', 'warrantyStart', 'WarrantyStart', 'garanti_baslangic'),
+    warrantyEnd:    pick('navision_field_warranty_end', 'warrantyEndDate', 'warrantyEnd', 'WarrantyEnd', 'garanti_bitis'),
     customerName:   pick('navision_field_customer_name', 'customerName', 'CustomerName', 'musteri_adi'),
     taxNo:          pick('navision_field_tax_no', 'taxNo', 'TaxNo', 'vergi_no'),
   };
@@ -253,8 +255,9 @@ router.post('/query', queryLimiter, async (req, res) => {
     return res.status(400).json({ error: 'captcha_failed' });
   }
 
-  // 2) Yerel önbellekten oku (ERP'ye canlı istek YOK — veri günlük sync ile gelir)
-  const row = db.prepare('SELECT * FROM warranty_cache WHERE serial_no = ?').get(serialNo);
+  // 2) Yerel önbellekten oku (ERP'ye canlı istek YOK — veri günlük sync ile gelir).
+  // COLLATE NOCASE: kullanıcı büyük/küçük harf farkıyla yazsa da eşleşsin.
+  const row = db.prepare('SELECT * FROM warranty_cache WHERE serial_no = ? COLLATE NOCASE').get(serialNo);
   if (!row) {
     logQuery(serialNo, 'not_found', ip);
     return res.json({ found: false });
