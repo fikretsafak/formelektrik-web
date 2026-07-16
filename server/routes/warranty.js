@@ -42,13 +42,10 @@ function cfg(key, envKey) {
 
 // Admin panelde düzenlenebilen tüm warranty ayar anahtarları.
 const WARRANTY_KEYS = [
-  'navision_api_url',       // tek-seri canlı test endpoint'i (admin bağlantı testi için)
-  'navision_list_url',      // TÜM kayıtları döndüren toplu/liste ucu (günlük sync; boşsa sync no-op)
-  'navision_auth_type',     // 'none' | 'basic' | 'bearer'
+  'navision_api_url',       // ERP OData ucu — TÜM kayıtları döndürür (hem sync hem test bunu kullanır)
   'navision_user',          // basic auth kullanıcı
   'navision_pass',          // basic auth şifre (maskeli)
-  'navision_api_key',       // bearer/api key (maskeli)
-  // API şekli belirsiz → yanıttaki alan yolları admin'den ayarlanır (nokta gösterimi: "data.invoiceDate")
+  // Yanıttaki alan yolları admin'den override edilebilir (nokta gösterimi: "data.invoiceDate")
   'navision_field_invoice_date',
   'navision_field_invoice_no',
   'navision_field_warranty_start',
@@ -58,7 +55,7 @@ const WARRANTY_KEYS = [
   'recaptcha_site_key',     // reCAPTCHA v2 site key (public)
   'recaptcha_secret',       // reCAPTCHA v2 secret (maskeli)
 ];
-const SECRET_KEYS = ['navision_pass', 'navision_api_key', 'recaptcha_secret'];
+const SECRET_KEYS = ['navision_pass', 'recaptcha_secret'];
 
 // ---- Maskeleme (backend) ----
 // "Ahmet Yılmaz" -> "Ah*** Yı***" ; tek kelimeyse "Ahmet" -> "Ah***"
@@ -107,17 +104,13 @@ function getByPath(obj, pathStr) {
   return pathStr.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
 }
 
-// Ayarlı auth tipine göre ortak istek header'ları.
+// Ortak istek header'ları — Navision Basic auth (kullanıcı/şifre).
 function buildHeaders() {
   const headers = { 'Accept': 'application/json' };
-  const authType = (cfg('navision_auth_type') || 'none').toLowerCase();
-  if (authType === 'basic') {
-    const user = cfg('navision_user', 'NAVISION_USER');
-    const pass = cfg('navision_pass', 'NAVISION_PASS');
+  const user = cfg('navision_user', 'NAVISION_USER');
+  const pass = cfg('navision_pass', 'NAVISION_PASS');
+  if (user || pass) {
     headers['Authorization'] = 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
-  } else if (authType === 'bearer') {
-    const key = cfg('navision_api_key');
-    if (key) headers['Authorization'] = 'Bearer ' + key;
   }
   return headers;
 }
@@ -143,44 +136,37 @@ function mapRecord(rec) {
   };
 }
 
-// Tek seri no ile canlı ERP sorgusu — YALNIZCA admin bağlantı testi (/test) için.
+// Canlı ERP bağlantı testi — YALNIZCA admin /test için. ERP tüm listeyi döndürür;
+// seri no verilirse listeden filtrelenir, yoksa ilk kayıt döner.
 // Public /query artık ERP'ye gitmez; warranty_cache'ten okur.
 async function queryNavision(serialNo) {
   const url = cfg('navision_api_url', 'NAVISION_API_URL');
   if (!url) { const e = new Error('not_configured'); e.code = 'not_configured'; throw e; }
 
-  // Seri no'yu URL'e yerleştir: {serial} placeholder varsa değiştir, yoksa query param ekle.
-  let reqUrl;
-  if (url.includes('{serial}')) {
-    reqUrl = url.replace('{serial}', encodeURIComponent(serialNo));
-  } else {
-    reqUrl = url + (url.includes('?') ? '&' : '?') + 'serial=' + encodeURIComponent(serialNo);
-  }
-
-  const r = await fetch(reqUrl, { headers: buildHeaders() });
-  if (r.status === 404) return null;                 // kayıt yok
+  const r = await fetch(url, { headers: buildHeaders() });
   if (!r.ok) { const e = new Error('erp_error_' + r.status); e.code = 'error'; throw e; }
   const data = await r.json().catch(() => null);
   if (!data) return null;
 
-  // OData/liste yanıtı ise ilk kaydı al (value[]), değilse objenin kendisi.
-  const rec = Array.isArray(data) ? data[0]
-    : (data.value && Array.isArray(data.value) ? data.value[0] : data);
-  if (!rec) return null;
-  const m = mapRecord(rec);
-  delete m.serialNo; // tek sorgu yanıtında seri no zaten biliniyor
-  return m;
+  const list = Array.isArray(data) ? data
+    : (data && data.value && Array.isArray(data.value) ? data.value : [data]);
+  const mapped = list.map(mapRecord);
+  const wanted = String(serialNo || '').trim().toLowerCase();
+  const rec = wanted
+    ? mapped.find(m => String(m.serialNo || '').trim().toLowerCase() === wanted)
+    : mapped[0];
+  return rec || null;
 }
 
-// ---- Günlük sync: ERP'nin toplu ucundan TÜM kayıtları çekip warranty_cache'i tazele ----
-// navision_list_url boşsa no-op. Sonuç/hata `settings`'e yazılır (admin panelde gösterilir).
+// ---- Günlük sync: ERP OData ucundan TÜM kayıtları çekip warranty_cache'i tazele ----
+// navision_api_url boşsa no-op. Sonuç/hata `settings`'e yazılır (admin panelde gösterilir).
 async function syncWarrantyCache() {
-  const listUrl = cfg('navision_list_url', 'NAVISION_LIST_URL');
-  if (!listUrl) return { skipped: true, reason: 'no_list_url' };
+  const url = cfg('navision_api_url', 'NAVISION_API_URL');
+  if (!url) return { skipped: true, reason: 'no_url' };
 
   let rows;
   try {
-    const r = await fetch(listUrl, { headers: buildHeaders() });
+    const r = await fetch(url, { headers: buildHeaders() });
     if (!r.ok) throw new Error('erp_error_' + r.status);
     const data = await r.json();
     const list = Array.isArray(data) ? data

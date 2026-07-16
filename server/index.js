@@ -104,18 +104,29 @@ app.use((err, req, res, next) => {
 });
 
 // Garanti önbelleği — günlük ERP sync. Public sorgu ERP'ye değil DB'ye gider; ERP yalnızca burada,
-// sunucu tarafında, günde bir kez kullanılır.
-// ponytail: tek süreç varsayımıyla stdlib setInterval. Çok-instance/PM2 cluster'a geçilirse
+// sunucu tarafında, günde bir kez (her akşam) kullanılır.
+// ponytail: tek süreç varsayımıyla stdlib setTimeout zinciri. Çok-instance/PM2 cluster'a geçilirse
 //           tek instance'ta çalışacak cron'a (node-cron) taşı.
 const { syncWarrantyCache } = require('./routes/warranty');
+const SYNC_HOUR = 23; // her akşam 23:00'te (sunucu yerel saati)
 function runWarrantySync() {
   Promise.resolve()
     .then(syncWarrantyCache)
     .then(r => { if (r && !r.skipped) console.log('[warranty] sync:', JSON.stringify(r)); })
     .catch(e => console.error('[warranty] sync error:', e));
 }
-setTimeout(runWarrantySync, 10 * 1000);              // açılışta bir kez (10 sn gecikmeli)
-setInterval(runWarrantySync, 24 * 60 * 60 * 1000);   // sonra her 24 saatte bir
+function msUntilNextSync() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(SYNC_HOUR, 0, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1); // saat geçtiyse yarına
+  return next - now;
+}
+function scheduleNextSync() {
+  setTimeout(() => { runWarrantySync(); scheduleNextSync(); }, msUntilNextSync());
+}
+setTimeout(runWarrantySync, 10 * 1000); // açılışta bir kez (DB'yi hemen güncel tut)
+scheduleNextSync();                     // sonra her akşam SYNC_HOUR'da
 
 app.listen(PORT, () => {
   console.log(`▶ Form Elektrik sunucusu çalışıyor: http://localhost:${PORT}`);

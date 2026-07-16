@@ -3336,39 +3336,23 @@ routes.warranty = async (page) => {
   card.innerHTML = `
     <div style="padding:24px 24px 0">
       <h3 style="margin:0 0 4px;font-size:18px">Garanti Sorgulama Ayarları</h3>
-      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfası buradan beslenir. Veri güvenlik için ERP'den <b>günde bir kez</b> çekilip yerel veritabanına kaydedilir; kullanıcı sorguları ERP'ye değil bu önbelleğe gider. <b>Liste/Toplu URL</b> tüm kayıtları döndüren uçtur (sync bunu kullanır). Şifre/anahtar alanları maskelidir; değiştirmezseniz eski değer korunur.</p>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfası buradan beslenir. ERP OData ucundaki <b>tüm kayıtlar</b> her akşam çekilip yerel veritabanına kaydedilir; kullanıcı sorguları ERP'ye değil bu önbelleğe gider. Şifre alanı maskelidir; değiştirmezseniz eski değer korunur.</p>
     </div>
     <div class="settings-form" style="padding:8px 24px 24px">
       <h4 style="margin:14px 0 10px;color:var(--navy);font-size:14px">Navision ERP Bağlantısı</h4>
       <div class="settings-cols">
         <div class="settings-col">
           <div class="settings-row">
-            <label class="settings-row-label" for="wUrl">Test URL (tek seri)</label>
-            <input class="settings-row-input" id="wUrl" value="${v('navision_api_url')}" placeholder="https://erp.../warranty?serial={serial}">
+            <label class="settings-row-label" for="wUrl">ERP OData URL</label>
+            <input class="settings-row-input" id="wUrl" value="${v('navision_api_url')}" placeholder="https://erp.../ODataV4/.../APIWarrantyLy">
           </div>
           <div class="settings-row">
-            <label class="settings-row-label" for="wListUrl">Liste/Toplu URL (sync)</label>
-            <input class="settings-row-input" id="wListUrl" value="${v('navision_list_url')}" placeholder="https://erp.../warranties (tüm kayıtlar)">
-          </div>
-          <div class="settings-row">
-            <label class="settings-row-label" for="wAuth">Kimlik Doğrulama</label>
-            <select class="settings-row-input" id="wAuth">
-              <option value="none"${(s.navision_auth_type||'none')==='none'?' selected':''}>Yok</option>
-              <option value="basic"${s.navision_auth_type==='basic'?' selected':''}>Basic (kullanıcı/şifre)</option>
-              <option value="bearer"${s.navision_auth_type==='bearer'?' selected':''}>Bearer / API Key</option>
-            </select>
-          </div>
-          <div class="settings-row">
-            <label class="settings-row-label" for="wUser">Kullanıcı (Basic)</label>
+            <label class="settings-row-label" for="wUser">Kullanıcı</label>
             <input class="settings-row-input" id="wUser" value="${v('navision_user')}">
           </div>
           <div class="settings-row">
-            <label class="settings-row-label" for="wPass">Şifre (Basic)</label>
+            <label class="settings-row-label" for="wPass">Şifre</label>
             <input class="settings-row-input" id="wPass" type="password" value="${v('navision_pass')}" placeholder="••••••••">
-          </div>
-          <div class="settings-row">
-            <label class="settings-row-label" for="wKey">API Key (Bearer)</label>
-            <input class="settings-row-input" id="wKey" type="password" value="${v('navision_api_key')}" placeholder="••••••••">
           </div>
         </div>
         <div class="settings-col">
@@ -3409,11 +3393,8 @@ routes.warranty = async (page) => {
 
   const collect = () => ({
     navision_api_url: page.querySelector('#wUrl').value.trim(),
-    navision_list_url: page.querySelector('#wListUrl').value.trim(),
-    navision_auth_type: page.querySelector('#wAuth').value,
     navision_user: page.querySelector('#wUser').value.trim(),
     navision_pass: page.querySelector('#wPass').value,
-    navision_api_key: page.querySelector('#wKey').value,
     navision_field_invoice_date: page.querySelector('#fInvDate').value.trim(),
     navision_field_invoice_no: page.querySelector('#fInvNo').value.trim(),
     navision_field_warranty_start: page.querySelector('#fWStart').value.trim(),
