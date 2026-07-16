@@ -37,22 +37,56 @@
   .warranty-note { margin-top: 16px; font-size: .84rem; color: var(--text-faint); text-align:center; line-height:1.6; }
   .warranty-note a { color: var(--cyan); }
 
-  /* Sonuç */
-  .warranty-result { margin-top: 24px; display:none; animation: wFade .3s ease; }
+  /* Sonuç — ayrı estetik kart, sorgu kartının altında */
+  .warranty-result { margin-top: 22px; display:none; animation: wFade .35s cubic-bezier(.2,.7,.3,1); }
   .warranty-result.show { display:block; }
-  @keyframes wFade { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
-  .warranty-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-size:.85rem; font-weight:600; margin-bottom:16px; }
-  .warranty-badge.active { background:#e9f9f0; color:#0f9d58; }
-  .warranty-badge.expired { background:#fdecec; color:#d93025; }
-  .result-title { font-family: var(--font-head); color: var(--navy); font-size: 1.05rem; margin: 0 0 14px; display:flex; align-items:center; gap:8px; }
-  .result-title .material-symbols-rounded { color: var(--cyan); font-size:22px; }
-  .result-grid { border:1px solid var(--line); border-radius: var(--radius-sm); overflow:hidden; }
-  .result-row { display:grid; grid-template-columns: 42% 58%; }
-  .result-row:not(:last-child) { border-bottom:1px solid var(--line); }
-  .result-row .k { background: color-mix(in srgb, var(--navy) 4%, #fff); padding: 13px 15px; font-weight:600; color: var(--navy); font-size:.88rem; }
-  .result-row .v { padding: 13px 15px; color: var(--text-soft); font-size:.92rem; word-break: break-word; }
-  .result-row .v.mask { font-family: var(--font-mono, monospace); letter-spacing: 1px; color: var(--navy); }
-  @media (max-width: 480px){ .result-row { grid-template-columns: 1fr; } .result-row .k { border-bottom:1px dashed var(--line); } .warranty-card { padding: 24px 18px; } }
+  @keyframes wFade { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform:none; } }
+
+  /* Durum banner'ı — büyük, renkli, kalan süreyi vurgular */
+  .warranty-status {
+    display:flex; align-items:center; gap:16px;
+    padding: 20px 22px; border-radius: var(--radius); margin-bottom: 18px;
+    border:1px solid transparent;
+  }
+  .warranty-status .st-icon {
+    width:52px; height:52px; flex-shrink:0; border-radius:14px;
+    display:grid; place-items:center;
+  }
+  .warranty-status .st-icon .material-symbols-rounded { font-size:30px; }
+  .warranty-status .st-text { min-width:0; }
+  .warranty-status .st-title { font-family:var(--font-head); font-weight:700; font-size:1.12rem; line-height:1.2; }
+  .warranty-status .st-sub { font-size:.88rem; margin-top:3px; opacity:.85; }
+  .warranty-status.active { background: linear-gradient(135deg,#eafaf1,#f3fbf7); border-color:#c9efd8; }
+  .warranty-status.active .st-icon { background:#0f9d58; color:#fff; }
+  .warranty-status.active .st-title { color:#0b7a43; }
+  .warranty-status.active .st-sub { color:#0f9d58; }
+  .warranty-status.expired { background: linear-gradient(135deg,#fdecec,#fdf4f4); border-color:#f6d0d0; }
+  .warranty-status.expired .st-icon { background:#d93025; color:#fff; }
+  .warranty-status.expired .st-title { color:#b5261c; }
+  .warranty-status.expired .st-sub { color:#d93025; }
+
+  .result-title { font-family: var(--font-head); color: var(--navy); font-size: .82rem; letter-spacing:.08em; text-transform:uppercase; margin: 0 0 12px; display:flex; align-items:center; gap:8px; }
+  .result-title .material-symbols-rounded { color: var(--cyan); font-size:20px; }
+
+  /* Bilgi satırları — ikonlu, kart hissi */
+  .result-list { display:flex; flex-direction:column; gap:8px; }
+  .result-item {
+    display:flex; align-items:center; gap:14px;
+    padding: 13px 16px; border:1px solid var(--line); border-radius: var(--radius-sm);
+    background:#fff; transition: border-color .15s, box-shadow .15s;
+  }
+  .result-item:hover { border-color: color-mix(in srgb, var(--cyan) 40%, var(--line)); box-shadow: 0 4px 14px rgba(11,31,59,.05); }
+  .result-item .ri-icon {
+    width:38px; height:38px; flex-shrink:0; border-radius:10px;
+    background: color-mix(in srgb, var(--cyan) 10%, #fff); color: var(--cyan);
+    display:grid; place-items:center;
+  }
+  .result-item .ri-icon .material-symbols-rounded { font-size:20px; }
+  .result-item .ri-body { min-width:0; flex:1; }
+  .result-item .ri-k { font-size:.76rem; color: var(--text-faint); font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
+  .result-item .ri-v { font-size:.98rem; color: var(--navy); font-weight:600; word-break: break-word; margin-top:1px; }
+  .result-item .ri-v.mask { font-family: var(--font-mono, monospace); letter-spacing: 1px; }
+  @media (max-width: 480px){ .warranty-card { padding: 24px 18px; } .warranty-status { padding:16px; gap:12px; } }
 </style>
 <!-- Rybbit Analytics -->
 <script src="https://analytics.enerjione.com/api/script.js" data-site-id="8d1bda3b72d3" defer></script>
@@ -121,15 +155,39 @@
     </form>
 
     <div class="warranty-result" id="warrantyResult">
-      <div id="resultBadge"></div>
+      <div class="warranty-status" id="resultBadge">
+        <div class="st-icon"><span class="material-symbols-rounded" id="stIcon">check_circle</span></div>
+        <div class="st-text">
+          <div class="st-title" id="stTitle">—</div>
+          <div class="st-sub" id="stSub"></div>
+        </div>
+      </div>
       <div class="result-title"><span class="material-symbols-rounded">receipt_long</span> <span id="wResultTitle">Garanti Bilgileri</span></div>
-      <div class="result-grid">
-        <div class="result-row"><div class="k" id="wkInvDate">Fatura Tarihi</div><div class="v" id="rInvoiceDate">—</div></div>
-        <div class="result-row"><div class="k" id="wkInvNo">Fatura No</div><div class="v" id="rInvoiceNo">—</div></div>
-        <div class="result-row"><div class="k" id="wkWStart">Garanti Başlangıç Tarihi</div><div class="v" id="rWStart">—</div></div>
-        <div class="result-row"><div class="k" id="wkWEnd">Garanti Bitiş Tarihi</div><div class="v" id="rWEnd">—</div></div>
-        <div class="result-row"><div class="k" id="wkCust">Müşteri Adı</div><div class="v mask" id="rCustomer">—</div></div>
-        <div class="result-row"><div class="k" id="wkTax">Vergi No</div><div class="v mask" id="rTaxNo">—</div></div>
+      <div class="result-list">
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">calendar_today</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkInvDate">Fatura Tarihi</div><div class="ri-v" id="rInvoiceDate">—</div></div>
+        </div>
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">receipt</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkInvNo">Fatura No</div><div class="ri-v" id="rInvoiceNo">—</div></div>
+        </div>
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">event_available</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkWStart">Garanti Başlangıç Tarihi</div><div class="ri-v" id="rWStart">—</div></div>
+        </div>
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">event_busy</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkWEnd">Garanti Bitiş Tarihi</div><div class="ri-v" id="rWEnd">—</div></div>
+        </div>
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">business</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkCust">Müşteri Adı</div><div class="ri-v mask" id="rCustomer">—</div></div>
+        </div>
+        <div class="result-item">
+          <div class="ri-icon"><span class="material-symbols-rounded">badge</span></div>
+          <div class="ri-body"><div class="ri-k" id="wkTax">Vergi No</div><div class="ri-v mask" id="rTaxNo">—</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -208,6 +266,8 @@
       notFound: 'Bu seri numarasına ait garanti kaydı bulunamadı. Lütfen numarayı kontrol edin.',
       querying: 'Sorgulanıyor…',
       active: 'Garanti Aktif', expired: 'Garanti Süresi Dolmuş',
+      remaining: 'kaldı', expiredAgo: 'önce sona erdi', endsToday: 'Bugün sona eriyor',
+      yr: 'yıl', mo: 'ay', dy: 'gün',
     },
     en: {
       eyebrow: 'WARRANTY QUERY',
@@ -229,6 +289,8 @@
       notFound: 'No warranty record found for this serial number. Please check the number.',
       querying: 'Querying…',
       active: 'Warranty Active', expired: 'Warranty Expired',
+      remaining: 'remaining', expiredAgo: 'ago', endsToday: 'Ends today',
+      yr: 'yr', mo: 'mo', dy: 'days',
     },
   };
 
@@ -298,6 +360,22 @@
     return esc(v);
   }
 
+  // İki tarih arası yıl/ay/gün farkını okunur metne çevir ("2 yıl 3 ay" / "12 gün").
+  function humanDuration(fromMs, toMs) {
+    let a = new Date(fromMs), b = new Date(toMs);
+    if (b < a) { const t = a; a = b; b = t; }
+    let years = b.getFullYear() - a.getFullYear();
+    let months = b.getMonth() - a.getMonth();
+    let days = b.getDate() - a.getDate();
+    if (days < 0) { months -= 1; const pm = new Date(b.getFullYear(), b.getMonth(), 0).getDate(); days += pm; }
+    if (months < 0) { years -= 1; months += 12; }
+    const parts = [];
+    if (years) parts.push(years + ' ' + T.yr);
+    if (months) parts.push(months + ' ' + T.mo);
+    if (!years && !months) parts.push(days + ' ' + T.dy);
+    return parts.join(' ');
+  }
+
   function showResult(w) {
     $('rInvoiceDate').textContent = fmtDate(w.invoiceDate);
     $('rInvoiceNo').textContent = esc(w.invoiceNo) || '—';
@@ -305,16 +383,26 @@
     $('rWEnd').textContent = fmtDate(w.warrantyEnd);
     $('rCustomer').textContent = esc(w.customerName) || '—';
     $('rTaxNo').textContent = esc(w.taxNo) || '—';
-    badgeEl.innerHTML = '';
+
+    // Durum banner'ı: aktif/bitti + kalan (veya geçen) süre
     const end = new Date(w.warrantyEnd);
-    if (!isNaN(end.getTime())) {
-      const active = end.getTime() >= Date.now();
-      const b = document.createElement('span');
-      b.className = 'warranty-badge ' + (active ? 'active' : 'expired');
-      b.innerHTML = `<span class="material-symbols-rounded" style="font-size:16px">${active ? 'check_circle' : 'cancel'}</span> ${active ? T.active : T.expired}`;
-      badgeEl.appendChild(b);
+    const hasEnd = !isNaN(end.getTime());
+    const now = Date.now();
+    const active = hasEnd ? end.getTime() >= now : true;
+    badgeEl.className = 'warranty-status ' + (active ? 'active' : 'expired');
+    $('stIcon').textContent = active ? 'verified' : 'cancel';
+    $('stTitle').textContent = active ? T.active : T.expired;
+    let sub = '';
+    if (hasEnd) {
+      const dur = humanDuration(now, end.getTime());
+      if (active) sub = dur ? (dur + ' ' + T.remaining) : T.endsToday;
+      else sub = dur + ' ' + T.expiredAgo;
     }
+    $('stSub').textContent = sub;
+
     resultEl.classList.add('show');
+    // Sonuca yumuşak kaydır — kullanıcı elle aşağı inmesin
+    requestAnimationFrame(() => resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
   }
 
   form.addEventListener('submit', async (e) => {
