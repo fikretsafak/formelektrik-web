@@ -103,6 +103,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'server_error' });
 });
 
+// Garanti önbelleği — günlük ERP sync. Public sorgu ERP'ye değil DB'ye gider; ERP yalnızca burada,
+// sunucu tarafında, günde bir kez kullanılır.
+// ponytail: tek süreç varsayımıyla stdlib setInterval. Çok-instance/PM2 cluster'a geçilirse
+//           tek instance'ta çalışacak cron'a (node-cron) taşı.
+const { syncWarrantyCache } = require('./routes/warranty');
+function runWarrantySync() {
+  Promise.resolve()
+    .then(syncWarrantyCache)
+    .then(r => { if (r && !r.skipped) console.log('[warranty] sync:', JSON.stringify(r)); })
+    .catch(e => console.error('[warranty] sync error:', e));
+}
+setTimeout(runWarrantySync, 10 * 1000);              // açılışta bir kez (10 sn gecikmeli)
+setInterval(runWarrantySync, 24 * 60 * 60 * 1000);   // sonra her 24 saatte bir
+
 app.listen(PORT, () => {
   console.log(`▶ Form Elektrik sunucusu çalışıyor: http://localhost:${PORT}`);
   console.log(`  Admin paneli: http://localhost:${PORT}/admin`);

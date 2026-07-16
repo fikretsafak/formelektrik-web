@@ -42,7 +42,8 @@ function cfg(key, envKey) {
 
 // Admin panelde düzenlenebilen tüm warranty ayar anahtarları.
 const WARRANTY_KEYS = [
-  'navision_api_url',       // ERP sorgu endpoint'i (boşsa servis "yapılandırılmadı")
+  'navision_api_url',       // tek-seri canlı test endpoint'i (admin bağlantı testi için)
+  'navision_list_url',      // TÜM kayıtları döndüren toplu/liste ucu (günlük sync; boşsa sync no-op)
   'navision_auth_type',     // 'none' | 'basic' | 'bearer'
   'navision_user',          // basic auth kullanıcı
   'navision_pass',          // basic auth şifre (maskeli)
@@ -106,6 +107,42 @@ function getByPath(obj, pathStr) {
   return pathStr.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
 }
 
+// Ayarlı auth tipine göre ortak istek header'ları.
+function buildHeaders() {
+  const headers = { 'Accept': 'application/json' };
+  const authType = (cfg('navision_auth_type') || 'none').toLowerCase();
+  if (authType === 'basic') {
+    const user = cfg('navision_user', 'NAVISION_USER');
+    const pass = cfg('navision_pass', 'NAVISION_PASS');
+    headers['Authorization'] = 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
+  } else if (authType === 'bearer') {
+    const key = cfg('navision_api_key');
+    if (key) headers['Authorization'] = 'Bearer ' + key;
+  }
+  return headers;
+}
+
+// Tek ERP kaydını iç modele eşle. Alan yolu admin'de tanımlıysa onu, yoksa yaygın adları dene.
+function mapRecord(rec) {
+  const pick = (settingKey, ...fallbacks) => {
+    const p = cfg(settingKey);
+    if (p) { const v = getByPath(rec, p); if (v != null) return v; }
+    for (const f of fallbacks) { if (rec[f] != null) return rec[f]; }
+    return '';
+  };
+  return {
+    serialNo:       pick('navision_field_serial', 'serial', 'serialNo', 'SerialNo', 'seri_no'),
+    invoiceDate:    pick('navision_field_invoice_date', 'invoiceDate', 'InvoiceDate', 'fatura_tarihi'),
+    invoiceNo:      pick('navision_field_invoice_no', 'invoiceNo', 'InvoiceNo', 'fatura_no'),
+    warrantyStart:  pick('navision_field_warranty_start', 'warrantyStart', 'WarrantyStart', 'garanti_baslangic'),
+    warrantyEnd:    pick('navision_field_warranty_end', 'warrantyEnd', 'WarrantyEnd', 'garanti_bitis'),
+    customerName:   pick('navision_field_customer_name', 'customerName', 'CustomerName', 'musteri_adi'),
+    taxNo:          pick('navision_field_tax_no', 'taxNo', 'TaxNo', 'vergi_no'),
+  };
+}
+
+// Tek seri no ile canlı ERP sorgusu — YALNIZCA admin bağlantı testi (/test) için.
+// Public /query artık ERP'ye gitmez; warranty_cache'ten okur.
 async function queryNavision(serialNo) {
   const url = cfg('navision_api_url', 'NAVISION_API_URL');
   if (!url) { const e = new Error('not_configured'); e.code = 'not_configured'; throw e; }
@@ -118,18 +155,7 @@ async function queryNavision(serialNo) {
     reqUrl = url + (url.includes('?') ? '&' : '?') + 'serial=' + encodeURIComponent(serialNo);
   }
 
-  const headers = { 'Accept': 'application/json' };
-  const authType = (cfg('navision_auth_type') || 'none').toLowerCase();
-  if (authType === 'basic') {
-    const user = cfg('navision_user', 'NAVISION_USER');
-    const pass = cfg('navision_pass', 'NAVISION_PASS');
-    headers['Authorization'] = 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
-  } else if (authType === 'bearer') {
-    const key = cfg('navision_api_key');
-    if (key) headers['Authorization'] = 'Bearer ' + key;
-  }
-
-  const r = await fetch(reqUrl, { headers });
+  const r = await fetch(reqUrl, { headers: buildHeaders() });
   if (r.status === 404) return null;                 // kayıt yok
   if (!r.ok) { const e = new Error('erp_error_' + r.status); e.code = 'error'; throw e; }
   const data = await r.json().catch(() => null);
@@ -139,22 +165,56 @@ async function queryNavision(serialNo) {
   const rec = Array.isArray(data) ? data[0]
     : (data.value && Array.isArray(data.value) ? data.value[0] : data);
   if (!rec) return null;
+  const m = mapRecord(rec);
+  delete m.serialNo; // tek sorgu yanıtında seri no zaten biliniyor
+  return m;
+}
 
-  // Alan eşleme: admin'de yol tanımlıysa onu kullan, yoksa yaygın alan adlarını dene.
-  const pick = (settingKey, ...fallbacks) => {
-    const p = cfg(settingKey);
-    if (p) { const v = getByPath(rec, p); if (v != null) return v; }
-    for (const f of fallbacks) { if (rec[f] != null) return rec[f]; }
-    return '';
-  };
-  return {
-    invoiceDate:    pick('navision_field_invoice_date', 'invoiceDate', 'InvoiceDate', 'fatura_tarihi'),
-    invoiceNo:      pick('navision_field_invoice_no', 'invoiceNo', 'InvoiceNo', 'fatura_no'),
-    warrantyStart:  pick('navision_field_warranty_start', 'warrantyStart', 'WarrantyStart', 'garanti_baslangic'),
-    warrantyEnd:    pick('navision_field_warranty_end', 'warrantyEnd', 'WarrantyEnd', 'garanti_bitis'),
-    customerName:   pick('navision_field_customer_name', 'customerName', 'CustomerName', 'musteri_adi'),
-    taxNo:          pick('navision_field_tax_no', 'taxNo', 'TaxNo', 'vergi_no'),
-  };
+// ---- Günlük sync: ERP'nin toplu ucundan TÜM kayıtları çekip warranty_cache'i tazele ----
+// navision_list_url boşsa no-op. Sonuç/hata `settings`'e yazılır (admin panelde gösterilir).
+async function syncWarrantyCache() {
+  const listUrl = cfg('navision_list_url', 'NAVISION_LIST_URL');
+  if (!listUrl) return { skipped: true, reason: 'no_list_url' };
+
+  let rows;
+  try {
+    const r = await fetch(listUrl, { headers: buildHeaders() });
+    if (!r.ok) throw new Error('erp_error_' + r.status);
+    const data = await r.json();
+    const list = Array.isArray(data) ? data
+      : (data && data.value && Array.isArray(data.value) ? data.value : []);
+    rows = list.map(mapRecord).filter(rec => String(rec.serialNo || '').trim());
+  } catch (err) {
+    const msg = String(err.message || err);
+    setSetting('warranty_last_sync_error', msg);
+    setSetting('warranty_last_sync', new Date().toISOString());
+    return { ok: false, error: msg };
+  }
+
+  // Tek transaction: eski cache'i sil, taze kayıtları yaz (ERP'de silinen cache'te kalmaz).
+  const replace = db.transaction((recs) => {
+    db.prepare('DELETE FROM warranty_cache').run();
+    const ins = db.prepare(`INSERT OR REPLACE INTO warranty_cache
+      (serial_no, invoice_date, invoice_no, warranty_start, warranty_end, customer_name, tax_no, synced_at)
+      VALUES (@serial_no, @invoice_date, @invoice_no, @warranty_start, @warranty_end, @customer_name, @tax_no, datetime('now'))`);
+    for (const rec of recs) {
+      ins.run({
+        serial_no: String(rec.serialNo).trim().slice(0, 120),
+        invoice_date: String(rec.invoiceDate || ''),
+        invoice_no: String(rec.invoiceNo || ''),
+        warranty_start: String(rec.warrantyStart || ''),
+        warranty_end: String(rec.warrantyEnd || ''),
+        customer_name: String(rec.customerName || ''),
+        tax_no: String(rec.taxNo || ''),
+      });
+    }
+  });
+  replace(rows);
+
+  setSetting('warranty_last_sync', new Date().toISOString());
+  setSetting('warranty_last_sync_count', String(rows.length));
+  setSetting('warranty_last_sync_error', '');
+  return { ok: true, count: rows.length };
 }
 
 function logQuery(serialNo, result, ip) {
@@ -193,32 +253,23 @@ router.post('/query', queryLimiter, async (req, res) => {
     return res.status(400).json({ error: 'captcha_failed' });
   }
 
-  // 2-3) Navision sorgu
-  try {
-    const rec = await queryNavision(serialNo);
-    if (!rec) {
-      logQuery(serialNo, 'not_found', ip);
-      return res.json({ found: false });
-    }
-    // 4) Maskeleme (backend)
-    const masked = {
-      invoiceDate: rec.invoiceDate || '',
-      invoiceNo: rec.invoiceNo || '',
-      warrantyStart: rec.warrantyStart || '',
-      warrantyEnd: rec.warrantyEnd || '',
-      customerName: maskName(rec.customerName),
-      taxNo: maskTaxNo(rec.taxNo),
-    };
-    logQuery(serialNo, 'found', ip);
-    res.json({ found: true, warranty: masked });
-  } catch (err) {
-    if (err.code === 'not_configured') {
-      logQuery(serialNo, 'not_configured', ip);
-      return res.status(503).json({ error: 'not_configured' });
-    }
-    logQuery(serialNo, 'error', ip);
-    res.status(502).json({ error: 'erp_error' });
+  // 2) Yerel önbellekten oku (ERP'ye canlı istek YOK — veri günlük sync ile gelir)
+  const row = db.prepare('SELECT * FROM warranty_cache WHERE serial_no = ?').get(serialNo);
+  if (!row) {
+    logQuery(serialNo, 'not_found', ip);
+    return res.json({ found: false });
   }
+  // 3) Maskeleme (backend) — ham müşteri adı / vergi no tarayıcıya gitmez
+  const masked = {
+    invoiceDate: row.invoice_date || '',
+    invoiceNo: row.invoice_no || '',
+    warrantyStart: row.warranty_start || '',
+    warrantyEnd: row.warranty_end || '',
+    customerName: maskName(row.customer_name),
+    taxNo: maskTaxNo(row.tax_no),
+  };
+  logQuery(serialNo, 'found', ip);
+  res.json({ found: true, warranty: masked });
 });
 
 // ============================================================
@@ -233,7 +284,16 @@ router.get('/settings', ...adminGuard, (req, res) => {
     const v = getSetting(k) || '';
     out[k] = (SECRET_KEYS.includes(k) && v) ? MASK : v;
   });
-  res.json({ settings: out });
+  const cacheCount = db.prepare('SELECT COUNT(*) AS n FROM warranty_cache').get().n;
+  res.json({
+    settings: out,
+    sync: {
+      lastSync: getSetting('warranty_last_sync') || '',
+      lastCount: getSetting('warranty_last_sync_count') || '',
+      lastError: getSetting('warranty_last_sync_error') || '',
+      cacheCount,
+    },
+  });
 });
 
 // Ayarları güncelle (maske gelen sırları koru).
@@ -269,4 +329,13 @@ router.post('/test', ...adminGuard, async (req, res) => {
   }
 });
 
+// Manuel sync — admin panelden "Şimdi Senkronize Et".
+router.post('/sync', ...adminGuard, async (req, res) => {
+  const result = await syncWarrantyCache();
+  if (result.skipped) return res.status(400).json({ ok: false, error: 'no_list_url' });
+  if (!result.ok) return res.status(502).json({ ok: false, error: 'erp_error', detail: result.error });
+  res.json({ ok: true, count: result.count });
+});
+
 module.exports = router;
+module.exports.syncWarrantyCache = syncWarrantyCache;

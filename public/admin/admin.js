@@ -3312,27 +3312,38 @@ routes['imha-politikasi'] = makeDocRoute('imha-politikasi', 'Kişisel Veri Sakla
 // ============================================
 routes.warranty = async (page) => {
   page.innerHTML = '<div class="loader">Yükleniyor...</div>';
-  let s = {};
+  let s = {}, sync = {};
   try {
     const r = await api.get('/api/warranty/settings');
     s = r.settings || {};
+    sync = r.sync || {};
   } catch { page.innerHTML = '<div class="empty"><p>Garanti ayarları yüklenemedi.</p></div>'; return; }
 
   const v = (k) => escapeHtml(s[k] || '');
+  const syncStatusHtml = (sy) => {
+    if (!sy) return '';
+    if (sy.lastError) return `<span style="color:#d93025">✗ Son sync hatası: ${escapeHtml(sy.lastError)}</span> (${escapeHtml((sy.lastSync||'').slice(0,19).replace('T',' '))})`;
+    if (!sy.lastSync) return 'Henüz senkronizasyon yapılmadı. Liste/Toplu URL ayarlayıp “Şimdi Senkronize Et”e basın.';
+    return `✓ Son sync: <b>${escapeHtml(String(sy.lastCount||'0'))}</b> kayıt · ${escapeHtml((sy.lastSync||'').slice(0,19).replace('T',' '))} · önbellekte <b>${escapeHtml(String(sy.cacheCount||0))}</b> kayıt`;
+  };
   page.innerHTML = '';
   const card = h('div', { class: 'card', style: 'width:100%' });
   card.innerHTML = `
     <div style="padding:24px 24px 0">
       <h3 style="margin:0 0 4px;font-size:18px">Garanti Sorgulama Ayarları</h3>
-      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfası buradan beslenir. Navision ERP bağlantısı ve reCAPTCHA anahtarları. Şifre/anahtar alanları maskelidir; değiştirmezseniz eski değer korunur.</p>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--text-dim)">Gizli <code>/garanti</code> sayfası buradan beslenir. Veri güvenlik için ERP'den <b>günde bir kez</b> çekilip yerel veritabanına kaydedilir; kullanıcı sorguları ERP'ye değil bu önbelleğe gider. <b>Liste/Toplu URL</b> tüm kayıtları döndüren uçtur (sync bunu kullanır). Şifre/anahtar alanları maskelidir; değiştirmezseniz eski değer korunur.</p>
     </div>
     <div class="settings-form" style="padding:8px 24px 24px">
       <h4 style="margin:14px 0 10px;color:var(--navy);font-size:14px">Navision ERP Bağlantısı</h4>
       <div class="settings-cols">
         <div class="settings-col">
           <div class="settings-row">
-            <label class="settings-row-label" for="wUrl">API URL</label>
+            <label class="settings-row-label" for="wUrl">Test URL (tek seri)</label>
             <input class="settings-row-input" id="wUrl" value="${v('navision_api_url')}" placeholder="https://erp.../warranty?serial={serial}">
+          </div>
+          <div class="settings-row">
+            <label class="settings-row-label" for="wListUrl">Liste/Toplu URL (sync)</label>
+            <input class="settings-row-input" id="wListUrl" value="${v('navision_list_url')}" placeholder="https://erp.../warranties (tüm kayıtlar)">
           </div>
           <div class="settings-row">
             <label class="settings-row-label" for="wAuth">Kimlik Doğrulama</label>
@@ -3376,14 +3387,16 @@ routes.warranty = async (page) => {
         </div>
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px;flex-wrap:wrap">
+      <div style="display:flex;gap:12px;margin-top:22px;border-top:1px solid var(--border);padding-top:18px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-primary" id="wSaveBtn"><span class="material-symbols-rounded">save</span> Kaydet</button>
+        <button class="btn btn-ghost" id="wSyncBtn"><span class="material-symbols-rounded">sync</span> Şimdi Senkronize Et</button>
         <span style="display:inline-flex;gap:8px;align-items:center">
           <input class="settings-row-input" id="wTestSerial" style="width:200px" placeholder="Test seri no">
           <button class="btn btn-ghost" id="wTestBtn"><span class="material-symbols-rounded">bolt</span> Bağlantıyı Test Et</button>
         </span>
         <a class="btn btn-ghost" href="/garanti" target="_blank" rel="noopener"><span class="material-symbols-rounded">open_in_new</span> Sayfayı Aç</a>
       </div>
+      <div id="wSyncStatus" style="margin-top:12px;font-size:13px;color:var(--text-dim)">${syncStatusHtml(sync)}</div>
       <div id="wTestOut" style="margin-top:12px;font-size:13px"></div>
     </div>
   `;
@@ -3391,6 +3404,7 @@ routes.warranty = async (page) => {
 
   const collect = () => ({
     navision_api_url: page.querySelector('#wUrl').value.trim(),
+    navision_list_url: page.querySelector('#wListUrl').value.trim(),
     navision_auth_type: page.querySelector('#wAuth').value,
     navision_user: page.querySelector('#wUser').value.trim(),
     navision_pass: page.querySelector('#wPass').value,
@@ -3410,6 +3424,23 @@ routes.warranty = async (page) => {
       await api.put('/api/warranty/settings', collect());
       toast('Garanti ayarları kaydedildi', 'success');
     } catch (e) { toast(e.message, 'error'); }
+  });
+
+  page.querySelector('#wSyncBtn').addEventListener('click', async () => {
+    const btn = page.querySelector('#wSyncBtn');
+    const status = page.querySelector('#wSyncStatus');
+    btn.disabled = true;
+    status.innerHTML = '<span style="color:var(--text-dim)">Senkronize ediliyor…</span>';
+    try {
+      const r = await api.post('/api/warranty/sync', {});
+      toast(`Senkronize edildi: ${r.count} kayıt`, 'success');
+      // Güncel durumu yeniden çek
+      const fresh = await api.get('/api/warranty/settings');
+      status.innerHTML = syncStatusHtml(fresh.sync || {});
+    } catch (e) {
+      const m = (e && e.message) || '';
+      status.innerHTML = '<span style="color:#d93025">✗ ' + escapeHtml(m.includes('no_list_url') ? 'Liste/Toplu URL girilmemiş.' : 'Sync hatası: ' + m) + '</span>';
+    } finally { btn.disabled = false; }
   });
 
   page.querySelector('#wTestBtn').addEventListener('click', async () => {

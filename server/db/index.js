@@ -42,6 +42,9 @@ if (tableExists('users') && !columnExists('users', 'must_change_password')) {
 if (tableExists('posts') && !columnExists('posts', 'show_cover')) {
   db.exec('ALTER TABLE posts ADD COLUMN show_cover INTEGER NOT NULL DEFAULT 1');
 }
+if (tableExists('posts') && !columnExists('posts', 'service_id')) {
+  db.exec('ALTER TABLE posts ADD COLUMN service_id INTEGER REFERENCES services(id) ON DELETE SET NULL');
+}
 // services — "Kapağı yazıda göster" alanı (posts ile aynı mantık)
 if (tableExists('services') && !columnExists('services', 'show_cover')) {
   db.exec('ALTER TABLE services ADD COLUMN show_cover INTEGER NOT NULL DEFAULT 1');
@@ -415,6 +418,21 @@ if (!tableExists('warranty_queries')) {
     result     TEXT,                        -- 'found' | 'not_found' | 'error' | 'not_configured' | 'captcha_failed'
     ip         TEXT,
     created_at TEXT DEFAULT (datetime('now'))
+  )`);
+}
+
+// === Garanti önbelleği (ERP'den günlük sync) ===
+// Public sorgu ERP'ye değil buraya gider; ham veri sync ile doldurulur, sorguda maskelenir.
+if (!tableExists('warranty_cache')) {
+  db.exec(`CREATE TABLE IF NOT EXISTS warranty_cache (
+    serial_no       TEXT PRIMARY KEY,
+    invoice_date    TEXT,
+    invoice_no      TEXT,
+    warranty_start  TEXT,
+    warranty_end    TEXT,
+    customer_name   TEXT,   -- ham (sorguda maskelenir)
+    tax_no          TEXT,   -- ham (sorguda maskelenir)
+    synced_at       TEXT DEFAULT (datetime('now'))
   )`);
 }
 
