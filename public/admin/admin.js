@@ -1417,7 +1417,7 @@ function createCrudPage(cfg) {
       h('h3', { class: 'crud-card-title' }, cfg.title),
       newBtn);
     const card = h('div', { class: 'card card-flush' }, cardHead);
-    const body = h('div', { class: 'crud-card-body' });
+    const body = h('div', { class: 'crud-card-body' + (cfg.bodyClass ? ' ' + cfg.bodyClass : '') });
     card.appendChild(body);
     page.appendChild(card);
 
@@ -1950,6 +1950,7 @@ routes.references = createCrudPage({
   newButtonText: 'Yeni Logo',
   listUrl: '/api/references/admin/all',
   pluralKey: 'logos',
+  bodyClass: 'crud-scroll',   // uzun liste — iç scroll (başlık sabit, liste kayar)
   saveUrl: (id) => id ? `/api/references/${id}` : '/api/references',
   columns: [
     { label: 'Logo', render: r => r.logo_url ? `<img src="${escapeHtml(r.logo_url)}" style="max-height:32px;max-width:120px;object-fit:contain" alt="">` : '—' },

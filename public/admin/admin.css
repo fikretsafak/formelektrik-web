@@ -471,6 +471,13 @@ table.table thead th {
 .crud-card-body table.table td:last-child { width: 1%; white-space: nowrap; text-align: right; }
 .crud-card-body table.table td:last-child .row-actions { justify-content: flex-end; }
 
+/* Uzun listeler için iç scroll: kart dibe uzanır, sadece tablo gövdesi kayar,
+   başlık satırı yukarıda sabit kalır. */
+.crud-card-body.crud-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.crud-card-body.crud-scroll table.table thead th {
+  position: sticky; top: 0; z-index: 1;
+}
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
