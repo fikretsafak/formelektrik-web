@@ -14,7 +14,8 @@
 </head>
 <body>
 
-<div class="app-shell">
+<!-- Auth doğrulanana kadar gizli — giriş yoksa panel hiç görünmesin (login flash önlenir). init() başarıda gösterir. -->
+<div class="app-shell" id="appShell" style="visibility:hidden">
   <aside class="sidebar" id="sidebar">
     <a class="side-brand" href="/admin/">
       <img src="/assets/main/logo.png" alt="Form Elektrik" class="brand-logo brand-logo-dark" />

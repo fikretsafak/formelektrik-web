@@ -420,6 +420,10 @@ async function init() {
   } catch { location.href = '/login.html'; return; }
   if (me.role !== 'admin') { location.href = '/account/'; return; }
 
+  // Auth doğrulandı — paneli görünür yap (login flash'ı önlemek için başta gizliydi)
+  const shell = document.getElementById('appShell');
+  if (shell) shell.style.visibility = '';
+
   // Global me referansı (şifre değişince banner'ı temizleyebilmek için)
   window.__me = me;
 
