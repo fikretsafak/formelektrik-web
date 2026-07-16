@@ -7,17 +7,21 @@ const router = express.Router();
 
 // Public: list published posts (yazar join + opsiyonel arama/yazar filtresi)
 router.get('/', (req, res) => {
-  const { language = 'tr', tag, q, author, limit = 20, offset = 0 } = req.query;
+  const { language = 'tr', tag, q, author, service_id, service, limit = 20, offset = 0 } = req.query;
   function build(lang) {
     let sql = `SELECT p.id, p.slug, p.title, p.excerpt, p.cover_image, p.tags, p.language, p.published_at,
+                      p.service_id, s.title AS service_title, s.slug AS service_slug,
                       p.author_id, u.name AS author_name, u.avatar_url AS author_avatar,
                       LENGTH(p.body) AS body_length
                FROM posts p
                LEFT JOIN users u ON u.id = p.author_id
+               LEFT JOIN services s ON s.id = p.service_id
                WHERE p.status = 'published' AND p.language = ?`;
     const params = [lang];
     if (tag) { sql += ' AND p.tags LIKE ?'; params.push(`%${tag}%`); }
     if (author) { sql += ' AND p.author_id = ?'; params.push(Number(author)); }
+    if (service_id) { sql += ' AND p.service_id = ?'; params.push(Number(service_id)); }
+    if (service) { sql += ' AND s.slug = ?'; params.push(service); }
     if (q) {
       sql += ' AND (p.title LIKE ? OR p.excerpt LIKE ?)';
       const like = `%${q}%`;
@@ -78,16 +82,18 @@ router.get('/:slug', (req, res) => {
 // Admin: full listing including drafts
 router.get('/admin/all', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
   const rows = db.prepare(`
-    SELECT p.*, u.name AS author_name, u.avatar_url AS author_avatar
+    SELECT p.*, u.name AS author_name, u.avatar_url AS author_avatar,
+           s.title AS service_title, s.slug AS service_slug
     FROM posts p
     LEFT JOIN users u ON u.id = p.author_id
+    LEFT JOIN services s ON s.id = p.service_id
     ORDER BY p.updated_at DESC
   `).all();
   res.json({ posts: rows });
 });
 
 router.post('/', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
-  const { title, body, excerpt, cover_image, show_cover, tags, language = 'tr', status = 'draft', slug } = req.body || {};
+  const { title, body, excerpt, cover_image, show_cover, tags, service_id, language = 'tr', status = 'draft', slug } = req.body || {};
   if (!isNonEmptyString(title, 200) || !isNonEmptyString(body, 200000)) {
     return res.status(400).json({ error: 'invalid_input' });
   }
@@ -96,9 +102,9 @@ router.post('/', authRequired, requireRole('admin'), requirePermission('posts'),
   const showCoverInt = show_cover === undefined ? 1 : (show_cover ? 1 : 0);
   try {
     const info = db.prepare(`
-      INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, language, status, author_id, published_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(finalSlug, title, excerpt || null, body, cover_image || null, showCoverInt, tags || null, language, status, req.user.id, publishedAt);
+      INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, service_id, language, status, author_id, published_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(finalSlug, title, excerpt || null, body, cover_image || null, showCoverInt, tags || null, service_id || null, language, status, req.user.id, publishedAt);
     res.status(201).json({ ok: true, id: info.lastInsertRowid, slug: finalSlug });
   } catch (e) {
     if (String(e.message).includes('UNIQUE')) return res.status(409).json({ error: 'slug_exists' });
@@ -107,7 +113,7 @@ router.post('/', authRequired, requireRole('admin'), requirePermission('posts'),
 });
 
 router.put('/:id', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
-  const { title, body, excerpt, cover_image, show_cover, tags, language, status, slug } = req.body || {};
+  const { title, body, excerpt, cover_image, show_cover, tags, service_id, language, status, slug } = req.body || {};
   const existing = db.prepare('SELECT * FROM posts WHERE id = ?').get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not_found' });
 
@@ -118,6 +124,7 @@ router.put('/:id', authRequired, requireRole('admin'), requirePermission('posts'
     cover_image: cover_image ?? existing.cover_image,
     show_cover: show_cover === undefined ? existing.show_cover : (show_cover ? 1 : 0),
     tags: tags ?? existing.tags,
+    service_id: service_id === undefined ? existing.service_id : (service_id || null),
     language: language ?? existing.language,
     status: status ?? existing.status,
     slug: slug ? slugify(slug) : existing.slug,
@@ -127,8 +134,8 @@ router.put('/:id', authRequired, requireRole('admin'), requirePermission('posts'
 
   try {
     db.prepare(`UPDATE posts SET
-      slug=?, title=?, excerpt=?, body=?, cover_image=?, show_cover=?, tags=?, language=?, status=?, published_at=?, updated_at=CURRENT_TIMESTAMP
-      WHERE id=?`).run(next.slug, next.title, next.excerpt, next.body, next.cover_image, next.show_cover, next.tags, next.language, next.status, publishedAt, req.params.id);
+      slug=?, title=?, excerpt=?, body=?, cover_image=?, show_cover=?, tags=?, service_id=?, language=?, status=?, published_at=?, updated_at=CURRENT_TIMESTAMP
+      WHERE id=?`).run(next.slug, next.title, next.excerpt, next.body, next.cover_image, next.show_cover, next.tags, next.service_id, next.language, next.status, publishedAt, req.params.id);
     res.json({ ok: true });
   } catch (e) {
     if (String(e.message).includes('UNIQUE')) return res.status(409).json({ error: 'slug_exists' });
@@ -157,16 +164,16 @@ router.post('/:id/duplicate', authRequired, requireRole('admin'), requirePermiss
   const newTitle = src.title + ' (kopya)';
   const newSlug = uniqueSlug(slugify(src.slug || src.title) + '-kopya', src.language || 'tr');
   const info = db.prepare(`
-    INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, language, status, author_id, published_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, NULL)
-  `).run(newSlug, newTitle, src.excerpt, src.body, src.cover_image, src.show_cover, src.tags, src.language, req.user.id);
+    INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, service_id, language, status, author_id, published_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, NULL)
+  `).run(newSlug, newTitle, src.excerpt, src.body, src.cover_image, src.show_cover, src.tags, src.service_id, src.language, req.user.id);
   res.status(201).json({ ok: true, id: info.lastInsertRowid, slug: newSlug });
 });
 
 // ===== Yedek al (export) — tüm yazıları JSON döndür =====
 router.get('/admin/export', authRequired, requireRole('admin'), requirePermission('posts'), (req, res) => {
   const posts = db.prepare(`
-    SELECT slug, title, excerpt, body, cover_image, show_cover, tags, language, status, published_at, created_at, updated_at
+    SELECT slug, title, excerpt, body, cover_image, show_cover, tags, service_id, language, status, published_at, created_at, updated_at
     FROM posts ORDER BY id
   `).all();
   res.json({ version: 1, exported_at: new Date().toISOString(), count: posts.length, posts });
@@ -179,12 +186,12 @@ router.post('/admin/import', authRequired, requireRole('admin'), requirePermissi
   if (!Array.isArray(posts)) return res.status(400).json({ error: 'invalid_input' });
 
   const insert = db.prepare(`
-    INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, language, status, author_id, published_at)
-    VALUES (@slug, @title, @excerpt, @body, @cover_image, @show_cover, @tags, @language, @status, @author_id, @published_at)
+    INSERT INTO posts (slug, title, excerpt, body, cover_image, show_cover, tags, service_id, language, status, author_id, published_at)
+    VALUES (@slug, @title, @excerpt, @body, @cover_image, @show_cover, @tags, @service_id, @language, @status, @author_id, @published_at)
   `);
   const update = db.prepare(`
     UPDATE posts SET title=@title, excerpt=@excerpt, body=@body, cover_image=@cover_image,
-      show_cover=@show_cover, tags=@tags, language=@language, status=@status,
+      show_cover=@show_cover, tags=@tags, service_id=@service_id, language=@language, status=@status,
       published_at=@published_at, updated_at=CURRENT_TIMESTAMP
     WHERE slug=@slug AND language=@language
   `);
@@ -199,7 +206,7 @@ router.post('/admin/import', authRequired, requireRole('admin'), requirePermissi
         title: p.title, excerpt: p.excerpt || null, body: p.body,
         cover_image: p.cover_image || null,
         show_cover: p.show_cover === 0 ? 0 : 1,
-        tags: p.tags || null, language: p.language || 'tr',
+        tags: p.tags || null, service_id: p.service_id || null, language: p.language || 'tr',
         status: ['draft', 'published'].includes(p.status) ? p.status : 'draft',
         author_id: req.user.id,
         published_at: p.published_at || (p.status === 'published' ? new Date().toISOString() : null),

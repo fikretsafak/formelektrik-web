@@ -7,6 +7,7 @@
   const emptyEl = document.getElementById('blogEmpty');
   const searchEl = document.getElementById('blogSearch');
   const authorEl = document.getElementById('blogAuthor');
+  const serviceEl = document.getElementById('blogService');
   const tagSelectEl = document.getElementById('blogTagMenu');
   const tagButton = document.getElementById('blogTagButton');
   const tagSelectWrap = document.getElementById('blogTagSelect');
@@ -54,6 +55,7 @@
     const q = (searchEl.value || '').trim();
     if (q) params.set('q', q);
     if (authorEl.value) params.set('author', authorEl.value);
+    if (serviceEl && serviceEl.value) params.set('service_id', serviceEl.value);
     activeTags.forEach(tag => params.append('tag', tag));
     return params.toString();
   }
@@ -69,7 +71,7 @@
 
     const posts = allPosts.slice();
     // İlk yazı featured (kapak görseli varsa, ve hiçbir filtre aktif değilse)
-    const filterActive = (searchEl.value || authorEl.value || activeTags.length);
+    const filterActive = (searchEl.value || authorEl.value || (serviceEl && serviceEl.value) || activeTags.length);
     const featuredCandidate = posts[0];
     if (!filterActive && featuredCandidate && featuredCandidate.cover_image) {
       renderFeatured(featuredCandidate);
@@ -209,6 +211,21 @@
     } catch { /* sessiz */ }
   }
 
+  async function loadServices() {
+    if (!serviceEl) return;
+    try {
+      const r = await fetch('/api/services?language=' + lang);
+      if (!r.ok) return;
+      const { services } = await r.json();
+      (services || []).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.title;
+        serviceEl.appendChild(opt);
+      });
+    } catch { /* sessiz */ }
+  }
+
   async function load() {
     try {
       const r = await fetch('/api/posts?' + buildQuery());
@@ -228,6 +245,7 @@
 
   searchEl.addEventListener('input', debounce(load, 300));
   authorEl.addEventListener('change', load);
+  if (serviceEl) serviceEl.addEventListener('change', load);
   tagButton.addEventListener('click', () => tagSelectWrap.classList.toggle('open'));
   document.addEventListener('click', e => { if (!tagSelectWrap.contains(e.target)) tagSelectWrap.classList.remove('open'); });
   activeTagClear.addEventListener('click', () => { activeTags = []; renderTagOptions(allPosts); updateActiveTagChip(); load(); });
@@ -236,5 +254,6 @@
   // iptal ediyordu) — burada tekrar bağlama.
 
   loadAuthors();
+  loadServices();
   load();
 })();
