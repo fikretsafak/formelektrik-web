@@ -4,9 +4,14 @@ const db = require('./db');
 let transporter = null;
 let configured = false;
 
-const APP_BASE_URL = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+// E-postadaki tüm site bağlantıları public production alan adına gitmeli.
+// Uygulama localhost'ta çalışsa bile alıcı localhost linki görmemeli.
+const MAIL_PUBLIC_BASE_URL = 'https://formelektrik.com';
+function mailPublicUrl(pathname = '') {
+  return MAIL_PUBLIC_BASE_URL + (String(pathname).startsWith('/') ? pathname : '/' + pathname);
+}
 // Not: logo-light.png projede yok; gerçek logo logo.png (beyaz zeminde iyi durur).
-const MAIL_LOGO_URL = 'https://formelektrik.com/assets/main/logo.png';
+const MAIL_LOGO_URL = mailPublicUrl('/assets/main/logo.png');
 
 // Ortak e-posta şablonu — logo başlık + içerik + "cevaplamayın" alt bilgisi.
 // Tüm bildirim mailleri (lead/randevu/kariyer) bunu kullanır.
@@ -104,4 +109,4 @@ async function sendMail({ to, cc, subject, html, text, replyTo, attachments, ica
   }
 }
 
-module.exports = { sendMail, isConfigured: () => configured, resetTransporter, wrapEmail, mailRow, mailTable };
+module.exports = { sendMail, isConfigured: () => configured, resetTransporter, wrapEmail, mailRow, mailTable, mailPublicUrl };

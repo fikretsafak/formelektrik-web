@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
 const { isEmail, isNonEmptyString } = require('../middleware/validate');
-const { sendMail, wrapEmail, mailRow, mailTable } = require('../mailer');
+const { sendMail, wrapEmail, mailRow, mailTable, mailPublicUrl } = require('../mailer');
 
 // Kariyer bildirim adresi: DB (admin) → .env → genel
 function careerNotifyTo() {
@@ -166,14 +166,13 @@ router.post('/apply', applyLimiter, async (req, res) => {
   // Admin bildirim maili
   const notifyTo = careerNotifyTo();
   if (notifyTo) {
-    const base = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
     const rows = mailTable(
       mailRow('Pozisyon', escapeHtml(jobTitle || 'Genel Başvuru')) +
       mailRow('Ad Soyad', `${escapeHtml(firstName)} ${escapeHtml(lastName)}`) +
       mailRow('E-posta', `<a href="mailto:${escapeHtml(email)}" style="color:#2aa9e0">${escapeHtml(email)}</a>`) +
       mailRow('Telefon', escapeHtml(phone || '-')) +
       mailRow('Mesaj', escapeHtml(message || '-').replace(/\n/g, '<br>')) +
-      (cleanCv ? mailRow('CV', `<a href="${base}${escapeHtml(cleanCv)}" style="color:#2aa9e0">CV'yi görüntüle</a>`) : '')
+      (cleanCv ? mailRow('CV', `<a href="${mailPublicUrl(cleanCv)}" style="color:#2aa9e0">CV'yi görüntüle</a>`) : '')
     );
     sendMail({
       to: notifyTo,

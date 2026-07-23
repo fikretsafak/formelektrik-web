@@ -3,12 +3,10 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { authRequired, requireRole, requirePermission } = require('../middleware/auth');
 const { isEmail, isNonEmptyString } = require('../middleware/validate');
-const { sendMail, wrapEmail, mailRow, mailTable } = require('../mailer');
+const { sendMail, wrapEmail, mailRow, mailTable, mailPublicUrl } = require('../mailer');
 const { buildIcs } = require('../ics');
 
 const router = express.Router();
-
-const APP_BASE_URL = (process.env.APP_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 const bookLimiter = rateLimit({ windowMs: 60 * 1000, max: 5 });
 
@@ -310,7 +308,7 @@ router.patch('/:id', authRequired, requireRole('admin'), requirePermission('appo
       html: `
         <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;background:#f5f7fb;border-radius:12px">
           <div style="background:#0a0e1a;padding:24px;border-radius:8px;text-align:center;margin-bottom:24px">
-            <img src="${LOGO_URL}" alt="Form Elektrik" style="height:36px;display:inline-block" />
+            <img src="${mailPublicUrl('/assets/main/logo.png')}" alt="Form Elektrik" style="height:36px;display:inline-block;background:#fff;border-radius:8px;padding:6px 12px" />
           </div>
           <div style="background:#ffffff;padding:32px;border-radius:8px">
             <h2 style="color:#0a1024;font-size:20px;margin:0 0 16px">Merhaba ${escapeHtml(appt.first_name)},</h2>
